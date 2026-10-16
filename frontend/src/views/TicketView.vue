@@ -6,7 +6,7 @@ import { useArchiveStore } from '../stores/archive'
 
 const archive = useArchiveStore()
 const selected = computed(() => objectByKey(archive.selectedObjectKey ?? ''))
-const note = sessionStorage.getItem('keeper-note') || '请继续为无名者保存真实经历。'
+const note = computed(() => archive.keeperNote || '请继续为无名者保存真实经历。')
 </script>
 
 <template>
@@ -29,7 +29,7 @@ const note = sessionStorage.getItem('keeper-note') || '请继续为无名者保�
           <span>{{ archive.archivedCount }} 件档案已整理</span>
         </footer>
       </div>
-      <p>海报导出接口已预留，后续接入正式字体、纹理和html2canvas。</p>
+      <p>这张凭证记录了你保存的物品与留言。仍无法确认的姓名，留待未来的材料回答。</p>
       <RouterLink class="secondary-button" to="/archive">返回档案室</RouterLink>
     </section>
   </AppShell>

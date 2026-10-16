@@ -11,6 +11,7 @@ export interface Clue {
 
 export interface Conclusion {
   id: string
+  screeningQuestion: string
   text: string
   expectedLevel: EvidenceLevel
   explanation: string
@@ -28,6 +29,8 @@ export interface ArchiveObject {
   accent: string
   silhouette: string
   intro: string
+  investigationQuestion: string
+  nextHook: string
   artNote: string
   clues: Clue[]
   conclusions: Conclusion[]
@@ -37,4 +40,11 @@ export interface ObjectRecord {
   status: ObjectStatus
   foundClueIds: string[]
   classified: Record<string, EvidenceLevel>
+  markerPositions: Record<string, { x: number; y: number }>
+  acceptedConclusionIds: string[]
+  rejectedClaimIds: string[]
+  screeningVerified: boolean
+  evidenceVerified: boolean
+  historyRevealed: boolean
+  historyRead: boolean
 }

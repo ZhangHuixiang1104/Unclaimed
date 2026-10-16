@@ -7,12 +7,16 @@ import { useArchiveStore } from '../stores/archive'
 
 const archive = useArchiveStore()
 const router = useRouter()
-const note = ref('')
+const note = ref(archive.keeperNote)
 const available = computed(() => archiveObjects.filter((item) => archive.getRecord(item.key).status === 'archived'))
+const chosenKey = ref(available.value.some((item) => item.key === archive.selectedObjectKey)
+  ? archive.selectedObjectKey
+  : available.value[0]?.key)
 
 const continueToTicket = () => {
-  if (!archive.selectedObjectKey && available.value[0]) archive.chooseObject(available.value[0].key)
-  sessionStorage.setItem('keeper-note', note.value.slice(0, 50))
+  if (!archive.endingUnlocked || !chosenKey.value) return
+  archive.chooseObject(chosenKey.value)
+  archive.keeperNote = note.value.slice(0, 50)
   router.push('/ticket')
 }
 </script>
@@ -32,8 +36,9 @@ const continueToTicket = () => {
             v-for="item in available"
             :key="item.key"
             type="button"
-            :class="{ selected: archive.selectedObjectKey === item.key }"
-            @click="archive.chooseObject(item.key)"
+            :class="{ selected: chosenKey === item.key }"
+            :aria-pressed="chosenKey === item.key"
+            @click="chosenKey = item.key"
           >
             <span>{{ item.silhouette }}</span>
             <strong>{{ item.name }}</strong>
@@ -43,7 +48,7 @@ const continueToTicket = () => {
           <span>写下一句陈列说明 <small>{{ note.length }}/50</small></span>
           <textarea v-model="note" maxlength="50" placeholder="例如：请保留那些无法辨认的空格。"></textarea>
         </label>
-        <button class="primary-button light-button" type="button" :disabled="!available.length" @click="continueToTicket">以无名长征参与者名义共同入藏</button>
+        <button class="primary-button light-button" type="button" :disabled="!archive.endingUnlocked || !chosenKey" @click="continueToTicket">以无名长征参与者名义共同入藏</button>
       </div>
     </section>
   </AppShell>

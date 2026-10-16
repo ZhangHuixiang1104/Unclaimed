@@ -1,0 +1,299 @@
+/* Final visual contract. Imported last so every route shares the same readable hierarchy. */
+::selection { color: #fff8ea; background: rgba(169,80,71,.72); }
+
+body,
+button,
+input,
+textarea,
+select { font-family: var(--font-sans); }
+
+p,
+li,
+dt,
+dd { text-wrap: pretty; }
+
+button,
+a { text-underline-offset: 3px; }
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #f0dfbd;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(169,80,71,.24);
+}
+
+.primary-button,
+.secondary-button,
+.icon-button,
+.text-button { font-family: var(--font-sans); }
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  font-weight: 700;
+  letter-spacing: .14em;
+}
+
+/* Shared navigation */
+:is(.shell-archive, .shell-object, .shell-history, .shell-history-detail, .shell-about) .topbar {
+  height: 70px;
+  color: var(--color-text-on-dark);
+  border-color: var(--color-line-dark);
+  background: rgba(14,17,14,.92);
+}
+:is(.shell-archive, .shell-object, .shell-history, .shell-history-detail, .shell-about) .brand strong {
+  color: var(--color-text-on-dark);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: .07em;
+}
+:is(.shell-archive, .shell-object, .shell-history, .shell-history-detail, .shell-about) .brand small,
+:is(.shell-archive, .shell-object, .shell-history, .shell-history-detail, .shell-about) .keeper-id {
+  color: var(--color-text-on-dark-muted);
+  font-size: 11px;
+}
+:is(.shell-archive, .shell-object, .shell-history, .shell-history-detail, .shell-about) .main-nav {
+  color: #aaaDA5;
+  font-size: 13px;
+  font-weight: 500;
+}
+:is(.shell-archive, .shell-object, .shell-history, .shell-history-detail, .shell-about) .main-nav a:hover { color: var(--color-text-on-dark); }
+:is(.shell-archive, .shell-object, .shell-history, .shell-history-detail, .shell-about) .main-nav a.router-link-active {
+  color: #e0a499;
+  border-color: var(--color-accent);
+}
+:is(.shell-archive, .shell-object, .shell-history, .shell-history-detail, .shell-about) .icon-button {
+  color: #b9bbb3;
+  border-color: rgba(216,204,175,.23);
+  font-size: 11px;
+}
+
+/* Opening scene */
+.home-page { --home-red: var(--color-accent); --home-red-deep: var(--color-accent-strong); color: var(--color-text-on-dark); }
+.night-duty-header { color: #aaaDA5; font-size: 11px; }
+.home-archive-number { color: #df9589; font-size: 11px; }
+.home-lead { color: #c4c2b8; font-family: var(--font-sans); font-size: 16px; font-weight: 400; }
+.current-trace span { color: #aaaDA5; font-size: 10px; }
+.current-trace strong { color: #e1d9ca; font-family: var(--font-sans); font-size: 14px; font-weight: 650; }
+.current-trace p { color: #a9aca4; font-size: 11px; }
+.home-actions a { color: #c0bdb4; font-size: 12px; }
+.home-meta { color: #989c94; font-size: 11px; }
+.home-meta strong { color: #ded5c5; }
+.warning-slip small,
+.loose-card span { font-size: 10px; }
+.warning-slip strong { font-family: var(--font-sans); font-size: 15px; font-weight: 650; }
+.folder-tab small { font-size: 10px; }
+.folder-tab strong { font-size: 11px; font-weight: 650; }
+.folder-stamp { font-family: var(--font-sans); font-size: 10px; font-weight: 700; }
+.loose-card small { font-size: 10px; }
+.case-hint { color: #a1a49c; font-size: 11px; }
+.case-statistics span { color: #a3a69e; font-size: 10px; }
+.case-statistics strong { color: #d0c7b8; }
+.home-principle { color: #83877f; font-size: 10px; }
+.home-principle p { color: #b6b4aa; font-family: var(--font-sans); font-size: 12px; font-weight: 500; }
+
+/* Archive room */
+.archive-room-heading p { color: var(--color-text-on-dark-secondary); font-family: var(--font-sans); font-size: 14px; }
+.archive-time { color: #dc9085; font-size: 10px; }
+.archive-room-progress span,
+.archive-room-progress small { color: var(--color-text-on-dark-muted); font-size: 10px; }
+.archive-index,
+.duty-board { border-color: var(--color-line-dark); background: rgba(27,30,25,.86); }
+.archive-index-heading span,
+.duty-board-heading span,
+.board-label { color: #a09f96; font-size: 10px; }
+.archive-index-heading strong,
+.duty-board-heading strong { color: #e1d8c8; font-family: var(--font-sans); font-size: 15px; font-weight: 650; }
+.archive-index-heading small,
+.duty-board-heading small { color: #959991; font-size: 10px; }
+.archive-index-item { color: #b2b3ab; }
+.archive-index-item:hover,
+.archive-index-item.active { color: #f0e7d8; }
+.index-number { color: #aaaDA5; font-size: 11px; }
+.index-copy small { color: #93978f; font-size: 10px; }
+.index-copy strong { font-family: var(--font-sans); font-size: 13px; font-weight: 650; }
+.index-status { color: #92968e; font-size: 10px; }
+.archive-index-footer { color: #8f948c; font-size: 10px; }
+.archive-dossier { color: var(--color-ink-900); background: linear-gradient(114deg, var(--color-paper-200), #cdc1aa 72%, #bcae94); }
+.dossier-code,
+.dossier-header small,
+.dossier-status,
+.dossier-section-label,
+.dossier-clue-progress span { font-size: 10px; }
+.dossier-header small,
+.dossier-clue-progress span { color: #6e665a; }
+.dossier-status { color: #5e5549; font-weight: 650; }
+.dossier-subtitle { color: #62594d; font-family: var(--font-sans); font-size: 13px; font-weight: 600; }
+.dossier-intro { color: #575249; font-family: var(--font-sans); font-size: 13px; line-height: 1.85; }
+.dossier-action { min-height: 44px; background: var(--color-accent-strong); border-color: var(--color-accent-strong); font-size: 12px; }
+.duty-board .evidence-summary > div span { color: #b7b8b0; font-size: 11px; }
+.duty-board .evidence-summary > div strong { color: #ddd3c1; }
+.duty-note blockquote { font-family: var(--font-sans); font-size: 13px; font-weight: 600; }
+.duty-note small { color: #675f52; font-size: 10px; }
+.mini-route-labels { color: #92968e; font-size: 10px; }
+.ending-seal small { font-size: 10px; }
+.ending-seal strong { font-family: var(--font-sans); font-size: 13px; font-weight: 650; }
+.ending-seal span { color: #c39087; font-size: 10px; }
+.archive-room-footer { color: #81867e; font-size: 10px; }
+.archive-room-footer p { color: #aaaDA5; font-family: var(--font-sans); font-size: 11px; }
+
+/* Object investigation */
+.shell-object .object-header .eyebrow,
+.shell-object .panel-heading .eyebrow { color: #df9185; font-family: var(--font-sans); font-size: 10px; font-weight: 700; }
+.shell-object .object-header p { color: var(--color-text-on-dark-secondary); font-family: var(--font-sans); font-size: 14px; }
+.object-stage-indicator { color: #92978f; font-size: 11px; }
+.shell-object .panel-heading h2 { color: #e7dece; font-family: var(--font-sans); font-size: 20px; font-weight: 650; }
+.shell-object .archive-no,
+.shell-object .evidence-count { color: #b4b1a7; font-size: 11px; }
+.inspection-note span,
+.tool-label,
+.field-record-strip span,
+.work-log time,
+.contact-sheet button small,
+.empty-film,
+.evidence-slip .slip-index,
+.empty-evidence-pocket span,
+.history-gate-code,
+.history-reveal-button small,
+.history-document-header div span,
+.history-section-no { font-size: 10px; }
+.inspection-note strong,
+.current-task-card strong { font-family: var(--font-sans); font-weight: 650; }
+.inspection-note p { color: #595247; font-size: 11px; }
+.shell-object .inspection-caption { color: #c0c1b9; font-family: var(--font-sans); font-size: 12px; }
+.shell-object .tool-row button { color: #c1c1b8; font-size: 12px; }
+.shell-object .tool-hint { color: #a6aaa2; font-size: 11px; }
+.shell-object .clue-card span { color: #b3b5ad; font-size: 10px; }
+.shell-object .clue-card strong { color: #ece2d1; font-family: var(--font-sans); font-size: 14px; font-weight: 650; }
+.classification-sealed span { color: #aaaDA5; font-size: 10px; }
+.classification-sealed strong,
+.shell-object .classification-intro strong { font-family: var(--font-sans); font-weight: 650; }
+.shell-object .classification-intro p { color: #b4b6ae; font-size: 12px; }
+.shell-object .conclusion-card p,
+.claim-candidate-stack button p,
+.conclusion-slip > p { color: #ded4c3; font-family: var(--font-sans); font-size: 13px; }
+.level-buttons button { font-size: 10px; }
+.feedback { font-size: 10px; }
+.board-section-heading span { color: #ce8176; font-size: 10px; }
+.board-section-heading small { color: #a5a9a1; font-size: 10px; }
+.evidence-slip strong { font-family: var(--font-sans); font-size: 13px; font-weight: 650; }
+.evidence-slip p { color: #5c554a; font-family: var(--font-sans); font-size: 11px; }
+.stamp-tray button small { font-size: 10px; }
+.stamp-tray button strong { font-family: var(--font-sans); font-size: 11px; font-weight: 650; }
+.history-gate-copy h2,
+.history-reveal-button span { font-family: var(--font-sans); font-weight: 650; }
+.history-gate-copy p { color: #aaaDA5; font-size: 11px; }
+.history-gate-lock small { color: #969b93; font-size: 10px; }
+.history-context > p,
+.boundary strong,
+.history-document-footer p { font-family: var(--font-sans); }
+.history-context > p { color: var(--color-ink-700); font-size: 14px; }
+.source-line span,
+.source-line strong,
+.boundary p { font-size: 10px; }
+
+/* Route archive and historical documents */
+.history-intro-copy p { color: var(--color-text-on-dark-secondary); font-size: 14px; }
+.history-room-metrics small { color: #b6b8b0; font-size: 11px; }
+.route-map-heading div span,
+.map-coordinates,
+.route-node-copy small,
+.route-dossier-panel > header span,
+.history-room-footer > span,
+.history-detail-index span,
+.history-ledger-section > span,
+.history-material-reader > header span { font-size: 10px; }
+.route-map-heading div strong { font-size: 17px; }
+.route-map-controls button { font-size: 11px; font-weight: 650; }
+.route-node-copy strong { font-size: 14px; }
+.map-legend { font-size: 11px; }
+.route-dossier-panel > header strong,
+.route-dossier-panel dt { font-size: 11px; }
+.route-dossier-panel p { color: #c3c4bb; font-size: 13px; }
+.route-dossier-action { font-size: 12px; }
+.route-dossier-secondary { color: #bbbcb4; font-size: 11px; }
+.dossier-progress small { color: #afb2aa; font-size: 10px; }
+.history-room-footer { color: #a3a79f; }
+.history-room-footer p { font-size: 12px; }
+.history-detail-title p,
+.history-ledger-section > p,
+.history-conclusion-grid strong,
+.history-conclusion-grid p,
+.history-material-card p,
+.history-material-reader section > p,
+.material-reader-list p span,
+.history-boundary-note > div span { font-family: var(--font-sans); }
+.history-ledger-index a { font-size: 12px; }
+.history-conclusion-grid small,
+.history-material-card small,
+.history-material-reader section > small { font-size: 10px; }
+.history-material-reader h3 { font-family: var(--font-sans); font-size: 19px; font-weight: 650; }
+.material-reader-list p strong { font-size: 11px; }
+
+/* Work statement */
+.about-focus-copy > p { color: var(--color-text-on-dark-secondary); font-size: 14px; }
+.about-focus-note { color: #a1a59d; font-size: 11px; }
+.trace-explorer > header span,
+.trace-stage small,
+.trace-selector span,
+.compact-principle-detail > span,
+.about-compact-closing > div span { font-size: 10px; }
+.trace-stage blockquote { color: #bfc0b7; font-family: var(--font-sans); font-size: 14px; }
+.compact-principles strong,
+.compact-principle-detail h3 { font-family: var(--font-sans); font-weight: 650; }
+.compact-principle-detail p { color: #b5b7af; font-size: 12px; }
+.about-boundary-compact small { color: #a1a69e; font-size: 10px; }
+.about-play-flow li { color: #b9bbb3; font-size: 11px; }
+.about-compact-closing > div strong { color: #e1dacb; font-family: var(--font-sans); font-size: 19px; font-weight: 650; }
+
+/* Absolute readability floor for formerly decorative 7–9px UI copy. */
+.route-node small,
+.object-copy small,
+.status-chip,
+.clue-card span,
+.level-buttons button,
+.feedback,
+.quality-row span,
+.marking-cursor-label,
+.inspection-note span,
+.work-log li,
+.board-section-heading small,
+.evidence-slip .slip-action,
+.stamp-hint,
+.history-document-header div small,
+.source-line span,
+.source-line strong,
+.boundary > span,
+.boundary p,
+.boundary div:only-child::after,
+.archive-time,
+.art-caption,
+.list-art::before,
+.history-verified-seal small,
+.about-compact-closing > a small { font-size: 10px; }
+.inspection-note p,
+.work-log > p { font-size: 11px; }
+
+/* Remaining light-paper routes */
+.keeper-ticket,
+.history-reveal-document { color: var(--color-ink-900); }
+.keeper-ticket p,
+.keeper-ticket blockquote,
+.history-reveal-document p { color: var(--color-ink-700); }
+.ticket-page > p { color: #69645b; font-size: 12px; }
+.ending-lead { color: #bebdb4; font-family: var(--font-sans); font-size: 16px; }
+.choice-grid strong { font-size: 11px; }
+
+@media (prefers-contrast: more) {
+  :root {
+    --color-text-on-dark-secondary: #d5d3cb;
+    --color-text-on-dark-muted: #b5b9b1;
+    --color-line-dark: rgba(236,225,198,.3);
+  }
+  button:focus-visible,
+  a:focus-visible { outline-width: 3px; }
+}

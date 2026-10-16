@@ -13,6 +13,8 @@ export const archiveObjects: ArchiveObject[] = [
     accent: '#8c5b48',
     silhouette: '名',
     intro: '纸面留下雨水、泥点与几处难以辨认的笔迹。先观察，再决定哪些文字能够写进档案。',
+    investigationQuestion: '这页纸还能告诉我们一个名字吗？',
+    nextHook: '姓名仍未找到。下一份物件留下的，是一条被反复改写的路。',
     artNote: '正式版本替换为名单正反面、纸片、泥点遮罩和侧光凹痕素材。',
     clues: [
       { id: 'list-fold', title: '重复折痕', description: '同一位置存在多次折叠和展开痕迹。', position: { x: 26, y: 31 } },
@@ -20,9 +22,9 @@ export const archiveObjects: ArchiveObject[] = [
       { id: 'list-repair', title: '纸角修补', description: '纸角使用与正文不同的纸张补过一次。', position: { x: 55, y: 76 } },
     ],
     conclusions: [
-      { id: 'list-c1', text: '名单曾被反复携带和展开。', expectedLevel: 'confirmed', explanation: '折痕和纸面磨损可以直接支持这一结论。' },
-      { id: 'list-c2', text: '保存者可能承担人员记录工作。', expectedLevel: 'inferred', explanation: '用途合理，但缺少身份信息，只能推测。' },
-      { id: 'list-c3', text: '可以确认名单保存者的姓名。', expectedLevel: 'unknown', explanation: '当前证据无法确认具体保存者。' },
+      { id: 'list-c1', screeningQuestion: '这页名单是否被反复携带和展开？', text: '名单曾被反复携带和展开。', expectedLevel: 'confirmed', explanation: '折痕和纸面磨损可以直接支持这一结论。' },
+      { id: 'list-c2', screeningQuestion: '保存者可能承担过什么工作？', text: '保存者可能承担人员记录工作。', expectedLevel: 'inferred', explanation: '用途合理，但缺少身份信息，只能推测。' },
+      { id: 'list-c3', screeningQuestion: '这些痕迹能否确认保存者的姓名？', text: '可以确认名单保存者的姓名。', expectedLevel: 'unknown', explanation: '当前证据无法确认具体保存者。' },
     ],
   },
   {
@@ -37,6 +39,8 @@ export const archiveObjects: ArchiveObject[] = [
     accent: '#817342',
     silhouette: '图',
     intro: '图上四层墨迹互相覆盖。它们是绘制错误，还是不同时刻留下的路线？',
+    investigationQuestion: '当路线一次次改变，哪条线才曾真正被走过？',
+    nextHook: '道路并不固定。队伍转向时，消息怎样传到每个人手中？',
     artNote: '正式版本替换为底图、四层SVG路线、时间卡片和折痕叠加层。',
     clues: [
       { id: 'map-ink', title: '四种墨色', description: '路线墨色深浅和渗透程度不同。', position: { x: 30, y: 36 } },
@@ -44,9 +48,9 @@ export const archiveObjects: ArchiveObject[] = [
       { id: 'map-erasure', title: '擦除痕迹', description: '旧路线被擦淡，但没有彻底删除。', position: { x: 48, y: 72 } },
     ],
     conclusions: [
-      { id: 'map-c1', text: '路线并非在同一时间绘制。', expectedLevel: 'confirmed', explanation: '墨色、覆盖关系与纸面老化程度可以相互印证。' },
-      { id: 'map-c2', text: '地图可能用于记录分阶段行动。', expectedLevel: 'inferred', explanation: '符合证据，但无法确认具体使用方式。' },
-      { id: 'map-c3', text: '四次修改均由同一人完成。', expectedLevel: 'unknown', explanation: '没有能够识别绘制者的直接证据。' },
+      { id: 'map-c1', screeningQuestion: '几条路线是在同一时间画上去的吗？', text: '路线并非在同一时间绘制。', expectedLevel: 'confirmed', explanation: '墨色、覆盖关系与纸面老化程度可以相互印证。' },
+      { id: 'map-c2', screeningQuestion: '这些修改可能对应怎样的使用过程？', text: '地图可能用于记录分阶段行动。', expectedLevel: 'inferred', explanation: '符合证据，但无法确认具体使用方式。' },
+      { id: 'map-c3', screeningQuestion: '能否确认四次修改出自同一人？', text: '四次修改均由同一人完成。', expectedLevel: 'unknown', explanation: '没有能够识别绘制者的直接证据。' },
     ],
   },
   {
@@ -61,6 +65,8 @@ export const archiveObjects: ArchiveObject[] = [
     accent: '#9b694c',
     silhouette: '电',
     intro: '接线处被三层布条反复加固，外壳上只有几个无法解释的数字。',
+    investigationQuestion: '它被一次次修好，是为了让什么消息继续传递？',
+    nextHook: '消息可以传递，漫长的道路却仍要靠脚步走完。',
     artNote: '当前使用CSS占位物件；正式版本应准备正反面、接线端、布条层和刻痕特写。',
     clues: [
       { id: 'battery-cloth', title: '三层布条', description: '不同缠法说明接线处至少被维修过三次。', position: { x: 28, y: 30 } },
@@ -68,9 +74,9 @@ export const archiveObjects: ArchiveObject[] = [
       { id: 'battery-mark', title: '不完整数字', description: '外壳刻痕只能辨认出三个数字，含义未知。', position: { x: 48, y: 72 } },
     ],
     conclusions: [
-      { id: 'battery-c1', text: '电池盒曾被多次维修并继续使用。', expectedLevel: 'confirmed', explanation: '布条层次和接线磨损共同支持这一结论。' },
-      { id: 'battery-c2', text: '使用者可能掌握基础通信维修知识。', expectedLevel: 'inferred', explanation: '维修方式支持这一推测，但无法确认具体身份。' },
-      { id: 'battery-c3', text: '刻痕数字就是使用者编号。', expectedLevel: 'unknown', explanation: '数字含义没有其他证据支撑。' },
+      { id: 'battery-c1', screeningQuestion: '它是否经历过不止一次维修？', text: '电池盒曾被多次维修并继续使用。', expectedLevel: 'confirmed', explanation: '布条层次和接线磨损共同支持这一结论。' },
+      { id: 'battery-c2', screeningQuestion: '维修方式能够说明使用者掌握什么技能吗？', text: '使用者可能掌握基础通信维修知识。', expectedLevel: 'inferred', explanation: '维修方式支持这一推测，但无法确认具体身份。' },
+      { id: 'battery-c3', screeningQuestion: '外壳数字的含义能被确认吗？', text: '刻痕数字就是使用者编号。', expectedLevel: 'unknown', explanation: '数字含义没有其他证据支撑。' },
     ],
   },
   {
@@ -85,6 +91,8 @@ export const archiveObjects: ArchiveObject[] = [
     accent: '#68704d',
     silhouette: '鞋',
     intro: '两只鞋的尺寸、磨损和补料并不相同。档案系统却把它们登记成“一双”。',
+    investigationQuestion: '这究竟是一双鞋，还是两个行路人留下的痕迹？',
+    nextHook: '脚步留下的姓名无从辨认。最后一件物品，也曾被反复使用和传递。',
     artNote: '正式版本替换为两只鞋的正反面、磨损热区、补料和双人步伐素材。',
     clues: [
       { id: 'shoes-size', title: '尺寸差异', description: '左右两只鞋的长度和宽度并不匹配。', position: { x: 32, y: 38 } },
@@ -92,9 +100,9 @@ export const archiveObjects: ArchiveObject[] = [
       { id: 'shoes-patch', title: '异色补料', description: '后补材料的颜色与编织方式不同。', position: { x: 48, y: 76 } },
     ],
     conclusions: [
-      { id: 'shoes-c1', text: '两只鞋的使用痕迹并不属于同一种步态。', expectedLevel: 'confirmed', explanation: '尺寸和磨损位置均能直接观察。' },
-      { id: 'shoes-c2', text: '它们可能来自两名使用者。', expectedLevel: 'inferred', explanation: '证据支持，但仍存在其他解释。' },
-      { id: 'shoes-c3', text: '两名使用者曾互换鞋子。', expectedLevel: 'unknown', explanation: '这是有感染力的解释，但没有直接证据。' },
+      { id: 'shoes-c1', screeningQuestion: '两只鞋的磨损方式相同吗？', text: '两只鞋的使用痕迹并不属于同一种步态。', expectedLevel: 'confirmed', explanation: '尺寸和磨损位置均能直接观察。' },
+      { id: 'shoes-c2', screeningQuestion: '它们可能由不同的人穿过吗？', text: '它们可能来自两名使用者。', expectedLevel: 'inferred', explanation: '证据支持，但仍存在其他解释。' },
+      { id: 'shoes-c3', screeningQuestion: '能否确认两名使用者交换过鞋子？', text: '两名使用者曾互换鞋子。', expectedLevel: 'unknown', explanation: '这是有感染力的解释，但没有直接证据。' },
     ],
   },
   {
@@ -109,6 +117,8 @@ export const archiveObjects: ArchiveObject[] = [
     accent: '#76675d',
     silhouette: '碗',
     intro: '碗底有两个方向不同的刻痕。它们像名字，也像编号，但没有一个结论足够确定。',
+    investigationQuestion: '两个刻痕能否证明它曾属于谁？',
+    nextHook: '五件物品都已归档。那些无法确认的名字，仍值得被郑重保存。',
     artNote: '正式版本替换为碗体多角度、缺口、三阶段修补和两张拓印结果。',
     clues: [
       { id: 'bowl-mark-a', title: '第一处刻痕', description: '笔画与名单中的一个姓氏相似。', position: { x: 35, y: 36 } },
@@ -116,9 +126,9 @@ export const archiveObjects: ArchiveObject[] = [
       { id: 'bowl-repair', title: '三次修补', description: '边缘存在三个阶段的修补痕迹。', position: { x: 48, y: 75 } },
     ],
     conclusions: [
-      { id: 'bowl-c1', text: '饭碗经过长期使用和多次修补。', expectedLevel: 'confirmed', explanation: '磨损和修补层次可以直接支持。' },
-      { id: 'bowl-c2', text: '饭碗可能曾在不同人之间流转。', expectedLevel: 'inferred', explanation: '多个刻痕与修补阶段支持这一推测。' },
-      { id: 'bowl-c3', text: '两个刻痕对应两位已知人物。', expectedLevel: 'unknown', explanation: '相似不等于相同，现有证据不足。' },
+      { id: 'bowl-c1', screeningQuestion: '这只碗经历了怎样的修补和使用？', text: '饭碗经过长期使用和多次修补。', expectedLevel: 'confirmed', explanation: '磨损和修补层次可以直接支持。' },
+      { id: 'bowl-c2', screeningQuestion: '它可能经过不同人的手吗？', text: '饭碗可能曾在不同人之间流转。', expectedLevel: 'inferred', explanation: '多个刻痕与修补阶段支持这一推测。' },
+      { id: 'bowl-c3', screeningQuestion: '两个刻痕能对应到具体人物吗？', text: '两个刻痕对应两位已知人物。', expectedLevel: 'unknown', explanation: '相似不等于相同，现有证据不足。' },
     ],
   },
 ]

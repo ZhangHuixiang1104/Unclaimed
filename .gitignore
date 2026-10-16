@@ -15,3 +15,8 @@ dist/
 .DS_Store
 Thumbs.db
 
+# Local account database
+backend/data/*.db
+backend/data/*.db-*
+backend/__pycache__/
+

@@ -1,11 +1,12 @@
 import type { ObjectRecord } from '../types/archive'
 
-const STORAGE_KEY = 'long-march-archive-progress-v1'
+const LEGACY_PROGRESS_KEY = 'long-march-archive-progress-v1'
 
 export interface SavedProgress {
   keeperNumber: string
   records: Record<string, ObjectRecord>
   selectedObjectKey?: string
+  keeperNote?: string
   createdAt: string
 }
 
@@ -14,19 +15,16 @@ export const createKeeperNumber = () => {
   return `2026-${suffix}`
 }
 
-export const loadProgress = (): SavedProgress | null => {
+// Progress lives in memory while anonymous and on the server after sign-in.
+// Remove only this project's old browser records when the new app first opens.
+export const clearLegacyLocalRecords = () => {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as SavedProgress) : null
+    localStorage.removeItem(LEGACY_PROGRESS_KEY)
+    localStorage.removeItem('archive-sound')
+    sessionStorage.removeItem('unclaimed-home-intro')
+    sessionStorage.removeItem('keeper-note')
+    sessionStorage.removeItem('keeper-ticket-ready')
   } catch {
-    return null
+    // Storage may be unavailable in a private or restricted browser context.
   }
-}
-
-export const saveProgress = (progress: SavedProgress) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(progress))
-}
-
-export const clearProgress = () => {
-  localStorage.removeItem(STORAGE_KEY)
 }

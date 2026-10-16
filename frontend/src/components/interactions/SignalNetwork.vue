@@ -46,7 +46,7 @@ const testLine = () => {
   <section class="signal-module panel">
     <header class="panel-heading compact">
       <div>
-        <span class="eyebrow">专属互动占位</span>
+        <span class="eyebrow">观察辅助任务 / SIGNAL</span>
         <h2>恢复临时通信线路</h2>
       </div>
       <span :class="['signal-status', { online: complete }]">{{ complete ? '线路稳定' : '等待测试' }}</span>
@@ -84,8 +84,8 @@ const testLine = () => {
 
     <div class="module-actions">
       <span v-if="tested && !stable">仍有一段信号过弱，缩短相邻节点距离。</span>
-      <span v-else-if="complete">信号已送达。正式版将在这里进入电报输入。</span>
-      <span v-else>当前为框架演示，地图和参数均可从配置文件替换。</span>
+      <span v-else-if="complete">信号已送达，线路复核记录已经保存。</span>
+      <span v-else>移动中继点，观察各段距离对信号质量的影响。</span>
       <button class="secondary-button" type="button" @click="testLine">测试线路</button>
     </div>
   </section>

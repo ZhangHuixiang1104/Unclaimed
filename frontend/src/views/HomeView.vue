@@ -1,37 +1,137 @@
+<script lang="ts">
+let introPlayedInVisit = false
+</script>
 <script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import ArchiveCase from '../components/home/ArchiveCase.vue'
+import HomeAtmosphere from '../components/home/HomeAtmosphere.vue'
+import NightDutyHeader from '../components/home/NightDutyHeader.vue'
+import { homeArchivePreviews } from '../data/homeArchives'
 import { useArchiveStore } from '../stores/archive'
 
 const router = useRouter()
 const archive = useArchiveStore()
 
-const enter = () => router.push('/archive')
+type HomeStage = 'arriving' | 'ready' | 'peeking' | 'opening' | 'leaving'
+
+const hasPlayedIntro = introPlayedInVisit
+const stage = ref<HomeStage>(hasPlayedIntro ? 'ready' : 'arriving')
+const hoveredId = ref<string | null>(null)
+const selectedId = ref<string | null>(archive.selectedObjectKey ?? null)
+const timers: number[] = []
+
+const archivedKeys = computed(() => homeArchivePreviews.filter((item) => archive.getRecord(item.key).status === 'archived').map((item) => item.key))
+const currentItem = computed(() => homeArchivePreviews.find((item) => item.key === (hoveredId.value ?? selectedId.value)) ?? null)
+const remainingObject = computed(() => homeArchivePreviews.find((item) => archive.getRecord(item.key).status !== 'archived') ?? homeArchivePreviews[0])
+const foundClueCount = computed(() => Object.values(archive.records).reduce((sum, record) => sum + record.foundClueIds.length, 0))
+const hasProgress = computed(() => archive.archivedCount > 0 || foundClueCount.value > 0)
+
+const homeLead = computed(() => hasProgress.value
+  ? '档案箱仍停在昨晚的位置。还有一些痕迹，尚未被妥善保存。'
+  : '五件没有主人的物件，一晚尚未完成的整理。先别急着写故事，看看它们自己留下了什么。')
+
+const actionLabel = computed(() => {
+  if (stage.value === 'opening' || stage.value === 'leaving') return '正在打开档案箱…'
+  if (selectedId.value) {
+    const item = homeArchivePreviews.find((entry) => entry.key === selectedId.value)
+    if (!archive.isObjectUnlocked(selectedId.value)) return `查看封存的 ${item?.index ?? ''} 号档案 →`
+    return `接收 ${item?.index ?? ''} 号档案 →`
+  }
+  if (hasProgress.value) return `继续第 ${remainingObject.value.index} 份档案 →`
+  return '接收档案箱 →'
+})
+
+const setHover = (key: string | null) => {
+  if (stage.value === 'opening' || stage.value === 'leaving') return
+  hoveredId.value = key
+  stage.value = key ? 'peeking' : 'ready'
+}
+
+const selectArchive = (key: string) => {
+  if (stage.value === 'opening' || stage.value === 'leaving') return
+  if (selectedId.value === key) {
+    void enter()
+    return
+  }
+  selectedId.value = key
+}
+
+const enter = async () => {
+  if (stage.value === 'opening' || stage.value === 'leaving') return
+  const focusKey = selectedId.value ?? (hasProgress.value ? remainingObject.value.key : null)
+  if (focusKey) archive.chooseObject(focusKey)
+  stage.value = 'opening'
+  await new Promise<void>((resolve) => timers.push(window.setTimeout(resolve, 780)))
+  stage.value = 'leaving'
+  await new Promise<void>((resolve) => timers.push(window.setTimeout(resolve, 160)))
+  await router.push({ path: '/archive', query: focusKey ? { focus: focusKey } : {} })
+}
+
+onMounted(() => {
+  if (hasPlayedIntro) return
+  timers.push(window.setTimeout(() => {
+    stage.value = 'ready'
+    introPlayedInVisit = true
+  }, 2700))
+})
+
+onBeforeUnmount(() => timers.forEach((timer) => window.clearTimeout(timer)))
 </script>
 
 <template>
-  <main class="home-page">
-    <div class="home-noise" aria-hidden="true"></div>
+  <main class="home-page" :class="[`stage-${stage}`, { 'has-selection': selectedId }]">
+    <HomeAtmosphere />
+    <div class="home-transition-curtain" aria-hidden="true"></div>
+
     <section class="home-copy">
-      <span class="eyebrow light">数字档案箱 LZ-1936-07</span>
-      <h1>长征<br /><em>失物招领处</em></h1>
-      <p class="home-lead">五件没有主人的物件，一晚尚未完成的整理。先别急着写故事，看看它们自己留下了什么。</p>
+      <NightDutyHeader />
+      <span class="home-archive-number">数字档案箱　LZ-1936-07</span>
+      <h1><span>长征</span><em>失物招领处</em></h1>
+      <p class="home-lead">{{ homeLead }}</p>
+
+      <div class="current-trace" :class="{ visible: currentItem }" aria-live="polite">
+        <span>{{ currentItem?.index ?? '00' }} / {{ currentItem?.shortTitle ?? '等待检查' }}</span>
+        <strong>{{ currentItem?.teaser ?? '移动光标查看箱内档案' }}</strong>
+        <p>{{ currentItem?.detail ?? '每一件物品都只陈述它能够证明的部分。' }}</p>
+      </div>
+
       <div class="home-actions">
-        <button class="primary-button light-button" type="button" @click="enter">开始今晚的值班</button>
+        <button class="home-primary-action" type="button" :disabled="stage === 'opening' || stage === 'leaving'" @click="enter">
+          <span>{{ actionLabel }}</span>
+          <i aria-hidden="true"></i>
+        </button>
         <RouterLink to="/about">查看作品说明</RouterLink>
       </div>
       <div class="home-meta">
-        <span>临时档案员</span>
-        <strong>{{ archive.keeperNumber }}</strong>
-        <span>本地进度自动保存</span>
+        <span>临时档案员 <strong>{{ archive.keeperNumber }}</strong></span>
+        <i></i>
+        <span>账号进度自动保存</span>
       </div>
     </section>
 
-    <section class="archive-box" aria-label="档案箱视觉占位">
-      <div class="box-lid"><span>请勿替未知填写姓名</span></div>
-      <div class="box-body">
-        <span v-for="index in 5" :key="index" class="paper-tab">0{{ index }}</span>
+    <section class="home-case-column">
+      <ArchiveCase
+        :items="homeArchivePreviews"
+        :hovered-id="hoveredId"
+        :selected-id="selectedId"
+        :archived-keys="archivedKeys"
+        :opening="stage === 'opening' || stage === 'leaving'"
+        @hover="setHover"
+        @select="selectArchive"
+      />
+
+      <div class="case-statistics" aria-label="档案箱统计">
+        <div><span>箱内物件</span><strong>05</strong></div>
+        <div><span>已归档</span><strong>{{ String(archive.archivedCount).padStart(2, '0') }}</strong></div>
+        <div><span>确认姓名</span><strong>00</strong></div>
       </div>
-      <p>今晚最后一个档案箱</p>
     </section>
+
+    <footer class="home-principle">
+      <span>UNCLAIMED / ARCHIVES OF THE LONG MARCH</span>
+      <p>主人未知。经历真实。共同保存。</p>
+      <span>保管规则 01—03</span>
+    </footer>
   </main>
 </template>
