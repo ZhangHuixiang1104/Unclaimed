@@ -20,15 +20,14 @@ const levels: Array<{ value: EvidenceLevel; label: string; code: string }> = [
 ]
 
 const record = computed(() => archive.getRecord(props.item.key))
-const allFound = computed(() => record.value.foundClueIds.length === props.item.clues.length)
+const allFound = computed(() => record.value.foundClueIds.length === props.item.clues.length
+  && (props.item.key !== 'list' || record.value.status === 'archived' || record.value.evidenceVerified
+    || (record.value.completedInteractions.includes('list-pieces-assembled') && record.value.completedInteractions.includes('list-mud-cleared'))))
 const isArchived = computed(() => record.value.status === 'archived')
 const allClassified = computed(() => props.item.conclusions.every((entry) => record.value.classified[entry.id]))
 const correctCount = computed(() => props.item.conclusions.filter((entry) => record.value.classified[entry.id] === entry.expectedLevel).length)
 const claimCandidates = computed(() => {
-  const decoys = [
-    { id: 'decoy-same-time', text: '能否从现有痕迹精确推算这件物品被购买的日期？' },
-    { id: 'decoy-owner', text: '能否从现有痕迹确认制作它的具体作坊？' },
-  ]
+  const decoys = props.item.screeningDecoys
   return [
     { id: props.item.conclusions[0].id, text: props.item.conclusions[0].screeningQuestion },
     decoys[0],

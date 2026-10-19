@@ -26,7 +26,7 @@ const statusText = (status: ObjectStatus) => {
     <header class="archive-index-heading">
       <span>CASE INDEX</span>
       <strong>箱内档案</strong>
-      <small>按路线顺序排列</small>
+      <small>按调查顺序排列</small>
     </header>
 
     <div class="archive-index-list">
@@ -53,7 +53,7 @@ const statusText = (status: ObjectStatus) => {
         <span class="index-number">{{ String(item.order).padStart(2, '0') }}</span>
         <span class="index-copy">
           <small>{{ statusFor(item.key) === 'archived' ? item.historicalLabel : `第 ${String(item.order).padStart(2, '0')} 份物件` }}</small>
-          <strong>{{ item.name.replace(/^被雨水浸过的|^改了四次的|^用布缠过的|^修补了七次的|^有两个刻痕的/, '') }}</strong>
+          <strong>{{ item.name.replace(/^被雨水浸过的|^划改接应点的|^用布缠过的|^用旧背带补过的|^有两个刻痕的/, '') }}</strong>
         </span>
         <span class="index-status">{{ statusText(statusFor(item.key)) }}</span>
       </button>

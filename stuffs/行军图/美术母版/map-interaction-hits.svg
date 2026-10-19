@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="group" aria-label="行路小图四处观察区域">
+  <title>透明观察区域几何</title>
+  <desc>这份几何应内联到前端交互组件，未发现前不显示数字圈、发光圈或答案。</desc>
+  <g id="map-hotspots" fill="#fff" fill-opacity="0" stroke="none" pointer-events="all">
+    <path id="map-near-route" data-clue-id="map-near-route" aria-label="观察折角与较淡的近路" tabindex="0" d="M242 679 Q357 552 517 536 Q590 534 610 575 Q569 627 467 653 Q356 706 254 732 Z"/>
+    <path id="map-north-bank" data-clue-id="map-north-bank" aria-label="观察北滩旁注" tabindex="0" d="M1009 220 Q1120 210 1180 254 L1191 377 Q1137 408 1037 384 Q995 313 1009 220 Z"/>
+    <path id="map-lower-bank" data-clue-id="map-lower-bank" aria-label="观察下滩线尾" tabindex="0" d="M969 552 Q1075 568 1189 585 L1202 726 Q1104 744 1015 692 Q965 637 969 552 Z"/>
+    <path id="map-crossing" data-clue-id="map-crossing" aria-label="观察两层墨线交叠处" tabindex="0" d="M553 328 Q681 310 811 350 Q831 416 788 482 Q666 513 566 449 Q542 389 553 328 Z"/>
+  </g>
+</svg>

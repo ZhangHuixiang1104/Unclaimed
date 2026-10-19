@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>行军图 · 美术资产叠放预览</title>
+  <style>
+    :root { color-scheme: dark; font-family: "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body { margin: 0; background: #111612; color: #eee6d6; }
+    main { max-width: 1500px; margin: auto; padding: 26px 30px 36px; }
+    header { display: flex; align-items: end; justify-content: space-between; gap: 32px; border-bottom: 1px solid #5e594e; padding-bottom: 18px; }
+    h1 { font-family: "Noto Serif CJK SC", "Songti SC", serif; font-size: 28px; margin: 0 0 6px; font-weight: 600; }
+    p { margin: 0; color: #c5bbab; font-size: 14px; line-height: 1.6; }
+    .eyebrow { color: #bc7968; letter-spacing: .12em; font-size: 12px; margin-bottom: 7px; }
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    button { border: 1px solid #716b5b; background: #20251f; color: #eee6d6; padding: 10px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+    button:hover, button:focus-visible { border-color: #d7b6a2; outline: none; }
+    button[aria-pressed="true"] { border-color: #c47d68; background: #67352e; }
+    .table { margin: 20px auto 0; max-width: 1370px; padding: 10px; background: radial-gradient(ellipse at center, #303329, #151a15 72%); box-shadow: 0 22px 55px #080b08; }
+    svg { display: block; width: 100%; height: auto; }
+    #ruler { cursor: grab; touch-action: none; }
+    #ruler:active { cursor: grabbing; }
+    footer { max-width: 1370px; margin: 15px auto 0; display: flex; justify-content: space-between; gap: 20px; }
+    @media (max-width: 950px) { header, footer { display: block; } .controls { margin-top: 16px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <div class="eyebrow">ASSET PROOF / 仅供制作检查</div>
+      <h1>行路小图 · 正反面叠放预览</h1>
+      <p>这不是玩家页面。四个阶段表示同一张图的逐次修改，不是四条历史行军路线。</p>
+    </div>
+    <div class="controls" aria-label="美术图层预览控制">
+      <button type="button" id="frontBtn" aria-pressed="true">正面</button>
+      <button type="button" id="backBtn" aria-pressed="false">背面</button>
+      <button type="button" id="phaseBtn" aria-label="切换正面四层路线">笔迹 4 / 4</button>
+      <button type="button" id="rulerBtn" aria-pressed="false">描图尺</button>
+    </div>
+  </header>
+  <div class="table">
+    <svg id="sheet" viewBox="0 0 1600 1000" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="虚构行路小图纸张与绘制素材叠放预览">
+      <defs>
+        <!-- 与 map-fold-mask.svg 同一纸形；正式组件须共用一份内联定义。 -->
+        <clipPath id="paperClip" clipPathUnits="userSpaceOnUse">
+          <path d="M76 67 L156 62 L242 66 L337 63 L433 65 L530 65 L626 64 L718 63 L816 68 L908 63 L1002 65 L1098 65 L1194 64 L1290 64 L1382 63 L1481 63 Q1533 65 1546 92 L1549 176 L1547 278 L1546 373 L1547 468 L1547 565 L1546 665 L1547 763 L1547 855 Q1548 909 1518 929 L1415 932 L1317 932 L1219 932 L1118 931 L1017 933 L918 933 L816 932 L716 932 L616 932 L514 932 L413 933 L313 932 L214 930 L113 931 Q53 930 43 896 L43 813 L45 715 L45 615 L43 516 L42 417 L41 318 L43 218 L42 135 Q42 81 76 67 Z"/>
+        </clipPath>
+      </defs>
+      <g clip-path="url(#paperClip)">
+        <g id="frontFace">
+          <image href="map_paper_front_blank.png" width="1600" height="1000" preserveAspectRatio="none"/>
+          <image href="map-terrain.svg" width="1600" height="1000"/>
+          <g id="routeLayers">
+            <image class="route" href="route-a.svg" width="1600" height="1000"/>
+            <image class="route" href="route-b.svg" width="1600" height="1000"/>
+            <image class="route" href="route-c.svg" width="1600" height="1000"/>
+            <image class="route" href="route-d.svg" width="1600" height="1000"/>
+          </g>
+          <svg x="160" y="137" width="410" height="118" viewBox="147 122 1846 557"><image href="ink-front-title.png" width="2167" height="726"/></svg>
+          <svg x="165" y="731" width="113" height="60" viewBox="351 239 893 500"><image href="ink-front-camp.png" width="1568" height="1003"/></svg>
+          <svg x="455" y="579" width="112" height="60" viewBox="387 297 795 441"><image href="ink-front-gully.png" width="1568" height="1003"/></svg>
+          <svg x="440" y="281" width="120" height="55" viewBox="373 293 909 426"><image href="ink-front-west-slope.png" width="1568" height="1003"/></svg>
+          <svg x="1050" y="226" width="125" height="54" viewBox="335 312 933 427"><image href="ink-front-north-bank.png" width="1568" height="1003"/></svg>
+          <svg x="1040" y="671" width="120" height="56" viewBox="404 313 849 429"><image href="ink-front-lower-bank.png" width="1568" height="1003"/></svg>
+          <svg x="790" y="148" width="123" height="62" viewBox="366 274 889 481"><image href="ink-front-high-ground.png" width="1568" height="1003"/></svg>
+          <svg x="317" y="607" width="120" height="43" viewBox="319 269 1165 427"><image href="ink-front-first-route.png" width="1774" height="887"/></svg>
+          <g id="ruler" hidden><image href="map-tracing-ruler.svg" x="540" y="390" width="420" height="102"/></g>
+        </g>
+        <g id="backFace" hidden>
+          <image href="map_paper_back_blank.png" width="1600" height="1000" preserveAspectRatio="none"/>
+          <g fill="none" stroke-linecap="round" stroke-width="7" opacity=".72">
+            <path d="M174 323 h28" stroke="#68665d"/><path d="M174 448 h28" stroke="#8a7962"/>
+            <path d="M174 573 h28" stroke="#9c5946"/><path d="M174 698 h28" stroke="#3b3831"/>
+          </g>
+          <svg x="210" y="273" width="560" height="83" viewBox="83 187 2006 346"><image href="ink-back-report-01.png" width="2172" height="724"/></svg>
+          <svg x="210" y="398" width="660" height="79" viewBox="43 215 2090 305"><image href="ink-back-report-02.png" width="2172" height="724"/></svg>
+          <svg x="210" y="523" width="660" height="81" viewBox="38 211 2096 310"><image href="ink-back-report-03.png" width="2172" height="724"/></svg>
+          <svg x="210" y="648" width="865" height="80" viewBox="16 215 2153 252"><image href="ink-back-report-04.png" width="2172" height="724"/></svg>
+          <svg x="1150" y="787" width="240" height="51" viewBox="115 207 1294 322"><image href="ink-back-north-blank.png" width="2172" height="724"/></svg>
+        </g>
+      </g>
+      <image href="map-fold-mask.svg" width="1600" height="1000" pointer-events="none"/>
+    </svg>
+  </div>
+  <footer>
+    <p id="phaseDesc">已显示四次绘线的叠墨关系；最后一笔止于高地，未越河。</p>
+    <p>所有地形、人物与纸面笔迹均属虚构；真实史实另设展柜。</p>
+  </footer>
+</main>
+<script>
+  const sheet = document.getElementById('sheet');
+  const front = document.getElementById('frontFace');
+  const back = document.getElementById('backFace');
+  const routes = [...document.querySelectorAll('.route')];
+  const phaseBtn = document.getElementById('phaseBtn');
+  const phaseDesc = document.getElementById('phaseDesc');
+  const ruler = document.getElementById('ruler');
+  let side = new URLSearchParams(location.search).get('side') === 'back' ? 'back' : 'front';
+  let phase = 4;
+  const descriptions = [
+    '',
+    '最早的一笔：由营地经沟口，拟向北滩。',
+    '第二次修订：绕过沟口，经西坡仍向北滩。',
+    '第三次修订：另向下滩，笔迹止于岸前。',
+    '第四次修订：沿叠墨处转向高地，纸上没有过河续线。'
+  ];
+  function render() {
+    front.toggleAttribute('hidden', side !== 'front');
+    back.toggleAttribute('hidden', side !== 'back');
+    document.getElementById('frontBtn').setAttribute('aria-pressed', side === 'front');
+    document.getElementById('backBtn').setAttribute('aria-pressed', side === 'back');
+    routes.forEach((route, index) => { route.toggleAttribute('hidden', index >= phase); });
+    phaseBtn.textContent = `笔迹 ${phase} / 4`;
+    phaseBtn.disabled = side === 'back';
+    ruler.toggleAttribute('hidden', side === 'back' || document.getElementById('rulerBtn').getAttribute('aria-pressed') !== 'true');
+    phaseDesc.textContent = side === 'front' ? descriptions[phase] : '背面四条更新语只记录获知的情况；“江北——”之后保持空白。';
+  }
+  document.getElementById('frontBtn').onclick = () => { side = 'front'; render(); };
+  document.getElementById('backBtn').onclick = () => { side = 'back'; render(); };
+  phaseBtn.onclick = () => { phase = phase === 4 ? 1 : phase + 1; render(); };
+  document.getElementById('rulerBtn').onclick = event => {
+    const pressed = event.currentTarget.getAttribute('aria-pressed') === 'true';
+    event.currentTarget.setAttribute('aria-pressed', !pressed);
+    render();
+  };
+  ruler.addEventListener('pointerdown', event => { ruler.setPointerCapture(event.pointerId); });
+  ruler.addEventListener('pointermove', event => {
+    if (!ruler.hasPointerCapture(event.pointerId)) return;
+    const point = sheet.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    const local = point.matrixTransform(sheet.getScreenCTM().inverse());
+    const image = ruler.querySelector('image');
+    image.setAttribute('x', Math.min(1110, Math.max(90, local.x - 210)));
+    image.setAttribute('y', Math.min(795, Math.max(100, local.y - 51)));
+  });
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" role="img" aria-labelledby="title description">
+  <title id="title">关下村截获军用地图的报道材料卡</title>
+  <desc id="description">依据2019年人民日报采访报道制作的原创材料卡，并非1935年地图原件或展陈照片。</desc>
+  <metadata>Source: https://dangshi.people.com.cn/n1/2019/0725/c85037-31254648.html</metadata>
+  <style>
+    .sans{font-family:'Microsoft YaHei UI','Microsoft YaHei','Source Han Sans SC',sans-serif}
+    .serif{font-family:'Source Han Serif SC','Noto Serif CJK SC','Songti SC',serif}
+    .mono{font-family:'Cascadia Mono',Consolas,monospace}
+  </style>
+  <rect width="1200" height="640" fill="#e8e1d2"/>
+  <path d="M0 0h1200v10H0z" fill="#3f6d70"/>
+  <text x="62" y="60" class="mono" font-size="18" letter-spacing="3" fill="#3f6d70">REAL HISTORY / 02</text>
+  <text x="62" y="113" class="serif" font-size="40" font-weight="600" fill="#222a29">地图，从哪里来？</text>
+  <text x="62" y="151" class="sans" font-size="18" fill="#56615f">两层时间必须分开：1935 年发生的事，与 2019 年的采访报道。</text>
+  <rect x="62" y="198" width="684" height="335" fill="#f6f1e7" stroke="#c7c5b7"/>
+  <path d="M62 198h684v6H62z" fill="#3f6d70"/>
+  <text x="95" y="256" class="mono" font-size="19" fill="#3f6d70">1935.04.27 / 关下村</text>
+  <text x="95" y="315" class="serif" font-size="32" fill="#232c2a">红军截获军用地图</text>
+  <path d="M95 345h613" stroke="#c9c8ba"/>
+  <text x="95" y="392" class="sans" font-size="21" fill="#303c39">据《人民日报》后来的采访报道，</text>
+  <text x="95" y="431" class="sans" font-size="21" fill="#303c39">地图被送往三元宫红军总部；</text>
+  <text x="95" y="470" class="sans" font-size="21" fill="#303c39">报道记载为 20 份十万分之一比例地图。</text>
+  <rect x="770" y="198" width="368" height="335" fill="#ece9df" stroke="#bfc4b9"/>
+  <path d="M770 198h368v6H770z" fill="#8b9b94"/>
+  <text x="800" y="256" class="mono" font-size="19" fill="#3f6d70">2019 / 报道与今日展陈</text>
+  <text x="800" y="315" class="serif" font-size="30" fill="#232c2a">这里陈列的是副本</text>
+  <path d="M800 345h310" stroke="#c9c8ba"/>
+  <text x="800" y="392" class="sans" font-size="20" fill="#303c39">三元宫今日陈列相关</text>
+  <text x="800" y="429" class="sans" font-size="20" fill="#303c39">军用地图副本。</text>
+  <text x="800" y="484" class="sans" font-size="17" fill="#65716d">此卡不是地图原件影像。</text>
+  <path d="M62 564h1076" stroke="#b8b8a9"/>
+  <text x="62" y="602" class="sans" font-size="17" fill="#465551">材料类型：2019 年《人民日报》采访报道</text>
+  <text x="1138" y="602" text-anchor="end" class="sans" font-size="17" fill="#3f6d70">原创材料卡</text>
+</svg>

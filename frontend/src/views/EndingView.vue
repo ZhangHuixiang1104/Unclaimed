@@ -25,9 +25,9 @@ const continueToTicket = () => {
   <AppShell>
     <section class="ending-page">
       <span class="eyebrow light">无人认领终章</span>
-      <h1>请填写物主姓名</h1>
-      <div class="owner-field"><span>物主姓名</span><strong>仍无法确认</strong></div>
-      <p class="ending-lead">找不到名字，不代表没有人来过。把知道的写清楚，把不知道的留下来。</p>
+      <h1>把已知的，郑重留下。</h1>
+      <div class="owner-field"><span>五份物件档案</span><strong>已完成调查</strong></div>
+      <p class="ending-lead">五件物品各自留下了可确认的痕迹，也留下不能替人回答的问题。把能核对的写清楚，把不知道的留白；真实历史资料另页保存。</p>
 
       <div class="ending-choice">
         <h2>选择一件最想保存的物品</h2>
@@ -48,7 +48,7 @@ const continueToTicket = () => {
           <span>写下一句陈列说明 <small>{{ note.length }}/50</small></span>
           <textarea v-model="note" maxlength="50" placeholder="例如：请保留那些无法辨认的空格。"></textarea>
         </label>
-        <button class="primary-button light-button" type="button" :disabled="!archive.endingUnlocked || !chosenKey" @click="continueToTicket">以无名长征参与者名义共同入藏</button>
+        <button class="primary-button light-button" type="button" :disabled="!archive.endingUnlocked || !chosenKey" @click="continueToTicket">生成这份故事档案的展签</button>
       </div>
     </section>
   </AppShell>

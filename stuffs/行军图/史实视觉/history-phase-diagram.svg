@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" role="img" aria-labelledby="title description">
+  <title id="title">1935年初至5月的路线阶段关系图</title>
+  <desc id="description">据公开党史年表编绘的时间关系图，不是测绘地图，也不对应游戏中的四层墨线。</desc>
+  <metadata>Sources: https://gxt.hunan.gov.cn/gxt/syzt/dsxxjy/dsydyy/dsdsj/202103/t20210329_15075565.html ; https://www.cac.gov.cn/2016-08/22/c_1119430867.htm</metadata>
+  <style>
+    .sans{font-family:'Microsoft YaHei UI','Microsoft YaHei','Source Han Sans SC',sans-serif}
+    .serif{font-family:'Source Han Serif SC','Noto Serif CJK SC','Songti SC',serif}
+    .mono{font-family:'Cascadia Mono',Consolas,monospace}
+  </style>
+  <rect width="1200" height="620" fill="#e8e1d2"/>
+  <path d="M0 0h1200v10H0z" fill="#3f6d70"/>
+  <text x="64" y="60" class="mono" font-size="18" letter-spacing="3" fill="#3f6d70">REAL HISTORY / 01</text>
+  <text x="64" y="113" class="serif" font-size="40" font-weight="600" fill="#222a29">方向是在一次次判断中改变的</text>
+  <text x="64" y="151" class="sans" font-size="18" fill="#56615f">1935 年 1 月—5 月 · 时间关系示意</text>
+  <path d="M72 271H1127" fill="none" stroke="#8d9c97" stroke-width="3" stroke-dasharray="2 11"/>
+  <g class="sans">
+    <rect x="62" y="204" width="266" height="292" rx="3" fill="#f6f1e7" stroke="#c7c5b7"/>
+    <rect x="62" y="204" width="266" height="5" fill="#3f6d70"/>
+    <circle cx="102" cy="271" r="10" fill="#3f6d70" stroke="#f6f1e7" stroke-width="4"/>
+    <text x="89" y="251" class="mono" font-size="15" fill="#516662">01—03 月</text>
+    <text x="88" y="322" class="serif" font-size="30" fill="#242b29">四渡赤水</text>
+    <text x="88" y="361" font-size="18" fill="#43504e">四次渡过赤水河</text>
+    <text x="88" y="396" font-size="16" fill="#666d68">1/29 · 2/18—21</text>
+    <text x="88" y="423" font-size="16" fill="#666d68">3/16—17 · 3/21—22</text>
+    <text x="88" y="462" font-size="16" fill="#6d7772">四次都发生于赤水河</text>
+
+    <rect x="344" y="204" width="266" height="292" rx="3" fill="#f6f1e7" stroke="#c7c5b7"/>
+    <rect x="344" y="204" width="266" height="5" fill="#3f6d70"/>
+    <circle cx="384" cy="271" r="10" fill="#3f6d70" stroke="#f6f1e7" stroke-width="4"/>
+    <text x="370" y="251" class="mono" font-size="15" fill="#516662">03 月末</text>
+    <text x="370" y="322" class="serif" font-size="30" fill="#242b29">南渡乌江</text>
+    <text x="370" y="361" font-size="18" fill="#43504e">四渡赤水之后</text>
+    <text x="370" y="396" font-size="16" fill="#666d68">主力转向乌江南岸</text>
+    <text x="370" y="462" font-size="16" fill="#6d7772">进入下一阶段</text>
+
+    <rect x="626" y="204" width="240" height="292" rx="3" fill="#f6f1e7" stroke="#c7c5b7"/>
+    <rect x="626" y="204" width="240" height="5" fill="#3f6d70"/>
+    <circle cx="666" cy="271" r="10" fill="#3f6d70" stroke="#f6f1e7" stroke-width="4"/>
+    <text x="652" y="251" class="mono" font-size="15" fill="#516662">04 月</text>
+    <text x="652" y="322" class="serif" font-size="30" fill="#242b29">进入云南</text>
+    <text x="652" y="361" font-size="18" fill="#43504e">佯攻贵阳之后</text>
+    <text x="652" y="396" font-size="16" fill="#666d68">向云南机动</text>
+    <text x="652" y="462" font-size="16" fill="#6d7772">渡江仍在前方</text>
+
+    <rect x="882" y="204" width="256" height="292" rx="3" fill="#f6f1e7" stroke="#c7c5b7"/>
+    <rect x="882" y="204" width="256" height="5" fill="#3f6d70"/>
+    <circle cx="922" cy="271" r="10" fill="#3f6d70" stroke="#f6f1e7" stroke-width="4"/>
+    <text x="908" y="251" class="mono" font-size="15" fill="#516662">05 月初</text>
+    <text x="908" y="322" class="serif" font-size="30" fill="#242b29">巧渡金沙江</text>
+    <text x="908" y="361" font-size="18" fill="#43504e">另一条河、另一阶段</text>
+    <text x="908" y="396" font-size="16" fill="#666d68">渡口与船工共同重要</text>
+    <text x="908" y="462" font-size="16" fill="#6d7772">详见后续展柜</text>
+  </g>
+  <path d="M64 532H1138" stroke="#b8b8a9"/>
+  <text x="64" y="566" class="sans" font-size="17" fill="#465551">据湖南省工信厅党史大事记及中央网信办刊载党史文章编绘</text>
+  <text x="1138" y="566" text-anchor="end" class="sans" font-size="17" fill="#3f6d70">非测绘地图</text>
+</svg>

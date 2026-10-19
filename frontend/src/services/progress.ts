@@ -3,12 +3,15 @@ import type { ObjectRecord } from '../types/archive'
 const LEGACY_PROGRESS_KEY = 'long-march-archive-progress-v1'
 
 export interface SavedProgress {
+  contentVersion?: string
   keeperNumber: string
   records: Record<string, ObjectRecord>
   selectedObjectKey?: string
   keeperNote?: string
   createdAt: string
 }
+
+export const CONTENT_VERSION = 'independent-chapters-v3'
 
 export const createKeeperNumber = () => {
   const suffix = Math.floor(1000 + Math.random() * 9000)

@@ -1,9 +1,10 @@
 export type ObjectStatus = 'locked' | 'available' | 'investigating' | 'archived'
 export type EvidenceLevel = 'confirmed' | 'inferred' | 'unknown'
-export type InteractionType = 'name-restorer' | 'route-rebuilder' | 'signal-network' | 'shoe-repair' | 'mark-comparison'
+export type InteractionType = 'name-restorer' | 'route-rebuilder' | 'material-check' | 'shoe-repair' | 'mark-comparison'
 
 export interface Clue {
   id: string
+  side: 'front' | 'back'
   title: string
   description: string
   position: { x: number; y: number }
@@ -15,6 +16,11 @@ export interface Conclusion {
   text: string
   expectedLevel: EvidenceLevel
   explanation: string
+}
+
+export interface ScreeningDecoy {
+  id: string
+  text: string
 }
 
 export interface ArchiveObject {
@@ -32,13 +38,17 @@ export interface ArchiveObject {
   investigationQuestion: string
   nextHook: string
   artNote: string
+  artifactFront: string[]
+  artifactBack: string[]
   clues: Clue[]
   conclusions: Conclusion[]
+  screeningDecoys: ScreeningDecoy[]
 }
 
 export interface ObjectRecord {
   status: ObjectStatus
   foundClueIds: string[]
+  completedInteractions: string[]
   classified: Record<string, EvidenceLevel>
   markerPositions: Record<string, { x: number; y: number }>
   acceptedConclusionIds: string[]

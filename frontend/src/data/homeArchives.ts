@@ -1,6 +1,6 @@
 import { archiveObjects } from './objects'
 
-export type ArchiveMaterial = 'paper' | 'map' | 'metal' | 'fiber' | 'enamel'
+export type ArchiveMaterial = 'paper' | 'map' | 'metal' | 'fiber' | 'vessel'
 
 export interface HomeArchivePreview {
   key: string
@@ -15,34 +15,34 @@ export interface HomeArchivePreview {
 
 const previewCopy: Record<string, Pick<HomeArchivePreview, 'shortTitle' | 'teaser' | 'detail' | 'material'>> = {
   list: {
-    shortTitle: '人员补录名单',
-    teaser: '姓名栏被水浸毁',
-    detail: '反复展开的纸页上，还留着无法辨认的书写压力。',
+    shortTitle: '受雨名单',
+    teaser: '姓名栏残缺',
+    detail: '纸面有一项尚待核对的转送记录。',
     material: 'paper',
   },
   map: {
     shortTitle: '折叠行军图',
-    teaser: '终点没有标注',
-    detail: '四层墨迹彼此覆盖，旧路线没有被彻底擦去。',
+    teaser: '四层墨线叠在一起',
+    detail: '路线反复修改，绘制先后仍待辨认。',
     material: 'map',
   },
   battery: {
-    shortTitle: '电台电池盒',
-    teaser: '仍残留一次呼叫',
-    detail: '接线处被三层布条反复加固，数字含义未知。',
+    shortTitle: '布缠电池盒',
+    teaser: '接线端修了又修',
+    detail: '三层布条与外壳刻痕留下不同疑问。',
     material: 'metal',
   },
   shoes: {
     shortTitle: '草鞋残件',
-    teaser: '鞋底留下两种泥土',
-    detail: '两只鞋的尺寸、补料与主要受力区域并不相同。',
+    teaser: '两只鞋似乎不成双',
+    detail: '尺寸、磨损与补料都值得重新比较。',
     material: 'fiber',
   },
   bowl: {
-    shortTitle: '搪瓷碗残片',
-    teaser: '碗沿刻痕并非姓名',
-    detail: '两个方向不同的刻痕，都不足以指向一个名字。',
-    material: 'enamel',
+    shortTitle: '双刻痕饭碗',
+    teaser: '碗底留着两种记号',
+    detail: '最后一件物品仍在封存，先完成前面的档案。',
+    material: 'vessel',
   },
 }
 

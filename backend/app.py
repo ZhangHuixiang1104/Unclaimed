@@ -14,7 +14,7 @@ from typing import Annotated, Literal
 
 from fastapi import Cookie, Depends, FastAPI, HTTPException, Response, status
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-from sqlalchemy import ForeignKey, Integer, String, Text, create_engine, select
+from sqlalchemy import ForeignKey, Integer, String, Text, create_engine, select, text
 from sqlalchemy.engine import URL
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 
@@ -23,6 +23,7 @@ SESSION_SECONDS = 14 * 24 * 60 * 60
 OBJECT_KEYS = frozenset({"list", "map", "battery", "shoes", "bowl"})
 USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9_-]{3,24}$")
 COOKIE_NAME = "archive_session"
+SAVE_CONTRACT_VERSION = "independent-chapters-v3"
 
 
 class Base(DeclarativeBase):
@@ -76,7 +77,8 @@ class MarkerPosition(BaseModel):
 class ObjectRecord(BaseModel):
     model_config = ConfigDict(extra="forbid")
     status: Literal["locked", "available", "investigating", "archived"]
-    foundClueIds: list[str] = Field(max_length=3)
+    foundClueIds: list[str] = Field(max_length=4)
+    completedInteractions: list[str] = Field(default_factory=list, max_length=20)
     classified: dict[str, Literal["confirmed", "inferred", "unknown"]]
     markerPositions: dict[str, MarkerPosition]
     acceptedConclusionIds: list[str] = Field(max_length=5)
@@ -89,6 +91,7 @@ class ObjectRecord(BaseModel):
 
 class Progress(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    contentVersion: str = Field(default="legacy-v1", min_length=1, max_length=40)
     keeperNumber: str = Field(min_length=1, max_length=32)
     records: dict[str, ObjectRecord]
     selectedObjectKey: str | None = None
@@ -149,7 +152,7 @@ def create_app(database_url: str | URL | None = None) -> FastAPI:
 
     engine = create_engine(
         database_url,
-        connect_args={"check_same_thread": False} if str(database_url).startswith("sqlite") else {},
+        connect_args={"check_same_thread": False, "timeout": 15} if str(database_url).startswith("sqlite") else {},
     )
     Base.metadata.create_all(engine)
     sessions = sessionmaker(bind=engine, expire_on_commit=False)
@@ -190,8 +193,9 @@ def create_app(database_url: str | URL | None = None) -> FastAPI:
         )
 
     @app.get("/api/v1/health")
-    async def health() -> dict[str, str]:
-        return {"status": "ok"}
+    def health(db: Session = Depends(get_db)) -> dict[str, str]:
+        db.execute(text("SELECT 1"))
+        return {"status": "ok", "saveContract": SAVE_CONTRACT_VERSION}
 
     @app.post("/api/v1/auth/register", status_code=status.HTTP_201_CREATED)
     def register(credentials: Credentials, response: Response, db: Session = Depends(get_db)) -> dict[str, str]:
@@ -251,6 +255,10 @@ def create_app(database_url: str | URL | None = None) -> FastAPI:
             raise HTTPException(status_code=413, detail="存档数据过大")
         saved = db.get(CloudSave, user.id)
         current_revision = saved.revision if saved else 0
+        # A lost HTTP response may cause the same snapshot to be retried with
+        # its previous revision. Do not turn a successful save into a conflict.
+        if saved is not None and saved.payload == serialized:
+            return SaveResponse(progress=request.progress, revision=saved.revision, updatedAt=saved.updated_at)
         if request.baseRevision != current_revision:
             raise HTTPException(status_code=409, detail="云端存档已被其他设备更新")
         now = int(time.time())

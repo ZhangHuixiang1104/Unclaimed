@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" role="img" aria-labelledby="title description">
+  <title id="title">皎平渡船工与摆渡的报道材料卡</title>
+  <desc id="description">原创文字与图形材料卡，来源为新华社采访及军事地理解读；不含船工肖像、馆方名单墙或历史照片。</desc>
+  <metadata>Sources: https://dangshi.people.com.cn/n1/2019/0723/c85037-31251766.html ; https://www.news.cn/20260917/12f46b49a5914e54a7952bf1d52bb326/c.html</metadata>
+  <style>
+    .sans{font-family:'Microsoft YaHei UI','Microsoft YaHei','Source Han Sans SC',sans-serif}
+    .serif{font-family:'Source Han Serif SC','Noto Serif CJK SC','Songti SC',serif}
+    .mono{font-family:'Cascadia Mono',Consolas,monospace}
+  </style>
+  <rect width="1200" height="640" fill="#e8e1d2"/>
+  <path d="M0 0h1200v10H0z" fill="#3f6d70"/>
+  <text x="62" y="60" class="mono" font-size="18" letter-spacing="3" fill="#3f6d70">REAL HISTORY / 04</text>
+  <text x="62" y="113" class="serif" font-size="40" font-weight="600" fill="#222a29">是谁把路线变成了渡江？</text>
+  <text x="62" y="151" class="sans" font-size="18" fill="#56615f">1935 年 5 月 · 皎平渡</text>
+  <rect x="62" y="192" width="435" height="341" fill="#3c6569"/>
+  <text x="90" y="273" class="mono" font-size="86" fill="#f2eee5">37</text>
+  <text x="92" y="319" class="serif" font-size="30" fill="#f2eee5">位船工</text>
+  <text x="92" y="359" class="sans" font-size="17" fill="#e8e2d7">据新华社 2019 年采访报道</text>
+  <path d="M92 418q36 -16 72 0t72 0t72 0t72 0t72 0" fill="none" stroke="#ccd9d3" stroke-width="3" opacity=".72"/>
+  <path d="M92 442q36 -16 72 0t72 0t72 0t72 0t72 0" fill="none" stroke="#ccd9d3" stroke-width="2" opacity=".45"/>
+  <path d="M356 381l39 -87m-45 34 51 22" fill="none" stroke="#f0e7d6" stroke-width="6" stroke-linecap="round" opacity=".72"/>
+  <rect x="517" y="192" width="621" height="341" fill="#f6f1e7" stroke="#c7c5b7"/>
+  <text x="553" y="260" class="serif" font-size="31" fill="#232c2a">图上只标方向，江上要有人划船。</text>
+  <path d="M553 292h548" stroke="#c7c8ba"/>
+  <text x="553" y="341" class="sans" font-size="21" fill="#303c39">皎平渡的船工与红军共同组织摆渡。</text>
+  <text x="553" y="385" class="sans" font-size="21" fill="#303c39">船只有限，他们在江面上反复往返。</text>
+  <text x="553" y="429" class="sans" font-size="21" fill="#303c39">路线能否走通，也取决于具体的人。</text>
+  <text x="553" y="492" class="sans" font-size="17" fill="#65716d">此卡不是当年的合影，也不是原始船工名册。</text>
+  <path d="M62 564h1076" stroke="#b8b8a9"/>
+  <text x="62" y="602" class="sans" font-size="17" fill="#465551">材料类型：新华社 2019 年采访报道与 2026 年地理解读</text>
+  <text x="1138" y="602" text-anchor="end" class="sans" font-size="17" fill="#3f6d70">原创材料卡</text>
+</svg>

@@ -24,7 +24,7 @@ const statusText = (status: ObjectStatus) => {
       <header class="dossier-header">
         <div>
           <span class="dossier-code">{{ item.archiveNo }}</span>
-          <small>{{ String(item.order).padStart(2, '0') }} / {{ status === 'archived' ? item.historicalLabel : '路线待核验' }}</small>
+          <small>{{ String(item.order).padStart(2, '0') }} / {{ status === 'archived' ? item.historicalLabel : '史实主题封存' }}</small>
         </div>
         <span class="dossier-status" :class="status">{{ statusText(status) }}</span>
       </header>
@@ -45,7 +45,7 @@ const statusText = (status: ObjectStatus) => {
 
         <div v-else-if="item.key === 'battery'" class="battery-art">
           <span class="battery-handle"></span>
-          <span class="battery-case"><i></i><b>3 · 7 · ?</b></span>
+          <span class="battery-case"><i></i><b>LZ · 03</b></span>
           <span class="battery-terminal left"></span><span class="battery-terminal right"></span>
           <span class="battery-wire one"></span><span class="battery-wire two"></span>
           <span class="battery-cloth"></span>
@@ -70,7 +70,7 @@ const statusText = (status: ObjectStatus) => {
       <section class="dossier-copy">
         <span class="dossier-section-label">OBJECT RECORD / {{ String(item.order).padStart(2, '0') }}</span>
         <h2>{{ item.name }}</h2>
-        <p class="dossier-subtitle">{{ item.subtitle }}</p>
+        <p class="dossier-subtitle">{{ status === 'locked' ? '完成上一份档案后开放调查' : item.subtitle }}</p>
         <p class="dossier-intro">{{ status === 'locked' ? '完成前一份物件档案后，这件物品将被送到检查台。' : item.intro }}</p>
       </section>
 

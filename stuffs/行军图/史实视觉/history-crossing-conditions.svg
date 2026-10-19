@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640" role="img" aria-labelledby="title description">
+  <title id="title">1935年金沙江三个渡口条件对照</title>
+  <desc id="description">据新华社军事地理解读编绘的条件对照，不表达真实方位、距离或精确行军路线。</desc>
+  <metadata>Source: https://www.news.cn/20260917/12f46b49a5914e54a7952bf1d52bb326/c.html</metadata>
+  <style>
+    .sans{font-family:'Microsoft YaHei UI','Microsoft YaHei','Source Han Sans SC',sans-serif}
+    .serif{font-family:'Source Han Serif SC','Noto Serif CJK SC','Songti SC',serif}
+    .mono{font-family:'Cascadia Mono',Consolas,monospace}
+  </style>
+  <rect width="1200" height="640" fill="#e8e1d2"/>
+  <path d="M0 0h1200v10H0z" fill="#3f6d70"/>
+  <text x="62" y="59" class="mono" font-size="18" letter-spacing="3" fill="#3f6d70">REAL HISTORY / 03</text>
+  <text x="62" y="112" class="serif" font-size="40" font-weight="600" fill="#222a29">地图指出渡口，却不能备好船</text>
+  <text x="62" y="150" class="sans" font-size="18" fill="#56615f">1935 年 4 月底—5 月初 · 渡口条件关系示意</text>
+  <g class="sans">
+    <rect x="60" y="192" width="324" height="302" fill="#f6f1e7" stroke="#c7c5b7"/>
+    <path d="M60 192h324v6H60z" fill="#8d756c"/>
+    <text x="86" y="244" class="serif" font-size="32" fill="#232c2a">龙街渡</text>
+    <text x="86" y="278" font-size="17" fill="#6c7370">元谋 · 北岸防守</text>
+    <path d="M86 308h272" stroke="#d4d0c4"/>
+    <text x="86" y="347" font-size="20" fill="#263230">北岸有防守</text>
+    <text x="86" y="385" font-size="20" fill="#263230">渡船遭毁</text>
+    <text x="86" y="423" font-size="20" fill="#263230">架浮桥受阻</text>
+    <text x="86" y="468" font-size="18" fill="#815e54">在此大规模渡江难以实现</text>
+
+    <rect x="438" y="192" width="324" height="302" fill="#f6f1e7" stroke="#c7c5b7"/>
+    <path d="M438 192h324v6H438z" fill="#8d756c"/>
+    <text x="464" y="244" class="serif" font-size="32" fill="#232c2a">洪门渡</text>
+    <text x="464" y="278" font-size="17" fill="#6c7370">禄劝 · 渡口已被夺占</text>
+    <path d="M464 308h272" stroke="#d4d0c4"/>
+    <text x="464" y="347" font-size="20" fill="#263230">找到的船只不足</text>
+    <text x="464" y="385" font-size="20" fill="#263230">浮桥多次被冲垮</text>
+    <text x="464" y="423" font-size="20" fill="#263230">部分人员继续摆渡</text>
+    <text x="464" y="468" font-size="18" fill="#815e54">大部队改向皎平渡</text>
+
+    <rect x="816" y="192" width="324" height="302" fill="#f6f1e7" stroke="#94aaa3" stroke-width="2"/>
+    <path d="M816 192h324v6H816z" fill="#3f6d70"/>
+    <text x="842" y="244" class="serif" font-size="32" fill="#232c2a">皎平渡</text>
+    <text x="842" y="278" font-size="17" fill="#6c7370">禄劝—会理 · 山路险峻</text>
+    <path d="M842 308h272" stroke="#d4d0c4"/>
+    <text x="842" y="347" font-size="20" fill="#263230">先遣队控制两岸</text>
+    <text x="842" y="385" font-size="20" fill="#263230">寻船并联络船工</text>
+    <text x="842" y="423" font-size="20" fill="#263230">大部队集中摆渡</text>
+    <text x="842" y="468" font-size="18" fill="#3f6d70">人和船让路线成行</text>
+  </g>
+  <path d="M384 508 Q570 542 803 508" fill="none" stroke="#8d9c97" stroke-width="2.5" stroke-dasharray="5 8"/>
+  <path d="M793 500 l13 8 -13 8" fill="none" stroke="#8d9c97" stroke-width="2.5"/>
+  <text x="60" y="577" class="sans" font-size="17" fill="#465551">据新华社 2026 年军事地理解读编绘；箭头表示改道关系，不表示实际方位和距离。</text>
+  <text x="1140" y="607" text-anchor="end" class="sans" font-size="16" fill="#3f6d70">非测绘地图</text>
+</svg>

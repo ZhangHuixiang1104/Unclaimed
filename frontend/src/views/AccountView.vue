@@ -12,10 +12,12 @@ const mode = ref<'register' | 'login'>('register')
 const name = ref('')
 const password = ref('')
 const busy = ref(false)
+const legacyBackupDownloaded = ref(false)
 const currentCount = computed(() => Object.keys(archive.records).length)
 const cloudCount = computed(() => Object.keys(account.cloudProgress?.records ?? {}).length)
 const updatedLabel = computed(() => account.cloudUpdatedAt
-  ? new Date(account.cloudUpdatedAt * 1000).toLocaleString('zh-CN') : '尚未保存')
+  ? new Date(account.cloudUpdatedAt * 1000).toLocaleString('zh-CN')
+  : account.syncState === 'offline' || account.syncState === 'loading' ? '尚未确认' : '尚未保存')
 
 const destination = computed(() => {
   const next = route.query.next
@@ -27,6 +29,7 @@ const enterArchive = () => router.replace(destination.value)
 
 const submit = async () => {
   if (busy.value) return
+  legacyBackupDownloaded.value = false
   busy.value = true
   try {
     const success = await account.authenticate(mode.value, name.value.trim(), password.value)
@@ -52,8 +55,30 @@ const resolveConflict = async (choice: 'cloud' | 'current') => {
 const signOut = async () => {
   if (busy.value) return
   busy.value = true
-  try { await account.logout() }
-  catch { account.error = '退出请求失败，请检查后端连接后重试。' }
+  try { await account.logout(); legacyBackupDownloaded.value = false }
+  catch (cause) { account.error = cause instanceof Error ? cause.message : '退出请求失败，请检查后端连接后重试。' }
+  finally { busy.value = false }
+}
+
+const downloadLegacySave = () => {
+  if (!account.cloudProgress) return
+  const snapshot = { edition: account.cloudProgress.contentVersion ?? 'legacy-v1', downloadedAt: new Date().toISOString(), progress: account.cloudProgress }
+  const file = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(file)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `unclaimed-legacy-save-${account.username ?? 'archivist'}.json`
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+  legacyBackupDownloaded.value = true
+}
+
+const beginNewEdition = async () => {
+  if (!legacyBackupDownloaded.value || busy.value) return
+  busy.value = true
+  try { if (await account.startNewEdition()) await enterArchive() }
   finally { busy.value = false }
 }
 </script>
@@ -72,16 +97,28 @@ const signOut = async () => {
       <section class="entry-story" aria-label="作品引言">
         <span class="entry-kicker">ARCHIVE CASE / LZ-1936-07</span>
         <h1>有人把故事<br><em>留在这里。</em></h1>
-        <p class="entry-lead">五件没有主人的物件，一晚尚未完成的整理。请先留下你的档案员编号，再打开箱子，看看它们自己留下了什么。</p>
+        <p class="entry-lead">五件等待整理的物品，五段尚未说完的故事。先领取档案，再亲手寻找线索；史实材料会在调查完成后逐步开放。</p>
         <div class="entry-story-line"><span>01</span><i></i><span>领取档案</span><span>02</span><i></i><span>寻找线索</span><span>03</span><i></i><span>核对史实</span></div>
         <blockquote>“别先问它们属于谁。先问，它们经历过什么。”</blockquote>
-        <div class="entry-story-foot"><span>主人未知 · 经历真实 · 共同保存</span><span>LONG MARCH ARCHIVE</span></div>
+        <div class="entry-story-foot"><span>游戏故事虚构 · 历史资料独立核验</span><span>LONG MARCH ARCHIVE</span></div>
       </section>
 
       <section class="entry-desk" aria-label="档案员账号">
         <div class="entry-card-top"><span>值班登记 / 01</span><span>请勿替未知填写姓名</span></div>
 
-        <template v-if="account.syncState === 'conflict'">
+        <template v-if="account.syncState === 'upgrade'">
+          <div class="entry-card-body">
+            <span class="entry-card-kicker">EDITION CHANGE / 旧档保护</span>
+            <h2>故事版本已更新</h2>
+            <p class="entry-card-copy">旧版线索与当前章节内容不兼容。旧存档目前仍在云端，尚未覆盖。请先下载备份，再由你决定是否开始新版调查。</p>
+            <p v-if="account.error" class="entry-error" role="status">{{ account.error }}</p>
+            <div class="entry-button-row"><button type="button" class="entry-outline" @click="downloadLegacySave">{{ legacyBackupDownloaded ? '重新下载旧档' : '下载旧版存档' }}</button><button type="button" class="entry-primary" :disabled="!legacyBackupDownloaded || busy" @click="beginNewEdition">确认开始新版</button></div>
+            <p class="entry-privacy">确认后云端会改为新版空白进度；已下载的旧档 JSON 可供人工留存。退出账号不会覆盖旧档。</p>
+            <button type="button" class="entry-quiet" :disabled="busy" @click="signOut">暂不迁移，退出账号</button>
+          </div>
+        </template>
+
+        <template v-else-if="account.syncState === 'conflict'">
           <div class="entry-card-body">
             <span class="entry-card-kicker">RECORD CONFLICT / 存档校对</span>
             <h2>两份未完的档案</h2>
@@ -99,16 +136,18 @@ const signOut = async () => {
           <div class="entry-card-body">
             <span class="entry-card-kicker">ARCHIVIST ON DUTY / 已登记</span>
             <h2>欢迎回来，{{ account.username }}</h2>
-            <p class="entry-card-copy">你的调查记录已与这个账号关联。打开档案箱，继续完成未归档的部分。</p>
+            <p class="entry-card-copy">{{ account.syncState === 'offline' ? (account.pendingSafe && account.pendingUpload ? '云端暂时不可用。新进度已暂存本机，重新连接后会尝试补传；请勿清理本站数据。' : '云端暂时不可用，浏览器也无法暂存进度；请保持页面开启并重试。') : '你的调查记录已与这个账号关联。打开档案箱，继续完成未归档的部分。' }}</p>
             <dl class="entry-details">
               <div><dt>档案员编号</dt><dd>{{ archive.keeperNumber }}</dd></div>
               <div><dt>已整理物件</dt><dd>{{ archive.archivedCount }} / 05</dd></div>
               <div><dt>最近云端保存</dt><dd>{{ updatedLabel }}</dd></div>
-              <div><dt>当前状态</dt><dd>{{ account.syncState === 'synced' ? '已同步' : account.syncState === 'saving' ? '保存中…' : '等待重新连接' }}</dd></div>
+              <div><dt>当前状态</dt><dd>{{ account.syncState === 'synced' && !account.pendingUpload ? '云端已保存' : account.syncState === 'saving' ? '保存中…' : account.syncState === 'loading' ? '正在连接…' : account.pendingSafe && account.pendingUpload ? '本机暂存，待同步' : '同步未完成' }}</dd></div>
             </dl>
             <p v-if="account.error" class="entry-error" role="alert">{{ account.error }}</p>
             <button v-if="account.syncState === 'offline'" type="button" class="entry-primary" :disabled="busy" @click="account.retry">重新连接存档服务</button>
+            <button v-else-if="account.syncState === 'loading'" type="button" class="entry-primary" disabled>正在核对云端存档…</button>
             <button v-else type="button" class="entry-primary" @click="enterArchive">打开档案箱 <span>→</span></button>
+            <button v-if="account.syncState === 'synced' || account.syncState === 'saving'" type="button" class="entry-outline entry-save-now" :disabled="busy || account.syncState === 'saving'" @click="account.saveNow()">{{ account.syncState === 'saving' ? '正在保存…' : '立即核对并保存进度' }}</button>
             <button type="button" class="entry-quiet" :disabled="busy || account.syncState === 'saving'" @click="signOut">退出当前账号</button>
           </div>
         </template>
@@ -123,13 +162,14 @@ const signOut = async () => {
               <label><span>账号名</span><input v-model="name" autocomplete="username" minlength="3" maxlength="24" pattern="[A-Za-z0-9_-]+" required placeholder="3—24 位字母、数字、_ 或 -"></label>
               <label><span>密码</span><input v-model="password" type="password" :autocomplete="mode === 'register' ? 'new-password' : 'current-password'" minlength="8" maxlength="128" required placeholder="至少 8 位"></label>
               <p v-if="account.error" class="entry-error" role="alert">{{ account.error }}</p>
+              <button v-if="account.syncState === 'offline'" type="button" class="entry-outline" :disabled="busy" @click="account.retry()">重新检测已有登录与存档</button>
               <button type="submit" class="entry-primary" :disabled="busy || account.syncState === 'loading'">{{ busy ? '正在核对档案…' : mode === 'register' ? '创建账号，接收档案箱' : '登录，继续值班' }} <span>→</span></button>
             </form>
             <p class="entry-privacy">无需邮箱。密码不会写入浏览器本地存储。</p>
           </div>
         </template>
 
-        <div class="entry-card-bottom"><span>登记号 LZ-1936-07</span><span>主人未知 / 经历真实</span></div>
+        <div class="entry-card-bottom"><span>登记号 LZ-1936-07</span><span>虚构任务 / 独立史实</span></div>
       </section>
     </div>
   </main>
@@ -147,6 +187,7 @@ const signOut = async () => {
 @media(max-width:1000px){.entry-layout{grid-template-columns:1fr;gap:50px}.entry-story{max-width:720px}.entry-desk{width:min(510px,100%)}.entry-story-foot{margin-top:35px}}@media(max-width:600px){.entry-header{margin:0 24px}.entry-duty{display:none}.entry-layout{padding:42px 24px}.entry-story h1{font-size:50px}.entry-story-line{gap:7px}.entry-card-body{padding:24px}.entry-story-foot{display:none}}
 .entry-card-top,.entry-card-bottom{font-size:10px;color:#6f6658}
 .entry-card-kicker{font-size:11px}
+.entry-save-now{width:100%;margin-top:10px}
 .entry-card-copy{font-size:14px;color:#514b42}
 .entry-tabs button{font-size:14px;color:#514b42}
 .entry-form label{font-size:13px}

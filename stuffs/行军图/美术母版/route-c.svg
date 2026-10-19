@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="向下滩试探的修订线">
+  <title>探行线 C</title>
+  <desc>从西坡经共线段向下滩岸边延伸，线尾在河前断开。</desc>
+  <g id="route-c" fill="none" stroke="#9c5946" stroke-linecap="round" stroke-linejoin="round">
+    <path id="route-c-shared" d="M520 355 Q625 400 700 450" stroke-width="10" opacity=".7"/>
+    <path id="route-c-tail" d="M700 450 Q940 560 1120 640" stroke-width="7" opacity=".88"/>
+    <path d="M1115 639 l5 1" stroke-width="2" opacity=".45"/>
+  </g>
+</svg>

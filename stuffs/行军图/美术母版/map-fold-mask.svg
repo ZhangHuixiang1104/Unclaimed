@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="行路小图共用纸形与折痕">
+  <title>共用纸形与折痕</title>
+  <desc>正反母版复用同一纸形，裁去生成图透明边缘的杂色；折痕不遮蔽笔迹。</desc>
+  <defs>
+    <clipPath id="map-paper-clip" clipPathUnits="userSpaceOnUse">
+      <path id="map-paper-contour" d="M76 67 L156 62 L242 66 L337 63 L433 65 L530 65 L626 64 L718 63 L816 68 L908 63 L1002 65 L1098 65 L1194 64 L1290 64 L1382 63 L1481 63 Q1533 65 1546 92 L1549 176 L1547 278 L1546 373 L1547 468 L1547 565 L1546 665 L1547 763 L1547 855 Q1548 909 1518 929 L1415 932 L1317 932 L1219 932 L1118 931 L1017 933 L918 933 L816 932 L716 932 L616 932 L514 932 L413 933 L313 932 L214 930 L113 931 Q53 930 43 896 L43 813 L45 715 L45 615 L43 516 L42 417 L41 318 L43 218 L42 135 Q42 81 76 67 Z"/>
+    </clipPath>
+  </defs>
+  <g id="fold-crease" fill="none" stroke-linecap="round" pointer-events="none">
+    <path d="M797 66 Q793 258 799 497 Q797 713 796 932" stroke="#625a4e" stroke-width="2.2" opacity=".14"/>
+    <path d="M43 497 Q420 503 799 499 Q1170 501 1547 499" stroke="#625a4e" stroke-width="2" opacity=".12"/>
+    <path d="M802 66 Q800 279 803 499 Q802 750 801 932" stroke="#fff5dd" stroke-width="2.2" opacity=".18"/>
+    <path d="M43 501 Q420 506 799 503 Q1180 505 1547 503" stroke="#fff5dd" stroke-width="2" opacity=".16"/>
+  </g>
+</svg>

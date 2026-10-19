@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppShell from '../components/common/AppShell.vue'
 import ObjectInspector from '../components/investigation/ObjectInspector.vue'
 import EvidenceBoard from '../components/investigation/EvidenceBoard.vue'
-import SignalNetwork from '../components/interactions/SignalNetwork.vue'
+import ListStoryNotebook from '../components/investigation/ListStoryNotebook.vue'
+import ListStorySynthesis from '../components/investigation/ListStorySynthesis.vue'
+import MapInvestigation from '../components/investigation/MapInvestigation.vue'
 import HistoryGate from '../components/story/HistoryGate.vue'
 import HistoryReveal from '../components/story/HistoryReveal.vue'
 import { objectByKey } from '../data/objects'
@@ -17,6 +19,8 @@ const archive = useArchiveStore()
 const justArchived = ref(false)
 const showHistory = ref(false)
 const inspector = ref<{ reviewClue: (clueId: string) => void } | null>(null)
+const synthesisTarget = ref<HTMLElement | null>(null)
+const gateTarget = ref<{ scrollIntoView: () => void } | null>(null)
 const item = computed(() => objectByKey(String(route.params.objectKey)))
 const unlocked = computed(() => Boolean(item.value && archive.isObjectUnlocked(item.value.key)))
 const record = computed(() => item.value ? archive.getRecord(item.value.key) : undefined)
@@ -40,10 +44,29 @@ watch(item, (value) => {
   justArchived.value = false
 }, { immediate: true })
 
+watch(evidenceVerified, async (verified, wasVerified) => {
+  if (!verified || wasVerified || !['list', 'map'].includes(item.value?.key ?? '')) return
+  await nextTick()
+  gateTarget.value?.scrollIntoView()
+})
+
+const showListStory = async () => {
+  await nextTick()
+  synthesisTarget.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+const saveListStory = () => {
+  if (item.value?.key === 'list') archive.completeListNarrative()
+}
+
 const revealHistory = () => {
   if (!item.value) return
   if (!evidenceVerified.value) return
   archive.revealHistory(item.value.key)
+  if (item.value.key === 'list' || item.value.key === 'map') {
+    void router.push(`/history/${item.value.key}`)
+    return
+  }
   showHistory.value = true
 }
 
@@ -66,26 +89,48 @@ const reviewClue = (clueId: string) => {
       <header class="object-header">
         <button class="text-button" type="button" @click="router.push('/archive')">← 返回档案室</button>
         <div>
-          <span class="eyebrow">{{ record?.status === 'archived' ? item.historicalLabel : `第 ${String(item.order).padStart(2, '0')} 份未整理物件` }} · {{ item.archiveNo }}</span>
+          <span class="eyebrow">原创虚构物件 · 第 {{ String(item.order).padStart(2, '0') }} 件 · {{ item.archiveNo }}</span>
           <h1>{{ item.name }}</h1>
           <p>{{ item.intro }}</p>
           <p class="investigation-question">{{ item.investigationQuestion }}</p>
         </div>
         <div class="stage-indicator object-stage-indicator">
           <span :class="{ active: currentStage === 1, complete: currentStage > 1 }">观察</span><i></i>
-          <span :class="{ active: currentStage === 2, complete: currentStage > 2 }">判断</span><i></i>
+          <span :class="{ active: currentStage === 2, complete: currentStage > 2 }">{{ item.key === 'list' ? '读完整页' : item.key === 'map' ? '写下展签' : '判断' }}</span><i></i>
           <span :class="{ active: currentStage === 3, complete: currentStage > 3 }">核对史实</span><i></i>
           <span :class="{ active: currentStage === 4 }">建档</span>
         </div>
       </header>
 
-      <div class="investigation-layout">
+      <div v-if="item.key === 'map'" class="map-investigation-flow">
+        <MapInvestigation ref="inspector" />
+        <HistoryGate
+          ref="gateTarget"
+          :story-mode="true"
+          story-subject="行军图"
+          :clues-found="record?.foundClueIds.length ?? 0"
+          :clues-total="item.clues.length"
+          :claims-reviewed="0"
+          :claims-total="item.conclusions.length"
+          :classified-count="0"
+          :classified-total="item.conclusions.length"
+          :evidence-verified="evidenceVerified"
+          :history-revealed="record?.historyRevealed ?? false"
+          :history-read="record?.historyRead ?? false"
+          @reveal="revealHistory"
+        />
+      </div>
+      <div v-else class="investigation-layout">
         <div class="investigation-main-column">
           <ObjectInspector :key="item.key" ref="inspector" :item="item" />
 
-          <SignalNetwork v-if="item.interactionType === 'signal-network' && cluesComplete" :key="item.key" />
+          <div v-if="item.key === 'list' && cluesComplete" ref="synthesisTarget">
+            <ListStorySynthesis :saved="evidenceVerified" @review="reviewClue" @save="saveListStory" />
+          </div>
 
           <HistoryGate
+            ref="gateTarget"
+            :story-mode="item.key === 'list'"
             :clues-found="record?.foundClueIds.length ?? 0"
             :clues-total="item.clues.length"
             :claims-reviewed="record?.screeningVerified ? item.conclusions.length : 0"
@@ -99,12 +144,13 @@ const reviewClue = (clueId: string) => {
           />
         </div>
         <div class="investigation-side-column">
-          <EvidenceBoard :key="item.key" :item="item" @review="reviewClue" />
+          <ListStoryNotebook v-if="item.key === 'list'" @review="reviewClue" @continue="showListStory" />
+          <EvidenceBoard v-else :key="item.key" :item="item" @review="reviewClue" />
         </div>
       </div>
 
       <HistoryReveal
-        v-if="showHistory"
+        v-if="showHistory && item.key !== 'list' && item.key !== 'map'"
         :item="item"
         :status="record?.status ?? 'investigating'"
         @close="showHistory = false"
@@ -114,11 +160,11 @@ const reviewClue = (clueId: string) => {
       <section v-if="justArchived || archive.getRecord(item.key).status === 'archived'" class="archive-success">
         <span>档案已建立</span>
         <h2>{{ item.name }}已进入陈列柜</h2>
-        <p>历史路线中的“{{ item.historicalLabel }}”节点已经点亮。</p>
+        <p>本章的历史阅读材料已开放；它与虚构物件分开陈列。</p>
         <p class="chapter-next-hook">{{ item.nextHook }}</p>
         <div>
           <RouterLink class="secondary-button" :to="`/history/${item.key}`">阅读本段史实 →</RouterLink>
-          <RouterLink class="text-button" to="/history">查看完整路线 →</RouterLink>
+          <RouterLink class="text-button" to="/history">查看章节与史实索引 →</RouterLink>
           <RouterLink v-if="nextItem" class="text-button" :to="{ path: '/archive', query: { focus: nextItem.key } }">接收下一件物品 →</RouterLink>
           <RouterLink v-else class="text-button" to="/ending">进入终章 →</RouterLink>
         </div>
@@ -128,7 +174,7 @@ const reviewClue = (clueId: string) => {
     <section v-else-if="item" class="not-found panel">
       <span class="eyebrow">物件尚未接收</span>
       <h1>先完成上一份档案</h1>
-      <p>这一件物品仍在档案箱中。前一段路线恢复后，检查台才会开放。</p>
+      <p>这一件物品仍在档案箱中。请先归档上一件，再接收这份新调查。</p>
       <RouterLink class="primary-button" :to="{ path: '/archive', query: { focus: item.key } }">返回档案室</RouterLink>
     </section>
 

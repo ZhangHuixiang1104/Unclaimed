@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 102" role="img" aria-label="可移动的透明描图尺">
+  <title>描图尺</title>
+  <desc>供玩家手动对比两层笔迹，尺上没有路线答案或编号。</desc>
+  <defs>
+    <linearGradient id="ruler-paper" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#eee5d1" stop-opacity=".64"/>
+      <stop offset=".55" stop-color="#f3ebdb" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#d4c8ae" stop-opacity=".56"/>
+    </linearGradient>
+  </defs>
+  <path id="tracing-ruler-body" d="M11 13 Q20 7 39 9 L401 12 Q413 13 412 26 L410 86 Q407 96 391 94 L24 92 Q9 90 8 81 Z" fill="url(#ruler-paper)" stroke="#83796a" stroke-opacity=".56" stroke-width="1.4"/>
+  <path d="M28 50 L390 52" fill="none" stroke="#695e4e" stroke-width="1.5" opacity=".45"/>
+  <g fill="none" stroke="#695e4e" stroke-width="1.5" opacity=".38">
+    <path d="M56 41 v18 M96 44 v15 M136 43 v16 M176 45 v14 M216 42 v18 M256 45 v14 M296 43 v17 M336 45 v14 M376 42 v19"/>
+  </g>
+</svg>

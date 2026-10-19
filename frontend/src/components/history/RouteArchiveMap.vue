@@ -30,13 +30,13 @@ const selectActive = () => {
 </script>
 
 <template>
-  <section class="route-archive-map" aria-label="已恢复的长征路线档案">
+  <section class="route-archive-map" aria-label="五件虚构物品的调查顺序">
     <header class="route-map-heading">
-      <div><span>ROUTE RECOVERY TABLE / 01—05</span><strong>路线恢复图</strong></div>
+      <div><span>STORY ORDER / 01—05</span><strong>五件调查顺序 · 非历史行军路线</strong></div>
       <div class="route-map-controls"><button type="button" @click="selectNext">逐段巡览 →</button><button type="button" @click="selectActive">聚焦当前进度</button></div>
     </header>
     <div class="route-map-canvas">
-      <div class="map-coordinates" aria-hidden="true"><span>W 104°</span><span>N 27°</span><span>ARCHIVE / LZ-1936</span></div>
+      <div class="map-coordinates" aria-hidden="true"><span>FICTION / FIVE STORIES</span><span>ORDER 01—05</span><span>ARCHIVE / LZ-1936</span></div>
       <span class="terrain-line terrain-line-a" aria-hidden="true"></span>
       <span class="terrain-line terrain-line-b" aria-hidden="true"></span>
       <span class="terrain-line terrain-line-c" aria-hidden="true"></span>
@@ -45,11 +45,11 @@ const selectActive = () => {
         <line v-for="(node, index) in nodes" :key="`segment-${node.item.key}`" :x1="index === 0 ? 4 : points[index - 1].x" :y1="index === 0 ? 86 : points[index - 1].y" :x2="points[index].x" :y2="points[index].y" :class="['route-segment', { recovered: node.state === 'complete' }]" />
       </svg>
       <template v-for="node in nodes" :key="node.item.key">
-        <RouterLink v-if="node.state === 'complete'" :to="`/history/${node.item.key}`" :class="['archive-route-node', node.state, { selected: selectedKey === node.item.key, edge: node.item.order === 5 }]" :style="{ left: `${node.x}%`, top: `${node.y}%` }" :aria-label="`打开${node.item.historicalLabel}史实档案`" @mouseenter="emit('select', node.item.key)" @focus="emit('select', node.item.key)">
+        <RouterLink v-if="node.state === 'complete'" :to="`/history/${node.item.key}`" :class="['archive-route-node', node.state, { selected: selectedKey === node.item.key, edge: node.item.order === 5 }]" :style="{ left: `${node.x}%`, top: `${node.y}%` }" :aria-label="`打开第${node.item.order}件的史实阅读`" @mouseenter="emit('select', node.item.key)" @focus="emit('select', node.item.key)">
           <span class="route-node-ring"><i></i></span><span class="route-node-copy"><small>0{{ node.item.order }} / 已核验</small><strong>{{ node.item.historicalLabel }}</strong></span>
         </RouterLink>
-        <button v-else type="button" :class="['archive-route-node', node.state, { selected: selectedKey === node.item.key, edge: node.item.order === 5 }]" :style="{ left: `${node.x}%`, top: `${node.y}%` }" :aria-label="`第${node.item.order}段路线尚未解锁`" @click="emit('select', node.item.key)" @mouseenter="emit('select', node.item.key)" @focus="emit('select', node.item.key)">
-          <span class="route-node-ring"><i></i></span><span class="route-node-copy"><small>0{{ node.item.order }} / {{ node.state === 'ready' ? '待归档' : node.state === 'investigating' ? '调查中' : '封存' }}</small><strong>未整理路段</strong></span>
+        <button v-else type="button" :class="['archive-route-node', node.state, { selected: selectedKey === node.item.key, edge: node.item.order === 5 }]" :style="{ left: `${node.x}%`, top: `${node.y}%` }" :aria-label="`第${node.item.order}件章节尚未解锁`" @click="emit('select', node.item.key)" @mouseenter="emit('select', node.item.key)" @focus="emit('select', node.item.key)">
+          <span class="route-node-ring"><i></i></span><span class="route-node-copy"><small>0{{ node.item.order }} / {{ node.state === 'ready' ? '待归档' : node.state === 'investigating' ? '调查中' : '封存' }}</small><strong>未公开章节</strong></span>
         </button>
       </template>
       <div class="map-legend"><span><i class="complete"></i>史实已公开</span><span><i class="investigating"></i>调查进行中</span><span><i></i>档案封存</span></div>

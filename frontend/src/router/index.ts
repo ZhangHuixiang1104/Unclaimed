@@ -10,6 +10,7 @@ import AboutView from '../views/AboutView.vue'
 import AccountView from '../views/AccountView.vue'
 import { useArchiveStore } from '../stores/archive'
 import { useAccountStore } from '../stores/account'
+import { canEnterProject } from './access'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -31,7 +32,7 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const account = useAccountStore()
   await account.initialize()
-  if (to.name !== 'account' && (!account.signedIn || !['synced', 'saving'].includes(account.syncState))) {
+  if (to.name !== 'account' && !canEnterProject(account.signedIn, account.cloudReady, account.syncState)) {
     return { name: 'account', query: { next: to.fullPath } }
   }
   const archive = useArchiveStore()

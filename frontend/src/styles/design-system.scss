@@ -297,3 +297,26 @@ select:focus-visible {
   button:focus-visible,
   a:focus-visible { outline-width: 3px; }
 }
+
+/* Content-bearing copy stays readable on PC; micro labels remain decorative only. */
+.inspection-note p,
+.evidence-slip p,
+.history-reveal-document .source-line strong,
+.history-reveal-document .boundary p,
+.history-conclusion-grid p,
+.history-material-card p,
+.history-material-reader section > p,
+.material-reader-list p span,
+.ticket-page > p { font-size: 13px; line-height: 1.75; }
+.stamp-hint,
+.work-log > p,
+.work-log li,
+.history-boundary-note > div span,
+.about-focus-note { font-size: 12px; line-height: 1.7; }
+.stamp-hint { color: #c9c6b9; }
+.work-log > p,
+.work-log li { color: #c1c2b9; }
+.history-material-reader > header button,
+.history-material-card i,
+.history-detail-navigation { font-size: 12px; }
+.material-source-slot a { display: inline-block; margin-top: 10px; color: #71332d; font-size: 13px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }

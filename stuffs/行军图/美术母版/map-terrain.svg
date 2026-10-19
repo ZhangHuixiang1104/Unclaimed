@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="虚构河谷地形底纹">
+  <title>无名河谷地形底纹</title>
+  <desc>原创虚构的坡地、浅沟、两处河滩与右侧河道；无文字、真实地名或地理坐标。</desc>
+  <g id="terrain-contours" fill="none" stroke="#746c5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".22">
+    <path d="M111 216 C235 180 356 184 452 236 S620 305 712 265"/>
+    <path d="M105 249 C232 214 344 218 427 265 S592 340 687 304"/>
+    <path d="M115 287 C230 258 321 261 407 309 S568 377 654 341"/>
+    <path d="M137 326 C228 302 302 307 379 349 S532 410 612 384"/>
+    <path d="M132 449 C251 418 339 420 438 454 S616 470 705 438"/>
+    <path d="M118 485 C237 458 328 462 409 490 S580 511 658 479"/>
+    <path d="M104 540 C246 510 349 515 436 535 S612 550 717 512"/>
+    <path d="M104 835 C259 800 350 790 477 815 S705 861 852 810"/>
+    <path d="M109 867 C255 832 363 825 482 849 S700 894 839 850"/>
+    <path d="M882 130 C952 119 1037 140 1091 181"/>
+    <path d="M855 159 C941 148 1030 170 1087 216"/>
+    <path d="M848 188 C938 183 1012 203 1056 248"/>
+    <path d="M816 763 C906 718 1026 722 1103 764"/>
+    <path d="M831 802 C930 761 1022 771 1095 813"/>
+  </g>
+  <g id="west-slope-shading" fill="none" stroke="#736a5c" stroke-linecap="round" opacity=".18">
+    <path d="M294 263 Q401 294 479 349" stroke-width="11"/>
+    <path d="M307 281 Q406 311 467 354" stroke-width="3"/>
+    <path d="M297 333 Q384 352 466 404" stroke-width="2"/>
+  </g>
+  <g id="gully" fill="none" stroke="#857767" stroke-linecap="round" opacity=".29">
+    <path d="M416 442 Q468 484 510 559 Q557 608 622 642" stroke-width="10"/>
+    <path d="M415 442 Q468 484 510 559 Q557 608 622 642" stroke="#efe4cd" stroke-width="4" opacity=".48"/>
+    <path d="M501 555 l-28 21 M513 565 l-25 22 M526 575 l-25 22" stroke-width="2"/>
+  </g>
+  <g id="river" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1219 75 C1192 161 1237 234 1220 318 C1200 402 1255 488 1237 565 C1212 664 1247 747 1217 930" stroke="#8ba39d" stroke-width="63" opacity=".11"/>
+    <path id="near-bank" d="M1185 79 C1163 166 1203 241 1187 319 C1168 405 1220 486 1204 559 C1181 657 1216 744 1184 925" stroke="#625f55" stroke-width="3.2" opacity=".33"/>
+    <path id="far-bank" d="M1252 74 C1233 158 1272 238 1252 326 C1230 410 1285 487 1268 569 C1240 667 1275 753 1250 930" stroke="#625f55" stroke-width="2.4" opacity=".28"/>
+    <g stroke="#80938b" stroke-width="2" opacity=".28">
+      <path d="M1203 207 q19 -7 34 3 M1216 221 q16 -5 27 4"/>
+      <path d="M1204 463 q20 -8 40 3 M1211 478 q16 -6 28 4"/>
+      <path d="M1204 695 q17 -8 34 2 M1211 709 q18 -5 31 5"/>
+    </g>
+  </g>
+  <g id="riverbanks" fill="none" stroke="#827767" stroke-width="2" stroke-linecap="round" opacity=".22">
+    <path d="M1046 252 Q1116 233 1174 258 M1056 280 Q1119 264 1183 286"/>
+    <path d="M1025 614 Q1108 584 1191 617 M1042 646 Q1116 618 1193 650"/>
+  </g>
+</svg>

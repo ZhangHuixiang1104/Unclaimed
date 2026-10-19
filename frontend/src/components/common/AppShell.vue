@@ -30,15 +30,26 @@ const account = useAccountStore()
 
       <div class="topbar-actions">
         <span class="keeper-id">档案员 {{ archive.keeperNumber }}</span>
-        <span class="keeper-id sync-label">{{ account.signedIn ? account.syncState === 'synced' ? '已保存' : account.syncState === 'saving' ? '保存中…' : '存档待同步' : '未登录 · 进度不保留' }}</span>
+        <span class="keeper-id sync-label">{{ account.signedIn ? account.syncState === 'synced' && !account.pendingUpload ? '云端已保存' : account.syncState === 'saving' ? '保存中…' : account.pendingSafe && account.pendingUpload ? '本机暂存 · 待同步' : '存档待同步' : '未登录 · 进度不保留' }}</span>
         <button class="icon-button" type="button" :aria-pressed="settings.soundEnabled" @click="settings.soundEnabled = !settings.soundEnabled">
           {{ settings.soundEnabled ? '声音 开' : '声音 关' }}
         </button>
       </div>
     </header>
 
+    <div v-if="account.syncState === 'offline' || account.syncState === 'conflict'" class="save-status-warning" role="status">
+      <span>{{ account.syncState === 'offline' ? (account.error || '存档服务暂时不可用。') + (account.pendingSafe && account.pendingUpload ? ' 新进度已暂存本机，尚未上传云端。' : ' 浏览器无法暂存新进度，请勿关闭页面。') : '云端与本机存档需要核对；目前没有覆盖任何一份。' }}</span>
+      <button v-if="account.syncState === 'offline'" type="button" @click="account.retry()">立即重试 →</button>
+      <RouterLink v-else to="/account">核对存档 →</RouterLink>
+    </div>
+
     <main :class="['shell-main', `route-${String(route.name ?? 'unknown')}`]">
       <slot />
     </main>
   </div>
 </template>
+
+<style scoped>
+.save-status-warning { display: flex; justify-content: center; gap: 16px; padding: 10px 24px; background: #6b332d; color: #f5e9d6; font-size: 13px; line-height: 1.5; }
+.save-status-warning a, .save-status-warning button { padding: 0; border: 0; background: transparent; color: #fff2ce; font-size: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+</style>

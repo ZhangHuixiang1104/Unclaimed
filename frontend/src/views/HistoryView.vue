@@ -25,7 +25,7 @@ const routeCoordinates = [
 ]
 const nodes = computed(() => archiveObjects.map((item, index) => ({ item, record: archive.getRecord(item.key), state: stateFor(item.key), ...routeCoordinates[index] })))
 const selectedNode = computed(() => nodes.value.find((node) => node.item.key === selectedKey.value) ?? nodes.value[0])
-const publishedMaterials = computed(() => archive.archivedCount * 2)
+const remainingObjects = computed(() => archiveObjects.length - archive.archivedCount)
 const nextObject = computed(() => archiveObjects.find((item) => item.key === archive.nextObjectKey) ?? archiveObjects[0])
 const nextActionLabel = computed(() => {
   if (archive.endingUnlocked) return '进入终章档案'
@@ -38,14 +38,14 @@ const nextActionLabel = computed(() => {
     <section class="history-room">
       <header class="history-room-intro">
         <div class="history-intro-copy">
-          <span class="history-kicker">LONG MARCH ROUTE ARCHIVE / 路线档案</span>
-          <h1>沿着遗物留下的方向</h1>
-          <p>每完成一件失物调查，就会恢复一段被封存的路线。未完成的节点不会提前公开地点与史实。</p>
+          <span class="history-kicker">INVESTIGATION ORDER / 章节与史实索引</span>
+          <h1>沿着证据，逐件阅读</h1>
+          <p>图中折线只表示五件虚构物品的调查顺序，不是长征行军路线。完成一件调查，才开放对应的独立史实主题。</p>
           <RouterLink class="history-intro-action" :to="archive.endingUnlocked ? '/ending' : `/object/${nextObject.key}`"><span>{{ nextActionLabel }}</span><i>→</i></RouterLink>
         </div>
-        <div class="history-room-metrics" aria-label="路线档案恢复进度">
-          <div><small>已恢复路线</small><strong>{{ archive.archivedCount }}<i>/05</i></strong></div>
-          <div><small>已公开材料</small><strong>{{ publishedMaterials }}<i>份</i></strong></div>
+        <div class="history-room-metrics" aria-label="章节档案进度">
+          <div><small>已开放章节</small><strong>{{ archive.archivedCount }}<i>/05</i></strong></div>
+          <div><small>尚待归档</small><strong>{{ remainingObjects }}<i>件</i></strong></div>
           <div><small>总完成度</small><strong>{{ archive.progressPercent }}<i>%</i></strong></div>
         </div>
       </header>
@@ -53,7 +53,7 @@ const nextActionLabel = computed(() => {
         <RouteArchiveMap :nodes="nodes" :selected-key="selectedKey" @select="selectedKey = $event" />
         <RouteDossierPanel :item="selectedNode.item" :record="selectedNode.record" :state="selectedNode.state" />
       </div>
-      <footer class="history-room-footer"><span>档案公开原则 01</span><p>先完成调查，再公布史实；先说明证据边界，再讲述人物故事。</p><RouterLink to="/archive">返回档案室 →</RouterLink></footer>
+      <footer class="history-room-footer"><span>档案公开原则 01</span><p>五件游戏物品各有原创故事；历史材料分别核验，不能连成同一条真实路线。</p><RouterLink to="/archive">返回档案室 →</RouterLink></footer>
     </section>
   </AppShell>
 </template>

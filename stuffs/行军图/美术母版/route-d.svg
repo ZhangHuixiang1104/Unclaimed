@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="止于高地的最后一条线">
+  <title>等待线 D</title>
+  <desc>从西坡压过下滩线的起段，转至高地等待；终点不越河。</desc>
+  <g id="route-d" fill="none" stroke="#3b3831" stroke-linecap="round" stroke-linejoin="round">
+    <path id="route-d-shared" d="M520 355 Q625 400 700 450" stroke-width="6" opacity=".94"/>
+    <path id="route-d-turn" d="M700 450 Q790 360 785 225" stroke-width="8" opacity=".96"/>
+  </g>
+</svg>

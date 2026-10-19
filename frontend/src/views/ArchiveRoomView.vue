@@ -59,8 +59,8 @@ archive.chooseObject(selectedKey.value)
       <header class="archive-room-header">
         <div class="archive-room-heading">
           <span class="archive-time">23:51 / 档案箱已接收</span>
-          <h1>今晚，从哪一件开始？</h1>
-          <p>它们没有留下主人姓名，只留下了可以被检查的痕迹。选择一份档案，先观察，再归档。</p>
+          <h1>从第一件，查到最后一件。</h1>
+          <p>五件物品各有待查的故事。请按顺序检查；未完成的档案仍保持封存。</p>
         </div>
         <div class="archive-room-progress">
           <span>值守进度</span>
@@ -90,7 +90,7 @@ archive.chooseObject(selectedKey.value)
 
       <footer class="archive-room-footer">
         <span>UNCLAIMED / NIGHT ARCHIVE ROOM</span>
-        <p>主人未知。经历真实。共同保存。</p>
+        <p>姓名留白，证据说话；故事与史实分别保存。</p>
         <span>LZ-1936-07 / 01—05</span>
       </footer>
     </section>

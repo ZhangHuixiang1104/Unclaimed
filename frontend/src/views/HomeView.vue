@@ -29,7 +29,7 @@ const hasProgress = computed(() => archive.archivedCount > 0 || foundClueCount.v
 
 const homeLead = computed(() => hasProgress.value
   ? '档案箱仍停在昨晚的位置。还有一些痕迹，尚未被妥善保存。'
-  : '五件没有主人的物件，一晚尚未完成的整理。先别急着写故事，看看它们自己留下了什么。')
+  : '五件等待整理的物品，各自留下不同的疑问。按顺序查找痕迹，再阅读独立的历史材料。')
 
 const actionLabel = computed(() => {
   if (stage.value === 'opening' || stage.value === 'leaving') return '正在打开档案箱…'
@@ -130,7 +130,7 @@ onBeforeUnmount(() => timers.forEach((timer) => window.clearTimeout(timer)))
 
     <footer class="home-principle">
       <span>UNCLAIMED / ARCHIVES OF THE LONG MARCH</span>
-      <p>主人未知。经历真实。共同保存。</p>
+      <p>姓名留白，证据说话；故事与史实分别保存。</p>
       <span>保管规则 01—03</span>
     </footer>
   </main>
