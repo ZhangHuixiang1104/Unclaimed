@@ -35,11 +35,20 @@ export const useAccountStore = defineStore('account', () => {
   }
 
   const hasPlayProgress = (progress: SavedProgress) => Object.keys(progress.records).length > 0
-  const isOlderEdition = (progress: SavedProgress) => hasPlayProgress(progress) && progress.contentVersion !== CONTENT_VERSION
+  // v3/v4/v5 may contain old battery/shoes/bowl placeholders. Only affected chapters
+  // migrate, with the previous records retained in legacy backup fields.
+  const isOlderEdition = (progress: SavedProgress) => hasPlayProgress(progress)
+    && progress.contentVersion !== CONTENT_VERSION
+    && progress.contentVersion !== 'independent-chapters-v3'
+    && progress.contentVersion !== 'independent-chapters-v4'
+    && progress.contentVersion !== 'independent-chapters-v5'
   const comparableProgress = (progress: SavedProgress) => JSON.stringify({
     contentVersion: progress.contentVersion ?? 'legacy-v1',
     keeperNumber: progress.keeperNumber,
     records: progress.records,
+    legacyBatteryRecord: progress.legacyBatteryRecord ?? null,
+    legacyShoesRecord: progress.legacyShoesRecord ?? null,
+    legacyBowlRecord: progress.legacyBowlRecord ?? null,
     selectedObjectKey: progress.selectedObjectKey ?? null,
     keeperNote: progress.keeperNote ?? '',
     createdAt: progress.createdAt,
@@ -83,6 +92,7 @@ export const useAccountStore = defineStore('account', () => {
     cloudReady.value = true
     syncState.value = 'synced'
     error.value = ''
+    if (save.progress && !sameProgress(save.progress, archive.exportProgress())) scheduleSave()
   }
 
   const upload = async (progress: SavedProgress) => {
@@ -130,12 +140,13 @@ export const useAccountStore = defineStore('account', () => {
       archive.replaceProgress(current)
       await nextTick()
       paused = false
-      if (sameProgress(remote.progress, current)) {
+      const migrated = archive.exportProgress()
+      if (sameProgress(remote.progress, migrated)) {
         await applyCloud(remote)
       } else if (!pending.conflicted && remote.revision === pending.baseRevision) {
-        await upload(current)
+        await upload(migrated)
       } else {
-        rememberProgress(current, pending.baseRevision, true)
+        rememberProgress(migrated, pending.baseRevision, true)
         syncState.value = 'conflict'
         error.value = '云端与本机都有更新，尚未覆盖任一份进度。'
       }
@@ -271,7 +282,7 @@ export const useAccountStore = defineStore('account', () => {
   }
 
   watch(
-    () => JSON.stringify({ keeperNumber: archive.keeperNumber, records: archive.records, selectedObjectKey: archive.selectedObjectKey, keeperNote: archive.keeperNote, createdAt: archive.createdAt }),
+    () => JSON.stringify({ keeperNumber: archive.keeperNumber, records: archive.records, legacyBatteryRecord: archive.legacyBatteryRecord, legacyShoesRecord: archive.legacyShoesRecord, legacyBowlRecord: archive.legacyBowlRecord, selectedObjectKey: archive.selectedObjectKey, keeperNote: archive.keeperNote, createdAt: archive.createdAt }),
     () => { if (!paused) scheduleSave() },
     { flush: 'sync' },
   )
@@ -290,9 +301,21 @@ export const useAccountStore = defineStore('account', () => {
   }
 
   const saveNow = async () => {
-    if (!username.value || syncState.value === 'conflict' || syncState.value === 'upgrade') return
+    if (!username.value || syncState.value === 'conflict' || syncState.value === 'upgrade') return false
     stopPendingSave()
-    await flushSave()
+    // An autosave may already be in flight. Wait for it before taking the
+    // requested snapshot; otherwise saveNow could report success too early.
+    for (let attempt = 0; saving && attempt < 100; attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+    if (saving) return false
+    for (let attempt = 0; attempt < 3; attempt++) {
+      stopPendingSave()
+      await flushSave()
+      if (syncState.value === 'synced' && !pendingUpload.value) return true
+      if (syncState.value === 'offline') return false
+    }
+    return false
   }
 
   const logout = async () => {

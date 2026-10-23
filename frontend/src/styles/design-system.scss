@@ -320,3 +320,78 @@ select:focus-visible {
 .history-material-card i,
 .history-detail-navigation { font-size: 12px; }
 .material-source-slot a { display: inline-block; margin-top: 10px; color: #71332d; font-size: 13px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+
+/* PC reading hierarchy: display serif, story copy sans, metadata mono. */
+.archive-room-heading p,
+.shell-object .object-header p,
+.history-intro-copy p,
+.history-detail-title p { color: #d3d0c5; font-size: 15px; line-height: 1.7; }
+.archive-time,
+.archive-index-heading span,
+.duty-board-heading span,
+.board-label,
+.dossier-section-label,
+.shell-object .object-header .eyebrow,
+.history-ledger-section > span { font-size: 11px; letter-spacing: .1em; }
+.archive-room-progress span,
+.archive-room-progress small,
+.archive-index-heading small,
+.duty-board-heading small,
+.index-copy small,
+.index-status,
+.archive-index-footer,
+.dossier-code,
+.dossier-header small,
+.dossier-status,
+.dossier-clue-progress span,
+.mini-route-labels { color: #b8b8ac; font-size: 11px; }
+.index-copy strong { color: #ebe3d3; font-size: 15px; }
+.archive-index-item.active { background: rgba(203,125,103,.13); box-shadow: inset 3px 0 #cd8b77; }
+.dossier-subtitle { color: #493f35; font-size: 15px; font-weight: 700; }
+.dossier-intro { color: #50483d; font-size: 14px; line-height: 1.7; }
+.dossier-action { font-size: 14px; font-weight: 700; }
+.dossier-clue-progress strong { font-size: 13px; font-weight: 700; }
+.duty-board .evidence-summary > div span { color: #d0cec1; font-size: 13px; }
+.duty-board .evidence-summary > div strong { color: #f1e5d0; font-size: 15px; }
+.duty-note { transform: none; background: #e0d4bc; }
+.duty-note .board-label { color: #7b3c33; }
+.duty-note strong { display: block; margin: 12px 0 8px; color: #292721; font: 700 17px/1.4 var(--font-sans); }
+.duty-note p { margin: 0 0 15px; color: #51483b; font: 13px/1.6 var(--font-sans); }
+.duty-note a { display: inline-flex; min-height: 36px; align-items: center; color: #772f29; font: 700 13px var(--font-sans); border-bottom: 1px solid currentColor; }
+.mini-route-heading strong { color: #e4d6bf; font-size: 13px; }
+.ending-seal strong { color: #e2d6c3; font-size: 14px; }
+.ending-seal span { color: #d6a196; font-size: 11px; }
+
+.shell-object .object-header p.investigation-question { color: #f0bcaa; font-size: 18px; line-height: 1.45; }
+.object-stage-indicator { color: #aaaDa5; font-size: 12px; }
+.shell-object .tool-row button,
+.shell-object .tool-hint,
+.shell-object .inspection-caption,
+.shell-object .classification-intro p { font-size: 13px; }
+.shell-object .clue-card strong,
+.evidence-slip strong { font-size: 15px; }
+.history-gate-copy p,
+.history-context > p { font-size: 14px; line-height: 1.7; }
+
+.history-ledger-index a,
+.history-detail-navigation a { font-size: 13px; }
+.history-ledger-section { padding: 34px 42px; }
+.history-ledger-section > p { color: #484239; font-size: 15px; line-height: 1.75; }
+.history-conclusion-grid strong { font-size: 15px; line-height: 1.5; }
+.history-conclusion-grid p,
+.history-material-card p,
+.history-material-reader section > p { color: #544c40; font-size: 13px; line-height: 1.65; }
+.history-material-card strong { font-family: var(--font-sans); font-size: 17px; font-weight: 700; }
+.history-material-card i { font-size: 12px; font-weight: 700; }
+
+.current-trace span,
+.current-trace p,
+.home-actions a,
+.about-focus-note,
+.about-play-flow li { color: #c4c1b5; font-size: 12px; }
+.current-trace strong { color: #f0e5d2; font-size: 15px; }
+.about-focus-copy > p { color: #d1cec2; font-size: 15px; line-height: 1.7; }
+.about-focus-actions a,
+.about-compact-closing > a { font-size: 14px; font-weight: 700; }
+.about-core > header p,
+.about-boundary-compact small { color: #c0bdb2; font-size: 12px; }

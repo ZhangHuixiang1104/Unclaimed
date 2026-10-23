@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">一条电波背后有多人</title>
+  <desc id="desc">通信保障关系示意：报务员、能源、收发设备与修理者共同支撑信息传递。不同设备和时期的配置并不相同。</desc>
+  <defs>
+    <pattern id="paper" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M0 11.5H12" stroke="#c5bba7" stroke-opacity=".12"/></pattern>
+    <style>
+      .sans{font-family:"Noto Sans SC","Microsoft YaHei",sans-serif}.serif{font-family:"Noto Serif SC","Source Han Serif SC","SimSun",serif}.meta{font:600 15px ui-monospace,Consolas,monospace;letter-spacing:2px;fill:#8d4f3e}.small{font-size:17px;fill:#525a50}.label{font-size:26px;font-weight:700;fill:#263329}
+    </style>
+  </defs>
+  <rect width="1200" height="700" fill="#e9e1cf"/><rect width="1200" height="700" fill="url(#paper)"/>
+  <rect x="40" y="40" width="1120" height="620" fill="none" stroke="#aca38e"/>
+  <text x="86" y="93" class="meta">H01 / COMMUNICATION</text>
+  <text x="86" y="163" class="serif" font-size="49" font-weight="700" fill="#1b2720">一条电波背后有多人</text>
+  <text x="88" y="207" class="sans small">通信保障关系示意 · 不是某一型电台的电路复原</text>
+  <path d="M160 368H1050" stroke="#9e6b4b" stroke-width="3" stroke-dasharray="3 12" stroke-linecap="round"/>
+  <g class="sans" text-anchor="middle">
+    <g transform="translate(210 367)"><circle r="70" fill="#26372e"/><path d="M-26 16v-27c0-15 12-27 27-27s27 12 27 27v27M-38 27h76" fill="none" stroke="#e9e1cf" stroke-width="4" stroke-linecap="round"/><circle cx="1" cy="-10" r="11" fill="none" stroke="#e9e1cf" stroke-width="3"/><text y="120" class="label">报务员</text></g>
+    <g transform="translate(468 367)"><circle r="70" fill="#ded0b4" stroke="#ad7655" stroke-width="2"/><path d="M-24-37H9L-4-7H27L-22 43L-4 4H-27Z" fill="#9c563e"/><text y="120" class="label">能源</text></g>
+    <g transform="translate(730 367)"><circle r="70" fill="#26372e"/><rect x="-38" y="-28" width="76" height="58" rx="5" fill="none" stroke="#e9e1cf" stroke-width="4"/><path d="M-23-10H23M-23 4H13M-23 18H5" stroke="#e9e1cf" stroke-width="3"/><text y="120" class="label">收发设备</text></g>
+    <g transform="translate(990 367)"><circle r="70" fill="#ded0b4" stroke="#ad7655" stroke-width="2"/><path d="M-27 25 19-21M-21-25l46 46M12-28l18 18" fill="none" stroke="#8d4f3e" stroke-width="7" stroke-linecap="round"/><text y="120" class="label">修理者</text></g>
+  </g>
+  <rect x="86" y="567" width="1028" height="58" fill="#f3ecdf" stroke="#c7bba7"/>
+  <text x="106" y="604" class="sans" font-size="20" fill="#263329">人、器材与维护相互支撑，才有信息抵达。</text>
+  <text x="880" y="604" class="sans" font-size="14" fill="#737869">据公开报道编绘／示意</text>
+</svg>

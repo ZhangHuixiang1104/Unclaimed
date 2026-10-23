@@ -1,6 +1,7 @@
 $ErrorActionPreference = 'Stop'
 $projectRoot = $PSScriptRoot
 $healthUrl = 'http://127.0.0.1:8000/api/v1/health'
+$expectedSaveContract = 'independent-chapters-v6'
 $backendProcess = $null
 
 function Get-ArchiveBackendHealth {
@@ -12,8 +13,8 @@ function Get-ArchiveBackendHealth {
 }
 
 $backendHealth = Get-ArchiveBackendHealth
-if ($backendHealth -and ($backendHealth.status -ne 'ok' -or $backendHealth.saveContract -ne 'independent-chapters-v3')) {
-  throw 'Port 8000 has an incompatible archive service. Stop that backend process, then run start-dev.ps1 again.'
+if ($backendHealth -and ($backendHealth.status -ne 'ok' -or $backendHealth.saveContract -ne $expectedSaveContract)) {
+  throw "Port 8000 has an incompatible archive service (found: $($backendHealth.saveContract); expected: $expectedSaveContract). Stop that backend process, then run start-dev.ps1 again."
 }
 
 if (-not $backendHealth) {
@@ -22,22 +23,30 @@ if (-not $backendHealth) {
   $backendReady = $false
   for ($attempt = 0; $attempt -lt 30; $attempt++) {
     $backendHealth = Get-ArchiveBackendHealth
-    if ($backendHealth -and $backendHealth.status -eq 'ok' -and $backendHealth.saveContract -eq 'independent-chapters-v3') { $backendReady = $true; break }
+    if ($backendHealth -and $backendHealth.status -eq 'ok' -and $backendHealth.saveContract -eq $expectedSaveContract) { $backendReady = $true; break }
     if ($backendProcess.HasExited) { break }
     Start-Sleep -Milliseconds 500
   }
   if (-not $backendReady) {
     if (-not $backendProcess.HasExited) { Stop-Process -Id $backendProcess.Id }
-    throw 'Archive service did not start. Install backend/requirements.txt and check port 8000.'
+    if ($backendHealth) {
+      throw "Archive service returned an incompatible save contract (found: $($backendHealth.saveContract); expected: $expectedSaveContract)."
+    }
+    throw 'Archive service did not start. Run "python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000" in this directory to see the backend error.'
   }
 }
 
 Write-Host 'Archive service is ready: http://127.0.0.1:8000/api/v1/health'
-Write-Host 'Starting frontend: http://127.0.0.1:4173'
+Write-Host 'Starting frontend: http://127.0.0.1:5173'
+$frontendExitCode = 0
 try {
   npm --prefix (Join-Path $projectRoot 'frontend') run dev
+  $frontendExitCode = $LASTEXITCODE
 } finally {
   if ($backendProcess -and -not $backendProcess.HasExited) {
     Stop-Process -Id $backendProcess.Id
   }
+}
+if ($frontendExitCode -ne 0) {
+  throw "Frontend did not start (exit code: $frontendExitCode). Check the error above and whether port 5173 is available."
 }

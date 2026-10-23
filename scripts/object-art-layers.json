@@ -1,0 +1,279 @@
+{
+  "map": {
+    "files": {
+      "frontPaper": "stuffs/行军图/美术母版/map_paper_front_blank.png",
+      "backPaper": "stuffs/行军图/美术母版/map_paper_back_blank.png",
+      "terrain": "stuffs/行军图/美术母版/map-terrain.svg",
+      "routeA": "stuffs/行军图/美术母版/route-a.svg",
+      "routeB": "stuffs/行军图/美术母版/route-b.svg",
+      "routeC": "stuffs/行军图/美术母版/route-c.svg",
+      "routeD": "stuffs/行军图/美术母版/route-d.svg",
+      "fold": "stuffs/行军图/美术母版/map-fold-mask.svg",
+      "rulerImage": "stuffs/行军图/美术母版/map-tracing-ruler.svg",
+      "frontTitle": "stuffs/行军图/美术母版/ink-front-title.png",
+      "frontCamp": "stuffs/行军图/美术母版/ink-front-camp.png",
+      "frontGully": "stuffs/行军图/美术母版/ink-front-gully.png",
+      "frontWest": "stuffs/行军图/美术母版/ink-front-west-slope.png",
+      "frontNorth": "stuffs/行军图/美术母版/ink-front-north-bank.png",
+      "frontLower": "stuffs/行军图/美术母版/ink-front-lower-bank.png",
+      "frontHigh": "stuffs/行军图/美术母版/ink-front-high-ground.png",
+      "frontFirst": "stuffs/行军图/美术母版/ink-front-first-route.png",
+      "backOne": "stuffs/行军图/美术母版/ink-back-report-01.png",
+      "backTwo": "stuffs/行军图/美术母版/ink-back-report-02.png",
+      "backThree": "stuffs/行军图/美术母版/ink-back-report-03.png",
+      "backFour": "stuffs/行军图/美术母版/ink-back-report-04.png",
+      "backBlank": "stuffs/行军图/美术母版/ink-back-north-blank.png"
+    },
+    "frontInk": [
+      {
+        "src": "frontTitle",
+        "x": 160,
+        "y": 137,
+        "w": 410,
+        "h": 118,
+        "crop": "147 122 1846 557",
+        "iw": 2167,
+        "ih": 726
+      },
+      {
+        "src": "frontCamp",
+        "x": 165,
+        "y": 731,
+        "w": 113,
+        "h": 60,
+        "crop": "351 239 893 500",
+        "iw": 1568,
+        "ih": 1003
+      },
+      {
+        "src": "frontGully",
+        "x": 455,
+        "y": 579,
+        "w": 112,
+        "h": 60,
+        "crop": "387 297 795 441",
+        "iw": 1568,
+        "ih": 1003
+      },
+      {
+        "src": "frontWest",
+        "x": 440,
+        "y": 281,
+        "w": 120,
+        "h": 55,
+        "crop": "373 293 909 426",
+        "iw": 1568,
+        "ih": 1003
+      },
+      {
+        "src": "frontNorth",
+        "x": 1050,
+        "y": 226,
+        "w": 125,
+        "h": 54,
+        "crop": "335 312 933 427",
+        "iw": 1568,
+        "ih": 1003
+      },
+      {
+        "src": "frontLower",
+        "x": 1040,
+        "y": 671,
+        "w": 120,
+        "h": 56,
+        "crop": "404 313 849 429",
+        "iw": 1568,
+        "ih": 1003
+      },
+      {
+        "src": "frontHigh",
+        "x": 790,
+        "y": 148,
+        "w": 123,
+        "h": 62,
+        "crop": "366 274 889 481",
+        "iw": 1568,
+        "ih": 1003
+      },
+      {
+        "src": "frontFirst",
+        "x": 317,
+        "y": 607,
+        "w": 120,
+        "h": 43,
+        "crop": "319 269 1165 427",
+        "iw": 1774,
+        "ih": 887
+      }
+    ],
+    "backInk": [
+      {
+        "src": "backOne",
+        "x": 210,
+        "y": 273,
+        "w": 560,
+        "h": 83,
+        "crop": "83 187 2006 346"
+      },
+      {
+        "src": "backTwo",
+        "x": 210,
+        "y": 398,
+        "w": 660,
+        "h": 79,
+        "crop": "43 215 2090 305"
+      },
+      {
+        "src": "backThree",
+        "x": 210,
+        "y": 523,
+        "w": 660,
+        "h": 81,
+        "crop": "38 211 2096 310"
+      },
+      {
+        "src": "backFour",
+        "x": 210,
+        "y": 648,
+        "w": 865,
+        "h": 80,
+        "crop": "16 215 2153 252"
+      },
+      {
+        "src": "backBlank",
+        "x": 1150,
+        "y": 787,
+        "w": 240,
+        "h": 51,
+        "crop": "115 207 1294 322"
+      }
+    ],
+    "clip": "M76 67 L156 62 L242 66 L337 63 L433 65 L530 65 L626 64 L718 63 L816 68 L908 63 L1002 65 L1098 65 L1194 64 L1290 64 L1382 63 L1481 63 Q1533 65 1546 92 L1549 176 L1547 278 L1546 373 L1547 468 L1547 565 L1546 665 L1547 763 L1547 855 Q1548 909 1518 929 L1415 932 L1317 932 L1219 932 L1118 931 L1017 933 L918 933 L816 932 L716 932 L616 932 L514 932 L413 933 L313 932 L214 930 L113 931 Q53 930 43 896 L43 813 L45 715 L45 615 L43 516 L42 417 L41 318 L43 218 L42 135 Q42 81 76 67 Z"
+  },
+  "list": {
+    "files": {
+      "frontPaper": "stuffs/名单/美术母版/list_front_master_blank.png",
+      "backPaper": "stuffs/名单/美术母版/list_back_master_blank.png",
+      "mudOverlay": "stuffs/名单/美术母版/list_mud_overlay.png",
+      "rakingTexture": "stuffs/名单/美术母版/list_raking_light_texture.png",
+      "frontTitle": "stuffs/名单/美术母版/ink-front-title.png",
+      "frontTurn1": "stuffs/名单/美术母版/ink-front-turn1.png",
+      "frontTurn2": "stuffs/名单/美术母版/ink-front-turn2.png",
+      "frontTurn3": "stuffs/名单/美术母版/ink-front-turn3.png",
+      "frontEquipment": "stuffs/名单/美术母版/ink-front-equipment.png",
+      "frontSupplies": "stuffs/名单/美术母版/ink-front-supplies.png",
+      "frontTwoPeople": "stuffs/名单/美术母版/ink-front-two-people.png",
+      "frontName": "stuffs/名单/美术母版/ink-front-name.png",
+      "backTitle": "stuffs/名单/美术母版/ink-back-title.png",
+      "backOpenBox": "stuffs/名单/美术母版/ink-back-open-box.png",
+      "backRecordedBox": "stuffs/名单/美术母版/ink-back-recorded-box.png",
+      "backReceipt": "stuffs/名单/美术母版/ink-back-receipt.png",
+      "backBorrow": "stuffs/名单/美术母版/ink-back-borrow.png",
+      "backReturn": "stuffs/名单/美术母版/ink-back-return.png"
+    },
+    "frontInk": [
+      {
+        "src": "frontTitle",
+        "x": 251.47038327526133,
+        "y": 165.70034843205576,
+        "width": 250.2439024390244,
+        "height": 98.84320557491289
+      },
+      {
+        "src": "frontTurn1",
+        "x": 226.15625,
+        "y": 347.65625,
+        "width": 166.3125,
+        "height": 83.15625
+      },
+      {
+        "src": "frontEquipment",
+        "x": 454.705035971223,
+        "y": 349.2014388489209,
+        "width": 153.15107913669067,
+        "height": 76.57553956834533
+      },
+      {
+        "src": "frontTurn2",
+        "x": 237.06849315068493,
+        "y": 477.5890410958904,
+        "width": 145.8082191780822,
+        "height": 72.9041095890411
+      },
+      {
+        "src": "frontSupplies",
+        "x": 468.2583170254403,
+        "y": 474.4070450097847,
+        "width": 186.27005870841487,
+        "height": 74.48923679060665
+      },
+      {
+        "src": "frontTurn3",
+        "x": 235.16955017301038,
+        "y": 616.3806228373702,
+        "width": 147.32179930795846,
+        "height": 73.66089965397923
+      },
+      {
+        "src": "frontTwoPeople",
+        "x": 468.21238938053096,
+        "y": 613.6460176991151,
+        "width": 220.7787610619469,
+        "height": 80.28318584070796
+      },
+      {
+        "src": "frontName",
+        "x": 242.94076655052265,
+        "y": 813.6236933797909,
+        "width": 148.34843205574913,
+        "height": 74.17421602787456
+      }
+    ],
+    "backInk": [
+      {
+        "src": "backTitle",
+        "x": 193.86666666666667,
+        "y": 156.0205128205128,
+        "width": 342.7487179487179,
+        "height": 115.89230769230768
+      },
+      {
+        "src": "backOpenBox",
+        "x": 308.38961038961037,
+        "y": 341.3376623376623,
+        "width": 338.49350649350646,
+        "height": 112.83116883116882
+      },
+      {
+        "src": "backRecordedBox",
+        "x": 330.8440366972477,
+        "y": 442.1559633027523,
+        "width": 478.2385321100918,
+        "height": 159.41284403669727
+      },
+      {
+        "src": "backReceipt",
+        "x": 244.31578947368422,
+        "y": 668.1578947368421,
+        "width": 208.73684210526315,
+        "height": 83.47368421052632
+      },
+      {
+        "src": "backBorrow",
+        "x": 239.17880794701986,
+        "y": 812.205298013245,
+        "width": 140.98013245033113,
+        "height": 70.49006622516556
+      },
+      {
+        "src": "backReturn",
+        "x": 884.68669527897,
+        "y": 818.6137339055794,
+        "width": 121.81974248927038,
+        "height": 60.90987124463519
+      }
+    ],
+    "clip": "M81 77 Q112 70 175 76 L1359 76 Q1373 77 1371 102 L1373 983 Q1372 1013 1350 1011 L88 1010 Q73 1007 76 986 L76 107 Q75 82 81 77 Z",
+    "mask": "\n          <rect width=\"1448\" height=\"1086\" fill=\"white\" />\n          <path d=\"M526 861 L550 850 L573 863 L601 844 L626 858 L649 848 L671 865 L700 851 L731 867 L750 852 L778 870 L800 859 L818 881 L829 1086 H507 L513 979 L504 941 L520 911 Z\" fill=\"black\" />\n          <path d=\"M1101 979 L1124 968 L1147 982 L1173 963 L1194 977 L1219 965 L1247 983 L1271 970 L1295 985 L1321 975 L1343 989 L1354 1086 H1087 Z\" fill=\"black\" />\n        "
+  }
+}

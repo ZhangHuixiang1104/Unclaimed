@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>电池盒章节 · 美术资产验收预览</title>
+  <style>
+    :root{font-family:"Noto Sans SC","Microsoft YaHei",sans-serif;color:#f2ead8;background:#131a16}*{box-sizing:border-box}body{margin:0;padding:36px max(28px,5vw) 80px}header{max-width:1100px;margin:0 auto 38px;border-bottom:1px solid #596457;padding-bottom:27px}small{color:#c18a73;letter-spacing:.16em;font-weight:700}h1{font-family:"Noto Serif SC","SimSun",serif;font-size:clamp(32px,4vw,52px);margin:12px 0}p{color:#c5cbbd;line-height:1.7;max-width:960px}h2{font-family:"Noto Serif SC","SimSun",serif;font-size:26px;margin:42px auto 20px;max-width:1100px}.grid{max-width:1100px;margin:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.tile{background:#222c24;border:1px solid #566255;overflow:hidden}.tile figure{margin:0}.tile .canvas{height:290px;display:flex;align-items:center;justify-content:center;padding:18px;background-color:#e6dfd0;background-image:linear-gradient(45deg,#d4cdbe 25%,transparent 25%),linear-gradient(-45deg,#d4cdbe 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#d4cdbe 75%),linear-gradient(-45deg,transparent 75%,#d4cdbe 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}.tile img{max-width:100%;max-height:100%;object-fit:contain}.tile figcaption{padding:16px 18px;display:flex;justify-content:space-between;gap:15px}.tile strong{font-size:16px}.tile span{font-size:13px;color:#abb7a9}.history .canvas{background:#e9e1cf;background-image:none}.foot{max-width:1100px;margin:30px auto;border-left:3px solid #9d5341;padding-left:18px}@media(max-width:760px){.grid{grid-template-columns:1fr}.tile .canvas{height:240px}}
+  </style>
+</head>
+<body>
+  <header>
+    <small>ART REVIEW / BATTERY BOX</small>
+    <h1>电池盒章节 · 全套素材验收</h1>
+    <p>以下为原创虚构器物素材及后制史实示意，尚未合成到游戏工作台。方格仅用于检查PNG透明度，不是图片背景。短笺上的正式文字以单独SVG或网页文本为准；研究照片没有放入本预览。</p>
+  </header>
+  <h2>游戏器物与分层</h2>
+  <div class="grid" id="objects"></div>
+  <h2>史实页 · 后制示意</h2>
+  <div class="grid history" id="history"></div>
+  <p class="foot">验收状态：单图与透明通道已检查；精确叠层坐标、字形跨设备表现、热点与开盖动画仍需在PC前端做实机复核。这里的电池盒不是史实中的手摇发电机。</p>
+  <script>
+    const objects=[
+      ["P01 关盖盒体","美术母版/battery_box_closed_blank.png","原创虚构器物"],
+      ["P02 右侧视图","美术母版/battery_box_right_blank.png","与P01同形制"],
+      ["P03 开盖内面","美术母版/battery_lid_inside_blank.png","留纸笺位置"],
+      ["P04 内层旧带","美术母版/battery_old_band.png","独立透明层"],
+      ["P05 干布衬片","美术母版/battery_dry_liner.png","独立透明层"],
+      ["P06 外层宽护带","美术母版/battery_outer_band.png","带头可动画"],
+      ["P07 空白短笺","美术母版/battery_note_blank.png","不烘焙文字"],
+      ["P08 接线端特写","美术母版/battery_terminal_detail.png","可选放大材质"],
+      ["W04 氛围字样","美术母版/ink-battery-note-optional.png","非正式文字层"],
+      ["W01—W03 正式短笺字","美术母版/battery_note_text.svg","可校字SVG，供接入参考"]
+    ];
+    const history=[
+      ["H01 通信保障关系","史实视觉/history-communication-chain.svg","后制示意"],
+      ["H02 修理与再用","史实视觉/history-repair-material.svg","后制示意"],
+      ["H03 发电机携行","史实视觉/history-generator-carry.svg","后制示意"],
+      ["H04 后来的馆藏记忆","史实视觉/history-museum-memory.svg","后制示意"]
+    ];
+    function render(id,items){document.getElementById(id).innerHTML=items.map(([title,src,tag])=>`<article class="tile"><figure><div class="canvas"><img src="${src}" alt="${title}" loading="lazy"></div><figcaption><strong>${title}</strong><span>${tag}</span></figcaption></figure></article>`).join("")}
+    render("objects",objects);render("history",history);
+  </script>
+</body>
+</html>

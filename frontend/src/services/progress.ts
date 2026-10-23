@@ -6,12 +6,15 @@ export interface SavedProgress {
   contentVersion?: string
   keeperNumber: string
   records: Record<string, ObjectRecord>
+  legacyBatteryRecord?: ObjectRecord
+  legacyShoesRecord?: ObjectRecord
+  legacyBowlRecord?: ObjectRecord
   selectedObjectKey?: string
   keeperNote?: string
   createdAt: string
 }
 
-export const CONTENT_VERSION = 'independent-chapters-v3'
+export const CONTENT_VERSION = 'independent-chapters-v6'
 
 export const createKeeperNumber = () => {
   const suffix = Math.floor(1000 + Math.random() * 9000)

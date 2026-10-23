@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import AppShell from '../components/common/AppShell.vue'
 import { objectByKey } from '../data/objects'
 import { useArchiveStore } from '../stores/archive'
+import { objectArtwork } from '../data/objectArtwork'
 
 const archive = useArchiveStore()
 const selected = computed(() => objectByKey(archive.selectedObjectKey ?? ''))
@@ -20,7 +21,7 @@ const note = computed(() => archive.keeperNote || '把能够确认的留下，�
         <div class="ticket-main">
           <span class="eyebrow">临时保管员票据</span>
           <h1>第 {{ archive.keeperNumber }} 号</h1>
-          <div class="ticket-object">{{ selected?.silhouette ?? '拾' }}</div>
+          <div class="ticket-object"><img v-if="selected" :src="objectArtwork[selected.key]" :alt="selected.name"><span v-else>拾</span></div>
           <h2>{{ selected?.name ?? '无名物件' }}</h2>
           <blockquote>{{ note }}</blockquote>
         </div>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" role="img" aria-label="原创后制示意：家庭保存、2019年捐赠与2026年展陈的抽象时间线，非真实展柜照片">
+  <defs>
+    <linearGradient id="paper" x2="0" y2="1"><stop stop-color="#e9dfcb"/><stop offset="1" stop-color="#d7c8af"/></linearGradient>
+    <pattern id="cloth" width="13" height="13" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><path d="M0 0v13" stroke="#a59278" stroke-width="2" opacity=".45"/></pattern>
+  </defs>
+  <rect width="960" height="600" fill="url(#paper)"/>
+  <path d="M102 459h758" stroke="#7c7767" stroke-width="3"/><path d="M224 455h282" stroke="#9a4e43" stroke-width="5"/><path d="M506 455h242" stroke="#9a4e43" stroke-width="5" stroke-dasharray="8 12"/>
+  <circle cx="222" cy="456" r="11" fill="#9a4e43"/><circle cx="506" cy="456" r="11" fill="#9a4e43"/><circle cx="748" cy="456" r="11" fill="#9a4e43"/>
+  <g transform="translate(103 167)"><path d="M7 75h228v221H7Z" fill="#756654" stroke="#5e5548" stroke-width="5"/><path d="M-10 70h263M-10 296h263" stroke="#625644" stroke-width="19" stroke-linecap="round"/><path d="M51 176q0-93 73-93t73 93q-3 59-73 59t-73-59Z" fill="#cab89b" stroke="#6d6656" stroke-width="5"/><path d="M36 165q22-86 91-84 66 2 88 84v90H36Z" fill="url(#cloth)" opacity=".74"/></g>
+  <g transform="translate(407 211)"><path d="M0 0h185v239H0Z" fill="#f1e7d3" stroke="#766b57" stroke-width="5"/><path d="M30 50h124M30 88h124M30 126h94M30 164h124" stroke="#a59880" stroke-width="5"/><circle cx="150" cy="194" r="17" fill="none" stroke="#985447" stroke-width="5"/></g>
+  <g transform="translate(655 148)"><path d="M0 0h195v289H0Z" fill="#d7e0d8" fill-opacity=".4" stroke="#776d5c" stroke-width="6"/><path d="M13 222h169" stroke="#776d5c" stroke-width="7"/><path d="M31 112q5 103 66 108 61-5 66-108Z" fill="#d5c2a0" stroke="#6d6557" stroke-width="4"/><ellipse cx="97" cy="112" rx="66" ry="22" fill="#f3e9d5" stroke="#6d6557" stroke-width="4"/><path d="M28 245h140" stroke="#a59984" stroke-width="4"/></g>
+  <path d="M63 75h834M63 528h834" stroke="#6d6c59" stroke-opacity=".45" stroke-width="2"/>
+</svg>

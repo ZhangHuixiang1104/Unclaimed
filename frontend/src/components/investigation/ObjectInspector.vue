@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ObservationControls from './ObservationControls.vue'
+import { inspectionRecord } from './inspectionRecord'
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
 import type { ArchiveObject } from '../../types/archive'
 import { useArchiveStore } from '../../stores/archive'
@@ -32,7 +34,7 @@ const rejectedCandidateIds = ref<string[]>([])
 let logId = 0
 let scanTimer: ReturnType<typeof setTimeout> | undefined
 
-const record = computed(() => archive.getRecord(props.item.key))
+const record = computed(() => inspectionRecord(props.item, archive.getRecord(props.item.key)))
 const listAssembled = computed(() => record.value.status === 'archived' || record.value.evidenceVerified || record.value.completedInteractions.includes('list-pieces-assembled'))
 const listMudWiped = computed(() => record.value.status === 'archived' || record.value.evidenceVerified || record.value.completedInteractions.includes('list-mud-cleared'))
 const allCluesFound = computed(() => record.value.foundClueIds.length === props.item.clues.length
@@ -93,7 +95,7 @@ const nextClue = computed(() => props.item.clues.find((clue) => !record.value.fo
 const currentTask = computed(() => {
   if (props.item.key === 'list' && !listAssembled.value) return '拖动三片纸，让断开的笔画和纸边重新相接。'
   if (props.item.key === 'list' && !listMudWiped.value) return '第二行还有一个字被泥遮住。拭去泥点，再看看物品与人被怎样写在同一页。'
-  if (props.item.key === 'list' && allCluesFound.value) return '这张纸的三段记录已经读到。下方可以把它们连成一段故事，留下该留白的地方。'
+  if (props.item.key === 'list' && allCluesFound.value) return '这张纸的三段记录已经读到。可在右侧“整理展签”中连成一段故事，留下该留白的地方。'
   if (props.item.key === 'list' && nextClue.value?.id === 'list-task') return '正面第三行写着「后随二人」。直接点击这一行，读第一段故事。'
   if (props.item.key === 'list' && nextClue.value?.id === 'list-key') return '翻到背面，点击两种方框的说明，看看第三行为什么没有合上。'
   if (props.item.key === 'list' && nextClue.value?.id === 'list-stub') return '仍在背面。点击「回执另存」和下方裁口，看看故事停在了哪里。'
@@ -268,16 +270,20 @@ onBeforeUnmount(() => window.clearTimeout(scanTimer))
 
 <template>
   <section ref="panel" class="inspector-panel panel">
-    <header class="panel-heading">
-      <div>
-        <span class="eyebrow">物件检查台</span>
-        <h2>{{ item.name }}</h2>
-      </div>
-      <span class="archive-no">{{ item.archiveNo }}</span>
-    </header>
 
+
+    <ObservationControls help="先接好三片纸，再轻拭泥点；正面读第三行，背面核对方框与回执裁口。" @reset="resetTools(); artifactSide = 'front'" :ready="listAssembled">
+<template #view><button type="button" :class="{ active: artifactSide === 'front' }" @click="showSide('front')">看正面</button>
+<button type="button" :class="{ active: artifactSide === 'back' }" :disabled="item.key === 'list' && !listAssembled" @click="showSide('back')">翻到背面</button></template>
+<template #observe><button type="button" :class="{ active: activeTool === 'side' }" :disabled="item.key === 'list' && !listAssembled" @click="selectTool('side')">侧光</button>
+<button type="button" :class="{ active: activeTool === 'backlight' }" :disabled="item.key === 'list' && !listAssembled" @click="selectTool('backlight')">透光</button>
+<button type="button" :class="{ active: activeTool === 'zoom' }" :disabled="item.key === 'list' && !listAssembled" @click="selectTool('zoom')">放大镜</button></template>
+<button v-if="item.key === 'list'" type="button" :class="{ active: activeTool === 'wipe' }" :disabled="!listAssembled || artifactSide !== 'front' || listMudWiped" @click="selectTool('wipe')">{{ listMudWiped ? '泥点已清' : '轻拭泥点' }}</button>
+<button v-if="item.key !== 'list'" type="button" class="mark-button" :class="{ active: markerMode }" :disabled="allCluesFound" @click="startMarking">{{ markerMode ? '取消标记' : '添加标记' }}</button>
+<button v-if="item.key !== 'list'" type="button" :class="{ active: scanning }" :disabled="allCluesFound" @click="runScan">申请提示</button>
+</ObservationControls>
     <div
-      :class="['inspection-stage', `tool-${activeTool}`, { scanning, marking: markerMode, 'list-inspection-stage': item.key === 'list' }]"
+      :class="['inspection-stage', 'inspection-artifact-stage', `tool-${activeTool}`, { scanning, marking: markerMode, 'list-inspection-stage': item.key === 'list' }]"
       :style="{ '--object-accent': item.accent, '--list-desk-url': `url(${listDesk})` }"
       @click="markStage"
     >
@@ -339,6 +345,17 @@ onBeforeUnmount(() => window.clearTimeout(scanTimer))
         </aside>
       </Transition>
 
+
+
+      <div v-if="markerMode" class="marking-cursor-label">点击落下标记</div>
+      <div class="inspection-caption">
+        <span>{{ markerMessage }}</span>
+        <strong>{{ item.key === 'list' ? (!listAssembled ? `${listAssemblyCount} / 3 片纸` : `${record.foundClueIds.length} / ${item.clues.length} 幕故事`) : `${record.foundClueIds.length} / ${item.clues.length} 条线索` }}</strong>
+      </div>
+    </div>
+
+
+
       <div v-if="item.key === 'list' && listCardOpen && activeClue && listClueCards[activeClue.id]" class="list-clue-card-overlay" @click.self="listCardOpen = false">
         <article class="list-clue-card" role="dialog" aria-modal="true" :aria-label="`${listClueCards[activeClue.id].heading}故事卡`">
           <div class="list-clue-card-heading"><span>名单故事 / 第 {{ listClueCards[activeClue.id].number }} 幕</span><button type="button" aria-label="关闭故事卡" @click="listCardOpen = false">×</button></div>
@@ -349,29 +366,6 @@ onBeforeUnmount(() => window.clearTimeout(scanTimer))
           <button class="list-clue-card-close" type="button" @click="listCardOpen = false">继续读这张纸 →</button>
         </article>
       </div>
-
-      <div v-if="markerMode" class="marking-cursor-label">点击落下标记</div>
-      <div class="inspection-caption">
-        <span>{{ markerMessage }}</span>
-        <strong>{{ item.key === 'list' ? (!listAssembled ? `${listAssemblyCount} / 3 片纸` : `${record.foundClueIds.length} / ${item.clues.length} 幕故事`) : `${record.foundClueIds.length} / ${item.clues.length} 条线索` }}</strong>
-      </div>
-    </div>
-
-    <div class="tool-row" aria-label="检查工具">
-      <span class="tool-label">观察</span>
-      <button type="button" :class="{ active: artifactSide === 'front' }" @click="showSide('front')">看正面</button>
-      <button type="button" :class="{ active: artifactSide === 'back' }" :disabled="item.key === 'list' && !listAssembled" @click="showSide('back')">翻到背面</button>
-      <button type="button" :class="{ active: activeTool === 'side' }" :disabled="item.key === 'list' && !listAssembled" @click="selectTool('side')">侧光</button>
-      <button type="button" :class="{ active: activeTool === 'backlight' }" :disabled="item.key === 'list' && !listAssembled" @click="selectTool('backlight')">透光</button>
-      <button type="button" :class="{ active: activeTool === 'zoom' }" :disabled="item.key === 'list' && !listAssembled" @click="selectTool('zoom')">放大镜</button>
-      <button v-if="item.key === 'list'" type="button" :class="{ active: activeTool === 'wipe' }" :disabled="!listAssembled || artifactSide !== 'front' || listMudWiped" @click="selectTool('wipe')">{{ listMudWiped ? '泥点已清' : '轻拭泥点' }}</button>
-      <span class="tool-divider"></span>
-      <button v-if="item.key !== 'list'" type="button" class="mark-button" :class="{ active: markerMode }" :disabled="allCluesFound" @click="startMarking">{{ markerMode ? '取消标记' : '添加标记' }}</button>
-      <button v-if="item.key !== 'list'" type="button" :class="{ active: scanning }" :disabled="allCluesFound" @click="runScan">申请提示</button>
-      <button type="button" class="tool-reset" @click="resetTools">复位工具</button>
-      <span class="tool-hint">当前：{{ toolLabels[activeTool] }}</span>
-    </div>
-
     <section class="field-record-strip">
       <div class="current-task-card">
         <span>当前任务 / TASK</span>

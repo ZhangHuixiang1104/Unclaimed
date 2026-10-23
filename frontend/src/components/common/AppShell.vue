@@ -37,7 +37,7 @@ const account = useAccountStore()
       </div>
     </header>
 
-    <div v-if="account.syncState === 'offline' || account.syncState === 'conflict'" class="save-status-warning" role="status">
+    <div v-if="route.name !== 'account' && (account.syncState === 'offline' || account.syncState === 'conflict')" class="save-status-warning" role="status">
       <span>{{ account.syncState === 'offline' ? (account.error || '存档服务暂时不可用。') + (account.pendingSafe && account.pendingUpload ? ' 新进度已暂存本机，尚未上传云端。' : ' 浏览器无法暂存新进度，请勿关闭页面。') : '云端与本机存档需要核对；目前没有覆盖任何一份。' }}</span>
       <button v-if="account.syncState === 'offline'" type="button" @click="account.retry()">立即重试 →</button>
       <RouterLink v-else to="/account">核对存档 →</RouterLink>

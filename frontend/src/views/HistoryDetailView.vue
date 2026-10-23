@@ -1,18 +1,26 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import AppShell from '../components/common/AppShell.vue'
 import ListHistoryExhibit from '../components/history/ListHistoryExhibit.vue'
 import MapHistoryExhibit from '../components/history/MapHistoryExhibit.vue'
+import BatteryHistoryExhibit from '../components/history/BatteryHistoryExhibit.vue'
+import ShoesHistoryExhibit from '../components/history/ShoesHistoryExhibit.vue'
+import BowlHistoryExhibit from '../components/history/BowlHistoryExhibit.vue'
 import { historyRecords } from '../data/historyRecords'
 import { archiveObjects, objectByKey } from '../data/objects'
 import { useArchiveStore } from '../stores/archive'
+import { useAccountStore } from '../stores/account'
 
 const route = useRoute()
 const archive = useArchiveStore()
+const account = useAccountStore()
+const bowlSaving = ref(false)
+const bowlSaveError = ref('')
 const item = computed(() => objectByKey(String(route.params.objectKey)))
+watch(() => item.value?.key, () => { bowlSaveError.value = '' })
 const record = computed(() => item.value ? archive.getRecord(item.value.key) : undefined)
-const unlocked = computed(() => record.value?.status === 'archived' || (['list', 'map'].includes(item.value?.key ?? '') && record.value?.historyRevealed))
+const unlocked = computed(() => record.value?.status === 'archived' || (['list', 'map', 'battery', 'shoes', 'bowl'].includes(item.value?.key ?? '') && record.value?.historyRevealed))
 const content = computed(() => item.value ? historyRecords[item.value.key] : undefined)
 const currentIndex = computed(() => item.value ? archiveObjects.findIndex((entry) => entry.key === item.value?.key) : -1)
 const previousUnlocked = computed(() => archiveObjects.slice(0, currentIndex.value).reverse().find((entry) => archive.getRecord(entry.key).status === 'archived'))
@@ -40,12 +48,53 @@ const finishMapHistory = () => {
   archive.markHistoryRead('map')
   archive.archiveObject('map')
 }
+const visitBatteryStation = (index: number) => {
+  if (item.value?.key !== 'battery' || !record.value?.historyRevealed || index < 0 || index > 3) return
+  archive.completeInteraction('battery', `battery-history-0${index + 1}`)
+}
+const finishBatteryHistory = () => {
+  if (item.value?.key !== 'battery' || !record.value?.historyRevealed) return
+  if (![1, 2, 3, 4].every((index) => record.value?.completedInteractions.includes(`battery-history-0${index}`))) return
+  archive.markHistoryRead('battery')
+  archive.archiveObject('battery')
+}
+const visitShoesStation = (index: number) => {
+  if (item.value?.key !== 'shoes' || !record.value?.historyRevealed || index < 0 || index > 3) return
+  archive.completeInteraction('shoes', `shoes-history-0${index + 1}`)
+}
+const finishShoesHistory = () => {
+  if (item.value?.key !== 'shoes' || !record.value?.historyRevealed) return
+  if (![1, 2, 3, 4].every((index) => record.value?.completedInteractions.includes(`shoes-history-0${index}`))) return
+  archive.markHistoryRead('shoes')
+  archive.archiveObject('shoes')
+}
+const visitBowlStation = (index: number) => {
+  if (item.value?.key !== 'bowl' || !record.value?.historyRevealed || index < 0 || index > 3) return
+  archive.completeInteraction('bowl', `bowl-history-0${index + 1}`)
+}
+const finishBowlHistory = async () => {
+  if (bowlSaving.value) return
+  if (item.value?.key !== 'bowl' || !record.value?.historyRevealed) return
+  if (![1, 2, 3, 4].every((index) => record.value?.completedInteractions.includes(`bowl-history-0${index}`))) return
+  bowlSaving.value = true
+  bowlSaveError.value = ''
+  archive.markHistoryRead('bowl')
+  archive.archiveObject('bowl')
+  try {
+    await account.saveNow()
+    if (item.value?.key === 'bowl' && (account.syncState !== 'synced' || account.pendingUpload)) bowlSaveError.value = '建档进度仍待同步；请恢复存档服务后再次点击建档。'
+  } finally { bowlSaving.value = false }
+}
 </script>
 
 <template>
   <AppShell>
+
     <ListHistoryExhibit v-if="item?.key === 'list' && content && unlocked" :archived="record?.status === 'archived'" :visited-station-ids="record?.completedInteractions ?? []" @visit="visitListStation" @archive="finishListHistory" />
     <MapHistoryExhibit v-else-if="item?.key === 'map' && content && unlocked" :archived="record?.status === 'archived'" :visited-station-ids="record?.completedInteractions ?? []" @visit="visitMapStation" @archive="finishMapHistory" />
+    <BatteryHistoryExhibit v-else-if="item?.key === 'battery' && content && unlocked" :archived="record?.status === 'archived'" :visited-station-ids="record?.completedInteractions ?? []" @visit="visitBatteryStation" @archive="finishBatteryHistory" />
+    <ShoesHistoryExhibit v-else-if="item?.key === 'shoes' && content && unlocked" :archived="record?.status === 'archived'" :visited-station-ids="record?.completedInteractions ?? []" @visit="visitShoesStation" @archive="finishShoesHistory" />
+    <BowlHistoryExhibit v-else-if="item?.key === 'bowl' && content && unlocked" :archived="record?.status === 'archived' && account.syncState === 'synced' && !account.pendingUpload" :visited-station-ids="record?.completedInteractions ?? []" :saving="bowlSaving" :save-error="bowlSaveError" @visit="visitBowlStation" @archive="finishBowlHistory" />
     <section v-else-if="item && content && unlocked" class="history-detail-page">
       <header class="history-detail-cover">
         <div class="history-detail-index"><RouterLink to="/history">← 返回章节索引</RouterLink><span>HISTORY CONTEXT / 0{{ item.order }}</span></div>
@@ -74,7 +123,7 @@ const finishMapHistory = () => {
       <footer class="history-detail-navigation"><RouterLink v-if="previousUnlocked" :to="`/history/${previousUnlocked.key}`">← 上一份公开档案</RouterLink><span v-else>第一章</span><RouterLink to="/history">查看章节与史实索引</RouterLink><RouterLink v-if="nextUnlocked" :to="`/history/${nextUnlocked.key}`">下一份公开档案 →</RouterLink><RouterLink v-else-if="nextChapter" :to="{ path: '/archive', query: { focus: nextChapter.key } }">接收下一件物品 →</RouterLink><RouterLink v-else to="/ending">进入终章 →</RouterLink></footer>
     </section>
     <section v-else-if="item" class="history-sealed-page">
-      <RouterLink to="/history">← 返回章节索引</RouterLink><div class="history-sealed-emblem">封</div><span>HISTORY RECORD / SEALED / 0{{ item.order }}</span><h1>这段史实仍在封存</h1><p>{{ item.key === 'list' ? '先读完名单的三幕故事，再从独立入口打开相关史实。' : item.key === 'map' ? '先在行路小图上读完四段故事、写下展签，再独立翻阅史实。' : '对应物件尚未完成调查与归档。地点、时间和材料将在证据核验完成后公开。' }}</p><RouterLink class="history-sealed-action" :to="record?.status === 'investigating' ? `/object/${item.key}` : '/archive'">{{ record?.status === 'investigating' ? '继续完成调查' : '返回档案室' }} →</RouterLink>
+      <RouterLink to="/history">← 返回章节索引</RouterLink><div class="history-sealed-emblem">封</div><span>HISTORY RECORD / SEALED / 0{{ item.order }}</span><h1>这段史实仍在封存</h1><p>{{ item.key === 'list' ? '先读完名单的三幕故事，再从独立入口打开相关史实。' : item.key === 'map' ? '先在行路小图上读完四段故事、写下展签，再独立翻阅史实。' : item.key === 'battery' ? '先读完电池盒的四段故事，保存有边界的展签，再主动翻阅真实材料。' : item.key === 'shoes' ? '先分开两只游戏草鞋，读完四段故事并保存展签，再主动翻阅真实材料。' : item.key === 'bowl' ? '先展开包纸、看碗沿和底面，翻读包纸背面并保存展签，再独立翻阅史实。' : '对应物件尚未完成调查与归档。地点、时间和材料将在证据核验完成后公开。' }}</p><RouterLink class="history-sealed-action" :to="record?.status === 'investigating' ? `/object/${item.key}` : '/archive'">{{ record?.status === 'investigating' ? '继续完成调查' : '返回档案室' }} →</RouterLink>
     </section>
     <section v-else class="history-sealed-page"><div class="history-sealed-emblem">?</div><h1>没有找到这份章节档案</h1><RouterLink class="history-sealed-action" to="/history">返回章节索引 →</RouterLink></section>
   </AppShell>

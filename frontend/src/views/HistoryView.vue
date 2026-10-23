@@ -5,9 +5,14 @@ import RouteArchiveMap from '../components/history/RouteArchiveMap.vue'
 import RouteDossierPanel from '../components/history/RouteDossierPanel.vue'
 import { archiveObjects } from '../data/objects'
 import { useArchiveStore } from '../stores/archive'
+import { useAccountStore } from '../stores/account'
+import { useContinueInvestigation } from '../composables/useContinueInvestigation'
 
 const archive = useArchiveStore()
-const firstRelevant = archiveObjects.find((item) => archive.getObjectStatus(item.key) === 'investigating')
+const account = useAccountStore()
+const { to: resumeTo, label: resumeLabel } = useContinueInvestigation()
+const endingReady = computed(() => archive.endingUnlocked && account.syncState === 'synced' && !account.pendingUpload)
+const firstRelevant = archiveObjects.find((item) => item.key === archive.nextObjectKey)
   ?? [...archiveObjects].reverse().find((item) => archive.getRecord(item.key).status === 'archived')
   ?? archiveObjects[0]
 const selectedKey = ref(firstRelevant.key)
@@ -15,21 +20,20 @@ const selectedKey = ref(firstRelevant.key)
 const stateFor = (key: string) => {
   const record = archive.getRecord(key)
   if (record.status === 'archived') return 'complete' as const
+  if (!archive.isObjectUnlocked(key)) return 'sealed' as const
   if (record.evidenceVerified || record.historyRevealed || record.historyRead) return 'ready' as const
   if (record.status === 'investigating' || record.foundClueIds.length > 0) return 'investigating' as const
-  return 'sealed' as const
+  return 'available' as const
 }
 
-const routeCoordinates = [
-  { x: 9, y: 72 }, { x: 29, y: 36 }, { x: 50, y: 60 }, { x: 72, y: 27 }, { x: 91, y: 47 },
-]
-const nodes = computed(() => archiveObjects.map((item, index) => ({ item, record: archive.getRecord(item.key), state: stateFor(item.key), ...routeCoordinates[index] })))
+const nodes = computed(() => archiveObjects.map(item => ({ item, record: archive.getRecord(item.key), state: stateFor(item.key) })))
 const selectedNode = computed(() => nodes.value.find((node) => node.item.key === selectedKey.value) ?? nodes.value[0])
-const remainingObjects = computed(() => archiveObjects.length - archive.archivedCount)
-const nextObject = computed(() => archiveObjects.find((item) => item.key === archive.nextObjectKey) ?? archiveObjects[0])
+const focusCurrent = () => { selectedKey.value = archive.nextObjectKey ?? archiveObjects[archiveObjects.length - 1]!.key }
+const stateLabel = (state: ReturnType<typeof stateFor>) => ({ complete: '已归档', ready: '待建档', investigating: '调查中', available: '待接收', sealed: '未开放' })[state]
 const nextActionLabel = computed(() => {
-  if (archive.endingUnlocked) return '进入终章档案'
-  return archive.getObjectStatus(nextObject.value.key) === 'investigating' ? '继续当前调查' : `接收第 ${nextObject.value.order} 件物品`
+  if (endingReady.value) return '进入终章档案'
+  if (archive.endingUnlocked) return '核对第五件云存档'
+  return resumeLabel.value
 })
 </script>
 
@@ -38,22 +42,19 @@ const nextActionLabel = computed(() => {
     <section class="history-room">
       <header class="history-room-intro">
         <div class="history-intro-copy">
-          <span class="history-kicker">INVESTIGATION ORDER / 章节与史实索引</span>
-          <h1>沿着证据，逐件阅读</h1>
-          <p>图中折线只表示五件虚构物品的调查顺序，不是长征行军路线。完成一件调查，才开放对应的独立史实主题。</p>
-          <RouterLink class="history-intro-action" :to="archive.endingUnlocked ? '/ending' : `/object/${nextObject.key}`"><span>{{ nextActionLabel }}</span><i>→</i></RouterLink>
+          <span class="history-kicker"><span>ROUTE ARCHIVE / </span>路线档案</span>
+          <h1><span class="history-title-full">循着来路，读懂记录。</span><span class="history-title-compact">路线与章节档案</span></h1>
         </div>
-        <div class="history-room-metrics" aria-label="章节档案进度">
-          <div><small>已开放章节</small><strong>{{ archive.archivedCount }}<i>/05</i></strong></div>
-          <div><small>尚待归档</small><strong>{{ remainingObjects }}<i>件</i></strong></div>
-          <div><small>总完成度</small><strong>{{ archive.progressPercent }}<i>%</i></strong></div>
+        <div class="history-room-summary">
+          <span class="history-room-count">已归档 <strong>{{ archive.archivedCount }}</strong> / 05</span>
+          <RouterLink class="history-intro-action" :to="endingReady ? '/ending' : archive.endingUnlocked ? '/history/bowl' : resumeTo"><span>{{ nextActionLabel }}</span><i>→</i></RouterLink>
         </div>
       </header>
       <div class="history-room-workspace">
-        <RouteArchiveMap :nodes="nodes" :selected-key="selectedKey" @select="selectedKey = $event" />
-        <RouteDossierPanel :item="selectedNode.item" :record="selectedNode.record" :state="selectedNode.state" />
+        <RouteArchiveMap />
+        <aside class="route-directory"><header><h2>章节目录</h2><button type="button" @click="focusCurrent">当前进度 ↗</button></header><nav aria-label="五章调查目录"><button v-for="node in nodes" :key="node.item.key" type="button" :aria-pressed="selectedKey === node.item.key" @click="selectedKey = node.item.key"><small>{{ String(node.item.order).padStart(2, '0') }}</small><strong>{{ node.item.name }}</strong><span>{{ stateLabel(node.state) }}</span></button></nav><RouteDossierPanel :key="selectedKey" :item="selectedNode.item" :record="selectedNode.record" :state="selectedNode.state" /></aside>
       </div>
-      <footer class="history-room-footer"><span>档案公开原则 01</span><p>五件游戏物品各有原创故事；历史材料分别核验，不能连成同一条真实路线。</p><RouterLink to="/archive">返回档案室 →</RouterLink></footer>
+      <footer class="history-room-footer"><p>地图为真实历史资料，五件虚构物品的章节顺序不代表行军路线。</p><RouterLink to="/archive">返回档案室 →</RouterLink></footer>
     </section>
   </AppShell>
 </template>

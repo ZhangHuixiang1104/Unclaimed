@@ -18,16 +18,18 @@ type HomeStage = 'arriving' | 'ready' | 'peeking' | 'opening' | 'leaving'
 const hasPlayedIntro = introPlayedInVisit
 const stage = ref<HomeStage>(hasPlayedIntro ? 'ready' : 'arriving')
 const hoveredId = ref<string | null>(null)
-const selectedId = ref<string | null>(archive.selectedObjectKey ?? null)
+const selectedId = ref<string | null>(archive.nextObjectKey ?? archive.selectedObjectKey ?? null)
 const timers: number[] = []
 
 const archivedKeys = computed(() => homeArchivePreviews.filter((item) => archive.getRecord(item.key).status === 'archived').map((item) => item.key))
 const currentItem = computed(() => homeArchivePreviews.find((item) => item.key === (hoveredId.value ?? selectedId.value)) ?? null)
 const remainingObject = computed(() => homeArchivePreviews.find((item) => archive.getRecord(item.key).status !== 'archived') ?? homeArchivePreviews[0])
 const foundClueCount = computed(() => Object.values(archive.records).reduce((sum, record) => sum + record.foundClueIds.length, 0))
-const hasProgress = computed(() => archive.archivedCount > 0 || foundClueCount.value > 0)
+const hasProgress = computed(() => archive.archivedCount > 0 || foundClueCount.value > 0 || Object.values(archive.records).some(record => record.status === 'investigating'))
 
-const homeLead = computed(() => hasProgress.value
+const homeLead = computed(() => archive.endingUnlocked
+  ? '五件物品的故事与史实已分别归档。那些没有答案的空白，仍被妥善保留。'
+  : hasProgress.value
   ? '档案箱仍停在昨晚的位置。还有一些痕迹，尚未被妥善保存。'
   : '五件等待整理的物品，各自留下不同的疑问。按顺序查找痕迹，再阅读独立的历史材料。')
 
@@ -35,9 +37,11 @@ const actionLabel = computed(() => {
   if (stage.value === 'opening' || stage.value === 'leaving') return '正在打开档案箱…'
   if (selectedId.value) {
     const item = homeArchivePreviews.find((entry) => entry.key === selectedId.value)
+    if (archive.getRecord(selectedId.value).status === 'archived') return `回看 ${item?.index ?? ''} 号档案 →`
     if (!archive.isObjectUnlocked(selectedId.value)) return `查看封存的 ${item?.index ?? ''} 号档案 →`
-    return `接收 ${item?.index ?? ''} 号档案 →`
+    return `${archive.getRecord(selectedId.value).status === 'investigating' ? '继续' : '接收'} ${item?.index ?? ''} 号档案 →`
   }
+  if (archive.endingUnlocked) return '重访档案箱 →'
   if (hasProgress.value) return `继续第 ${remainingObject.value.index} 份档案 →`
   return '接收档案箱 →'
 })

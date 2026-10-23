@@ -1,58 +1,43 @@
 <script setup lang="ts">
-import type { ArchiveObject, ObjectRecord } from '../../types/archive'
-
-interface RouteNode {
-  item: ArchiveObject
-  record: ObjectRecord
-  x: number
-  y: number
-  state: 'sealed' | 'investigating' | 'ready' | 'complete'
-}
-
-const props = defineProps<{ nodes: RouteNode[]; selectedKey: string }>()
-const emit = defineEmits<{ select: [key: string] }>()
-
-const points = [
-  { x: 9, y: 72 }, { x: 29, y: 36 }, { x: 50, y: 60 }, { x: 72, y: 27 }, { x: 91, y: 47 },
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import routeImage from '../../assets/history/long-march-route.png'
+import overviewImage from '../../assets/history/long-march-overview.jpg'
+const maps = [
+  { label: '主要节点', title: '中国工农红军长征图', period: '1934.10—1936.10', image: overviewImage,
+    source: '上海党史网 · 党史镜报', note: '公开报道所附长征图 · 主要节点概览',
+    url: 'https://www.ccphistory.org.cn/shds/shhm/content/383e7ee8-064a-4e8f-8b36-1281ea34cbaf.html',
+    alt: '上海党史网文章所附中国工农红军长征图，以红线和地名标注长征主要节点' },
+  { label: '各路红军', title: '中国工农红军长征线路图', period: '1934.08—1936.10', image: routeImage,
+    source: '中国地图出版集团供图', note: '审图号：GS（2021）3573 · 原图完整展示',
+    url: 'https://zrzyt.xinjiang.gov.cn/xjgtzy/fypx/202109/121197f280c646dbb448f3bd81ebcd76.shtml',
+    alt: '中国地图出版集团编制的各路红军长征线路图，保留图例和审图号 GS（2021）3573' },
 ]
-
-const selectNext = () => {
-  const current = props.nodes.findIndex((node) => node.item.key === props.selectedKey)
-  emit('select', props.nodes[(current + 1) % props.nodes.length].item.key)
+const mapIndex = ref(0)
+const activeMap = computed(() => maps[mapIndex.value]!)
+const expanded = ref(false)
+const enlargeButton = ref<HTMLButtonElement | null>(null)
+const closeButton = ref<HTMLButtonElement | null>(null)
+const setExpanded = async (value: boolean) => {
+  expanded.value = value
+  document.body.classList.toggle('route-image-open', value)
+  await nextTick()
+  ;(value ? closeButton.value : enlargeButton.value)?.focus()
 }
-
-const selectActive = () => {
-  const target = props.nodes.find((node) => node.state === 'complete')
-    ?? props.nodes.find((node) => node.state === 'ready' || node.state === 'investigating')
-    ?? props.nodes[0]
-  emit('select', target.item.key)
+const onKey = (event: KeyboardEvent) => {
+  if (!expanded.value) return
+  if (event.key === 'Escape') { event.preventDefault(); void setExpanded(false) }
+  if (event.key === 'Tab') { event.preventDefault(); closeButton.value?.focus() }
 }
+onMounted(() => window.addEventListener('keydown', onKey))
+onUnmounted(() => { window.removeEventListener('keydown', onKey); document.body.classList.remove('route-image-open') })
 </script>
 
 <template>
-  <section class="route-archive-map" aria-label="五件虚构物品的调查顺序">
-    <header class="route-map-heading">
-      <div><span>STORY ORDER / 01—05</span><strong>五件调查顺序 · 非历史行军路线</strong></div>
-      <div class="route-map-controls"><button type="button" @click="selectNext">逐段巡览 →</button><button type="button" @click="selectActive">聚焦当前进度</button></div>
-    </header>
-    <div class="route-map-canvas">
-      <div class="map-coordinates" aria-hidden="true"><span>FICTION / FIVE STORIES</span><span>ORDER 01—05</span><span>ARCHIVE / LZ-1936</span></div>
-      <span class="terrain-line terrain-line-a" aria-hidden="true"></span>
-      <span class="terrain-line terrain-line-b" aria-hidden="true"></span>
-      <span class="terrain-line terrain-line-c" aria-hidden="true"></span>
-      <svg class="route-map-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <polyline points="4,86 9,72 29,36 50,60 72,27 91,47 97,39" class="route-base" />
-        <line v-for="(node, index) in nodes" :key="`segment-${node.item.key}`" :x1="index === 0 ? 4 : points[index - 1].x" :y1="index === 0 ? 86 : points[index - 1].y" :x2="points[index].x" :y2="points[index].y" :class="['route-segment', { recovered: node.state === 'complete' }]" />
-      </svg>
-      <template v-for="node in nodes" :key="node.item.key">
-        <RouterLink v-if="node.state === 'complete'" :to="`/history/${node.item.key}`" :class="['archive-route-node', node.state, { selected: selectedKey === node.item.key, edge: node.item.order === 5 }]" :style="{ left: `${node.x}%`, top: `${node.y}%` }" :aria-label="`打开第${node.item.order}件的史实阅读`" @mouseenter="emit('select', node.item.key)" @focus="emit('select', node.item.key)">
-          <span class="route-node-ring"><i></i></span><span class="route-node-copy"><small>0{{ node.item.order }} / 已核验</small><strong>{{ node.item.historicalLabel }}</strong></span>
-        </RouterLink>
-        <button v-else type="button" :class="['archive-route-node', node.state, { selected: selectedKey === node.item.key, edge: node.item.order === 5 }]" :style="{ left: `${node.x}%`, top: `${node.y}%` }" :aria-label="`第${node.item.order}件章节尚未解锁`" @click="emit('select', node.item.key)" @mouseenter="emit('select', node.item.key)" @focus="emit('select', node.item.key)">
-          <span class="route-node-ring"><i></i></span><span class="route-node-copy"><small>0{{ node.item.order }} / {{ node.state === 'ready' ? '待归档' : node.state === 'investigating' ? '调查中' : '封存' }}</small><strong>未公开章节</strong></span>
-        </button>
-      </template>
-      <div class="map-legend"><span><i class="complete"></i>史实已公开</span><span><i class="investigating"></i>调查进行中</span><span><i></i>档案封存</span></div>
-    </div>
+  <section class="route-atlas" aria-label="中国工农红军长征线路图">
+    <header class="route-atlas-heading"><div><small>历史地理 / {{ activeMap.period }}</small><h2>{{ activeMap.title }}</h2></div><button ref="enlargeButton" type="button" @click="setExpanded(true)">放大图版 ↗</button></header>
+    <nav class="route-atlas-tabs" aria-label="历史地图图版"><button v-for="(map, index) in maps" :key="map.label" type="button" :aria-pressed="mapIndex === index" @click="mapIndex = index">{{ map.label }}</button></nav>
+    <button class="route-atlas-image" type="button" aria-label="放大查看完整长征线路图" @click="setExpanded(true)"><img :src="activeMap.image" :alt="activeMap.alt"></button>
+    <footer class="route-atlas-source"><div><strong>{{ activeMap.source }}</strong><span>{{ activeMap.note }}</span></div><a :href="activeMap.url" target="_blank" rel="noopener noreferrer">核对地图出处 ↗</a></footer>
+    <Teleport to="body"><div v-if="expanded" class="route-atlas-dialog" role="dialog" aria-modal="true" aria-label="完整长征线路图" @click.self="setExpanded(false)"><div><header><span>{{ activeMap.title }}</span><button ref="closeButton" type="button" @click="setExpanded(false)">关闭图版 ×</button></header><img :src="activeMap.image" :alt="activeMap.alt"><p>{{ activeMap.source }} · {{ activeMap.note }}</p></div></div></Teleport>
   </section>
 </template>

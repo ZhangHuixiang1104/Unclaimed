@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ArchiveObject, ObjectStatus } from '../../types/archive'
+import { objectArtwork as artwork } from '../../data/objectArtwork'
 
 defineProps<{
   item: ArchiveObject
@@ -17,7 +18,7 @@ const statusText = (status: ObjectStatus) => {
 
 <template>
   <Transition name="dossier-swap" mode="out-in">
-    <article :key="item.key" class="archive-dossier" :style="{ '--dossier-accent': item.accent }">
+    <article :key="item.key" class="archive-dossier" :class="{ locked: status === 'locked' }" :style="{ '--dossier-accent': item.accent }">
       <span class="dossier-binding" aria-hidden="true"></span>
       <span class="dossier-corner" aria-hidden="true"></span>
 
@@ -30,41 +31,8 @@ const statusText = (status: ObjectStatus) => {
       </header>
 
       <div class="dossier-art" :class="`art-${item.key}`" aria-hidden="true">
-        <div v-if="item.key === 'list'" class="list-art">
-          <span v-for="line in 7" :key="line"></span>
-          <i class="water-mark one"></i><i class="water-mark two"></i>
-        </div>
-
-        <svg v-else-if="item.key === 'map'" class="map-art" viewBox="0 0 560 270">
-          <path class="map-fold" d="M185 15v240M372 15v240" />
-          <path class="map-river" d="M-20 190C90 90 176 235 285 142S468 84 590 34" />
-          <path class="map-route route-old" d="M48 213L142 161L226 184L318 105L443 128L518 65" />
-          <path class="map-route route-new" d="M48 213L126 198L205 125L296 151L390 83L518 65" />
-          <circle cx="48" cy="213" r="5"/><circle cx="205" cy="125" r="5"/><circle cx="390" cy="83" r="5"/><circle cx="518" cy="65" r="5"/>
-        </svg>
-
-        <div v-else-if="item.key === 'battery'" class="battery-art">
-          <span class="battery-handle"></span>
-          <span class="battery-case"><i></i><b>LZ · 03</b></span>
-          <span class="battery-terminal left"></span><span class="battery-terminal right"></span>
-          <span class="battery-wire one"></span><span class="battery-wire two"></span>
-          <span class="battery-cloth"></span>
-        </div>
-
-        <div v-else-if="item.key === 'shoes'" class="shoes-art">
-          <span class="shoe left"><i></i></span>
-          <span class="shoe right"><i></i></span>
-          <span class="shoe-thread"></span>
-        </div>
-
-        <div v-else class="bowl-art">
-          <span class="bowl-rim"></span>
-          <span class="bowl-body"></span>
-          <i class="bowl-mark first"></i><i class="bowl-mark second"></i>
-        </div>
-
-        <span class="art-scale">0　1　2　3 CM</span>
-        <span class="art-caption">数字复原示意 / 线索定位用</span>
+        <img class="dossier-artwork" :src="artwork[item.key]" alt="">
+        <span class="art-caption">原创虚构物件 / 美术展示</span>
       </div>
 
       <section class="dossier-copy">

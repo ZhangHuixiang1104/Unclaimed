@@ -14,8 +14,9 @@ from typing import Annotated, Literal
 
 from fastapi import Cookie, Depends, FastAPI, HTTPException, Response, status
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-from sqlalchemy import ForeignKey, Integer, String, Text, create_engine, select, text
+from sqlalchemy import ForeignKey, Integer, String, Text, create_engine, select, text, update
 from sqlalchemy.engine import URL
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 
 
@@ -23,7 +24,7 @@ SESSION_SECONDS = 14 * 24 * 60 * 60
 OBJECT_KEYS = frozenset({"list", "map", "battery", "shoes", "bowl"})
 USERNAME_PATTERN = re.compile(r"^[A-Za-z0-9_-]{3,24}$")
 COOKIE_NAME = "archive_session"
-SAVE_CONTRACT_VERSION = "independent-chapters-v3"
+SAVE_CONTRACT_VERSION = "independent-chapters-v6"
 
 
 class Base(DeclarativeBase):
@@ -94,6 +95,9 @@ class Progress(BaseModel):
     contentVersion: str = Field(default="legacy-v1", min_length=1, max_length=40)
     keeperNumber: str = Field(min_length=1, max_length=32)
     records: dict[str, ObjectRecord]
+    legacyBatteryRecord: ObjectRecord | None = None
+    legacyShoesRecord: ObjectRecord | None = None
+    legacyBowlRecord: ObjectRecord | None = None
     selectedObjectKey: str | None = None
     keeperNote: str | None = Field(default=None, max_length=50)
     createdAt: str = Field(min_length=1, max_length=64)
@@ -206,7 +210,11 @@ def create_app(database_url: str | URL | None = None) -> FastAPI:
             password_hash=hash_password(credentials.password), created_at=int(time.time()),
         )
         db.add(user)
-        db.commit()
+        try:
+            db.commit()
+        except IntegrityError:
+            db.rollback()
+            raise HTTPException(status_code=409, detail="账号名已被使用") from None
         set_login_cookie(response, user, db)
         return {"username": user.username}
 
@@ -263,14 +271,30 @@ def create_app(database_url: str | URL | None = None) -> FastAPI:
             raise HTTPException(status_code=409, detail="云端存档已被其他设备更新")
         now = int(time.time())
         if saved is None:
-            saved = CloudSave(user_id=user.id, payload=serialized, revision=1, updated_at=now)
-            db.add(saved)
+            db.add(CloudSave(user_id=user.id, payload=serialized, revision=1, updated_at=now))
+            try:
+                db.commit()
+            except IntegrityError:
+                db.rollback()
+                latest = db.get(CloudSave, user.id)
+                if latest is not None and latest.payload == serialized:
+                    return SaveResponse(progress=request.progress, revision=latest.revision, updatedAt=latest.updated_at)
+                raise HTTPException(status_code=409, detail="云端存档已被其他设备更新") from None
+            return SaveResponse(progress=request.progress, revision=1, updatedAt=now)
         else:
-            saved.payload = serialized
-            saved.revision += 1
-            saved.updated_at = now
+            result = db.execute(
+                update(CloudSave)
+                .where(CloudSave.user_id == user.id, CloudSave.revision == request.baseRevision)
+                .values(payload=serialized, revision=request.baseRevision + 1, updated_at=now)
+            )
+            if result.rowcount != 1:
+                db.rollback()
+                latest = db.get(CloudSave, user.id)
+                if latest is not None and latest.payload == serialized:
+                    return SaveResponse(progress=request.progress, revision=latest.revision, updatedAt=latest.updated_at)
+                raise HTTPException(status_code=409, detail="云端存档已被其他设备更新")
         db.commit()
-        return SaveResponse(progress=request.progress, revision=saved.revision, updatedAt=saved.updated_at)
+        return SaveResponse(progress=request.progress, revision=request.baseRevision + 1, updatedAt=now)
 
     return app
 

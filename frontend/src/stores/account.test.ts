@@ -7,12 +7,47 @@ import type { SavedProgress } from '../services/progress'
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
   status, headers: { 'Content-Type': 'application/json' },
 })
-const health = () => json({ status: 'ok', saveContract: 'independent-chapters-v3' })
+const health = () => json({ status: 'ok', saveContract: 'independent-chapters-v6' })
 
 beforeEach(() => { setActivePinia(createPinia()) })
 afterEach(() => { vi.unstubAllGlobals() })
 
 describe('账号与云端进度', () => {
+  it('退出后登录另一账号只恢复其独立档案，重新登录原账号仍保留原进度', async () => {
+    const archive = useArchiveStore()
+    archive.startObject('list')
+    archive.records.list!.foundClueIds = ['list-task']
+    const firstSave = { ...archive.exportProgress(), keeperNumber: '2026-1111' }
+    const secondSave = { ...archive.exportProgress(), keeperNumber: '2026-2222', records: {} }
+    archive.reset()
+    let activeUser = ''
+    const writes: string[] = []
+    vi.stubGlobal('fetch', vi.fn(async (input: string, init?: RequestInit) => {
+      if (input.endsWith('/health')) return health()
+      if (input.endsWith('/auth/login')) {
+        activeUser = JSON.parse(String(init?.body)).username
+        return json({ username: activeUser })
+      }
+      if (input.endsWith('/auth/logout')) return json({ ok: true })
+      if (init?.method === 'PUT') writes.push(activeUser)
+      return json({ progress: activeUser === 'keeper01' ? firstSave : secondSave, revision: 1, updatedAt: 100 })
+    }))
+    const account = useAccountStore()
+    expect(await account.authenticate('login', 'keeper01', 'long-password')).toBe(true)
+    expect(archive.getRecord('list').foundClueIds).toEqual(['list-task'])
+    await account.logout()
+    expect(account.signedIn).toBe(false)
+    expect(Object.keys(archive.records)).toHaveLength(0)
+    expect(await account.authenticate('login', 'keeper02', 'long-password')).toBe(true)
+    expect(archive.keeperNumber).toBe('2026-2222')
+    expect(Object.keys(archive.records)).toHaveLength(0)
+    await account.logout()
+    expect(await account.authenticate('login', 'keeper01', 'long-password')).toBe(true)
+    expect(archive.keeperNumber).toBe('2026-1111')
+    expect(archive.getRecord('list').foundClueIds).toEqual(['list-task'])
+    expect(writes).toHaveLength(0)
+  })
+
   it('旧后端进程未更新时直接提示版本不一致，不尝试写入', async () => {
     const requests: string[] = []
     vi.stubGlobal('fetch', vi.fn(async (input: string) => {
@@ -69,7 +104,7 @@ describe('账号与云端进度', () => {
     expect(await secondAccount.authenticate('login', 'keeper01', 'long-password')).toBe(true)
     expect(secondAccount.syncState).toBe('conflict')
     await secondAccount.chooseCloud()
-    expect(secondAccount.syncState).toBe('synced')
+    expect(secondAccount.syncState).toBe('saving')
     expect(archive.keeperNumber).toBe('2026-1234')
     expect(Object.keys(archive.records)).toHaveLength(0)
   })
@@ -120,9 +155,118 @@ describe('账号与云端进度', () => {
 
     expect(await account.startNewEdition()).toBe(true)
     expect(uploads).toHaveLength(1)
-    expect(uploads[0].contentVersion).toBe('independent-chapters-v3')
+    expect(uploads[0].contentVersion).toBe('independent-chapters-v6')
     expect(uploads[0].records).toEqual({})
     expect(account.syncState).toBe('synced')
+  })
+
+  it('v3云存档只重开电池盒章节，保留旧记录并自动上传v5', async () => {
+    vi.useFakeTimers()
+    try {
+      const oldBattery = { ...useArchiveStore().getRecord('battery'), status: 'archived' as const,
+        foundClueIds: ['battery-cut'], evidenceVerified: true, historyRevealed: true, historyRead: true }
+      const remote: SavedProgress = { ...useArchiveStore().exportProgress(), contentVersion: 'independent-chapters-v3',
+        records: { list: { ...useArchiveStore().getRecord('list'), status: 'archived' },
+          map: { ...useArchiveStore().getRecord('map'), status: 'archived' }, battery: oldBattery } }
+      const uploads: SavedProgress[] = []
+      vi.stubGlobal('fetch', vi.fn(async (input: string, init?: RequestInit) => {
+        if (input.endsWith('/health')) return health()
+        if (input.endsWith('/auth/me')) return json({ username: 'keeper01' })
+        if (input.endsWith('/save') && init?.method === 'PUT') {
+          const body = JSON.parse(String(init.body)) as { progress: SavedProgress }
+          uploads.push(body.progress)
+          return json({ progress: body.progress, revision: 2, updatedAt: 201 })
+        }
+        return json({ progress: remote, revision: 1, updatedAt: 200 })
+      }))
+      const account = useAccountStore()
+      await account.initialize()
+      await vi.advanceTimersByTimeAsync(750)
+      const archive = useArchiveStore()
+      expect(account.syncState).toBe('synced')
+      expect(archive.getRecord('list').status).toBe('archived')
+      expect(archive.getRecord('map').status).toBe('archived')
+      expect(archive.getRecord('battery').status).toBe('investigating')
+      expect(uploads).toHaveLength(1)
+      expect(uploads[0].contentVersion).toBe('independent-chapters-v6')
+      expect(uploads[0].legacyBatteryRecord?.foundClueIds).toEqual(['battery-cut'])
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('v4云存档仅迁移草鞋占位章节，旧记录随v5上传保留', async () => {
+    vi.useFakeTimers()
+    try {
+      const archive = useArchiveStore()
+      const oldShoes = { ...archive.getRecord('shoes'), status: 'archived' as const,
+        foundClueIds: ['shoes-patch'], evidenceVerified: true, historyRevealed: true, historyRead: true }
+      const remote: SavedProgress = { ...archive.exportProgress(), contentVersion: 'independent-chapters-v4', records: {
+        list: { ...archive.getRecord('list'), status: 'archived' },
+        map: { ...archive.getRecord('map'), status: 'archived' },
+        battery: { ...archive.getRecord('battery'), status: 'archived' },
+        shoes: oldShoes,
+      } }
+      const uploads: SavedProgress[] = []
+      vi.stubGlobal('fetch', vi.fn(async (input: string, init?: RequestInit) => {
+        if (input.endsWith('/health')) return health()
+        if (input.endsWith('/auth/me')) return json({ username: 'keeper01' })
+        if (input.endsWith('/save') && init?.method === 'PUT') {
+          const body = JSON.parse(String(init.body)) as { progress: SavedProgress }
+          uploads.push(body.progress)
+          return json({ progress: body.progress, revision: 2, updatedAt: 201 })
+        }
+        return json({ progress: remote, revision: 1, updatedAt: 200 })
+      }))
+      const account = useAccountStore()
+      await account.initialize()
+      await vi.advanceTimersByTimeAsync(750)
+      expect(account.syncState).toBe('synced')
+      expect(archive.getRecord('shoes').status).toBe('investigating')
+      expect(archive.getRecord('battery').status).toBe('archived')
+      expect(uploads).toHaveLength(1)
+      expect(uploads[0].contentVersion).toBe('independent-chapters-v6')
+      expect(uploads[0].legacyShoesRecord?.foundClueIds).toEqual(['shoes-patch'])
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('v5云存档只重开未完成的饭碗章，旧线索随v6上传保留', async () => {
+    vi.useFakeTimers()
+    try {
+      const archive = useArchiveStore()
+      const oldBowl = { ...archive.getRecord('bowl'), status: 'investigating' as const,
+        foundClueIds: ['bowl-note'], evidenceVerified: true, historyRevealed: true }
+      const remote: SavedProgress = { ...archive.exportProgress(), contentVersion: 'independent-chapters-v5', records: {
+        list: { ...archive.getRecord('list'), status: 'archived' },
+        map: { ...archive.getRecord('map'), status: 'archived' },
+        battery: { ...archive.getRecord('battery'), status: 'archived' },
+        shoes: { ...archive.getRecord('shoes'), status: 'archived' },
+        bowl: oldBowl,
+      } }
+      const uploads: SavedProgress[] = []
+      vi.stubGlobal('fetch', vi.fn(async (input: string, init?: RequestInit) => {
+        if (input.endsWith('/health')) return health()
+        if (input.endsWith('/auth/me')) return json({ username: 'keeper01' })
+        if (input.endsWith('/save') && init?.method === 'PUT') {
+          const body = JSON.parse(String(init.body)) as { progress: SavedProgress }
+          uploads.push(body.progress)
+          return json({ progress: body.progress, revision: 2, updatedAt: 201 })
+        }
+        return json({ progress: remote, revision: 1, updatedAt: 200 })
+      }))
+      const account = useAccountStore()
+      await account.initialize()
+      await vi.advanceTimersByTimeAsync(750)
+      expect(account.syncState).toBe('synced')
+      expect(archive.getRecord('shoes').status).toBe('archived')
+      expect(archive.getRecord('bowl').status).toBe('investigating')
+      expect(archive.getRecord('bowl').foundClueIds).toEqual([])
+      expect(uploads).toHaveLength(1)
+      expect(uploads[0].contentVersion).toBe('independent-chapters-v6')
+      expect(uploads[0].legacyBowlRecord?.foundClueIds).toEqual(['bowl-note'])
+    } finally { vi.useRealTimers() }
   })
 
   it('账号已创建但首次存档失败时保留身份，并允许重试完成保存', async () => {

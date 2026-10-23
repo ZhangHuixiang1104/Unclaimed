@@ -1,11 +1,7 @@
 <script setup lang="ts">
 defineProps<{ saved: boolean }>()
-const emit = defineEmits<{ review: [clueId: string]; save: [] }>()
-const beats = [
-  { id: 'list-task', label: '01 / 正面', title: '物品之后，是人', text: '第三行写着「后随二人」，姓名处却缺了一角。' },
-  { id: 'list-key', label: '02 / 背面', title: '笔停在交接之前', text: '开口的方框表示：这一项尚待接收。' },
-  { id: 'list-stub', label: '03 / 纸边', title: '还有另一页', text: '「回执另存」指向了不在场的记录。' },
-]
+const emit = defineEmits<{ save: [] }>()
+
 </script>
 
 <template>
@@ -13,15 +9,7 @@ const beats = [
     <div class="synthesis-heading">
       <span>虚构名单 / 故事收束</span>
       <h2 id="list-story-title">这一页，停在交接之前</h2>
-      <p>你找到了三处记录。点开任意一幕，可以再看一眼纸面。</p>
-    </div>
-    <div class="synthesis-chain">
-      <button v-for="(beat, index) in beats" :key="beat.id" type="button" @click="emit('review', beat.id)">
-        <small>{{ String(index + 1).padStart(2, '0') }} / {{ beat.label }}</small>
-        <strong>{{ beat.title }}</strong>
-        <span>{{ beat.text }}</span>
-        <em>回看纸面 ↗</em>
-      </button>
+      <p>三处记录停在同一个边界：此页尚未记下接收。</p>
     </div>
     <div class="synthesis-conclusion">
       <span>本章结语 / 虚构故事</span>

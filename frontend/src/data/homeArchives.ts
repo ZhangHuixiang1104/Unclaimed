@@ -28,20 +28,20 @@ const previewCopy: Record<string, Pick<HomeArchivePreview, 'shortTitle' | 'tease
   },
   battery: {
     shortTitle: '布缠电池盒',
-    teaser: '接线端修了又修',
-    detail: '三层布条与外壳刻痕留下不同疑问。',
+    teaser: '旧带被留在新带下面',
+    detail: '盖内写着“到了干处再试”，结果栏仍空着。',
     material: 'metal',
   },
   shoes: {
-    shortTitle: '草鞋残件',
-    teaser: '两只鞋似乎不成双',
-    detail: '尺寸、磨损与补料都值得重新比较。',
+    shortTitle: '不成双的草鞋',
+    teaser: '被登记作“一双”',
+    detail: '长短、补编与磨损各不相同；不要急着认定原来的主人。',
     material: 'fiber',
   },
   bowl: {
-    shortTitle: '双刻痕饭碗',
-    teaser: '碗底留着两种记号',
-    detail: '最后一件物品仍在封存，先完成前面的档案。',
+    shortTitle: '包起的旧碗',
+    teaser: '一件东西被仔细包住',
+    detail: '修补与包裹留在碗上，曾经的使用者与后来的去向仍待分辨。',
     material: 'vessel',
   },
 }

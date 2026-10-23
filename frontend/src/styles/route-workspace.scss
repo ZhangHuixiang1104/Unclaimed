@@ -1,0 +1,207 @@
+/* The atlas and all five chapter entries share the available screen height. */
+.app-shell.shell-history {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 0;
+}
+.shell-history > :is(.topbar, .save-status-warning) { flex-shrink: 0; }
+.shell-history .shell-main.route-history {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  padding: 18px clamp(20px, 4vw, 76px) 12px;
+}
+.shell-history .history-room {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  height: 100%;
+  min-height: 0;
+}
+.shell-history .history-room-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0;
+  border: 0;
+}
+.shell-history .history-kicker { font-size: 10px; letter-spacing: .1em; }
+.history-title-compact { display: none; }
+.shell-history .history-intro-copy h1 {
+  margin: 7px 0 0;
+  font: 600 clamp(24px, 2.1vw, 32px)/1.35 var(--font-display);
+}
+.history-room-summary { display: flex; align-items: center; gap: 26px; flex-shrink: 0; }
+.history-room-count { color: #aab39a; font-size: 12px; white-space: nowrap; }
+.history-room-count strong { margin-left: 6px; color: #e5d7bb; font: 500 20px var(--font-mono); }
+.shell-history .history-intro-action {
+  min-width: 170px;
+  min-height: 40px;
+  margin: 0;
+  padding: 8px 15px;
+  background: #7c4033;
+  border-color: #9e6b50;
+}
+.shell-history .history-room-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(290px, 29vw, 390px);
+  grid-template-rows: minmax(0, 1fr);
+  min-height: 0;
+  margin-top: 0;
+  border-color: #77775a66;
+  background: #1a2019;
+}
+.shell-history .route-atlas { min-height: 0; }
+.shell-history .route-atlas-heading { padding: 10px 18px; gap: 12px; }
+.shell-history .route-atlas-heading small { font-size: 10px; }
+.shell-history .route-atlas-heading h2 { margin-top: 3px; font-size: 19px; line-height: 1.4; }
+.shell-history .route-atlas-tabs { padding: 0 18px; }
+.shell-history .route-atlas-tabs button { padding: 7px 0; font-size: 11px; }
+.shell-history .route-atlas-image {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 0;
+  background: radial-gradient(ellipse, #51493460, #1c231a);
+}
+.shell-history .route-atlas-image img {
+  position: absolute;
+  inset: 12px;
+  width: calc(100% - 24px);
+  height: calc(100% - 24px);
+  max-height: none;
+  object-fit: contain;
+}
+.shell-history .route-atlas-source { flex: none; gap: 8px; padding: 8px 18px; font-size: 10px; }
+.shell-history .route-atlas-source strong,
+.shell-history .route-atlas-source span { display: inline; }
+.shell-history .route-atlas-source span { margin-left: 12px; color: #8e9a80; }
+.shell-history .route-directory {
+  display: grid;
+  grid-template-rows: 44px minmax(155px, 1fr) auto;
+  min-height: 0;
+  border-top: 0;
+  border-left: 1px solid #77775a66;
+  background: #242b20;
+}
+.shell-history .route-directory > header { padding: 8px 18px; }
+.shell-history .route-directory > header h2 { font-size: 16px; }
+.shell-history .route-directory > header button { font-size: 11px; }
+.shell-history .route-directory > nav {
+  display: grid;
+  grid-template-rows: repeat(5, minmax(0, 1fr));
+  min-height: 0;
+  padding: 0 14px;
+}
+.shell-history .route-directory > nav button {
+  min-height: 0;
+  padding: 5px 6px;
+  gap: 6px;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+}
+.shell-history .route-directory > nav button strong { font-size: 13px; line-height: 1.5; }
+.shell-history .route-directory > nav button[aria-pressed=true] {
+  padding-left: 10px;
+  color: #f3dfbf;
+  background: #b99d6b14;
+}
+.route-selection { min-width: 0; padding: 16px 18px; border-top: 1px solid #77775a55; }
+.route-selection-label { color: #bd9e74; font-size: 10px; }
+.route-selection h2 { margin: 7px 0; color: #eadebf; font: 600 20px/1.4 var(--font-display); }
+.route-selection p { margin: 0 0 13px; color: #aeb89e; font-size: 12px; line-height: 1.7; }
+.route-selection-actions { display: flex; align-items: center; gap: 12px; }
+.route-selection-primary {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 40px;
+  padding: 9px 12px;
+  border: 1px solid #9e6b50;
+  background: #7c4033;
+  color: #fff0d6;
+  font-size: 12px;
+}
+.route-selection-primary:hover { background: #91503f; }
+.route-selection-secondary { flex-shrink: 0; color: #c5b38e; font-size: 11px; }
+.shell-history .history-room-footer {
+  flex-wrap: nowrap;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  gap: 15px;
+}
+.shell-history .history-room-footer p { flex-basis: auto; color: #909c83; font-size: 11px; line-height: 1.6; }
+.shell-history .history-room-footer a { flex-shrink: 0; color: #c3aa83; }
+.shell-history :is(button, a):focus-visible { outline: 2px solid #c8a16f; outline-offset: 2px; }
+
+@media (max-width: 760px) {
+  .shell-history .shell-main.route-history { padding: 12px 14px 9px; }
+  .shell-history .history-room { gap: 9px; }
+  .shell-history .history-room-intro { gap: 12px; }
+  .shell-history .history-kicker { font-size: 9px; }
+  .shell-history .history-intro-copy h1 { font-size: 23px; }
+  .history-room-summary { gap: 10px; }
+  .shell-history .history-intro-action { min-width: 0; min-height: 36px; padding: 7px 10px; gap: 12px; font-size: 11px; }
+  .history-room-count { font-size: 10px; }
+  .history-room-count strong { margin: 0; font-size: 15px; }
+  .shell-history .history-room-workspace {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+  .shell-history .route-atlas-heading { padding: 7px 12px; }
+  .shell-history .route-atlas-heading small { display: none; }
+  .shell-history .route-atlas-heading h2 { margin: 0; font-size: 16px; }
+  .shell-history .route-atlas-heading button { font-size: 10px; padding: 3px 0; }
+  .shell-history .route-atlas-tabs { padding-inline: 12px; }
+  .shell-history .route-atlas-tabs button { padding: 5px 0; font-size: 10px; }
+  .shell-history .route-atlas-image img { inset: 7px; width: calc(100% - 14px); height: calc(100% - 14px); }
+  .shell-history .route-atlas-source { padding: 4px 12px; font-size: 9px; }
+  .shell-history .route-atlas-source span { display: none; }
+  .shell-history .route-directory { grid-template-rows: 30px 155px auto; border-left: 0; border-top: 1px solid #77775a66; }
+  .shell-history .route-directory > header { padding: 4px 12px; }
+  .shell-history .route-directory > header h2 { font-size: 13px; }
+  .shell-history .route-directory > nav { padding-inline: 8px; }
+  .shell-history .route-directory > nav button strong { font-size: 12px; }
+  .shell-history .route-directory > nav button { padding-block: 3px; }
+  .route-selection { padding: 8px 12px 10px; }
+  .route-selection-label, .route-selection p { display: none; }
+  .route-selection h2 { font-size: 16px; margin: 0 0 7px; }
+  .route-selection-primary { min-height: 34px; padding: 7px 10px; font-size: 11px; }
+  .route-selection-secondary { font-size: 10px; }
+  .shell-history .history-room-footer { gap: 10px; }
+  .shell-history .history-room-footer p { font-size: 9px; }
+  .shell-history .history-room-footer a { font-size: 10px; }
+}
+@media (max-width: 520px) {
+  .shell-history .history-room-intro { align-items: flex-start; }
+  .shell-history .history-intro-copy h1 { font-size: 20px; }
+  .shell-history .history-kicker > span { display: none; }
+  .history-room-summary { flex-direction: column; align-items: flex-end; gap: 4px; }
+  .shell-history .history-intro-action { min-height: 30px; padding: 4px 8px; }
+}
+@media (max-width: 760px) and (max-height: 720px) {
+  .shell-history .history-kicker, .history-title-full { display: none; }
+  .history-title-compact { display: inline; }
+  .shell-history .history-intro-copy h1 { margin-top: 8px; font-size: 18px; }
+  .shell-history .route-atlas { position: relative; }
+  .shell-history .route-atlas-heading { height: 0; padding: 0; border: 0; }
+  .shell-history .route-atlas-heading h2 { display: none; }
+  .shell-history .route-atlas-heading button { position: absolute; right: 12px; top: 2px; z-index: 1; }
+  .shell-history .route-atlas-tabs { padding-right: 90px; }
+  .shell-history .route-directory { grid-template-rows: 28px 145px auto; }
+  .route-selection h2 { display: none; }
+}
+@media (max-height: 680px) and (min-width: 761px) {
+  .shell-history .shell-main.route-history { padding-block: 10px; }
+  .shell-history .history-room { gap: 9px; }
+  .shell-history .route-directory { grid-template-rows: 36px minmax(150px, 1fr) auto; }
+  .route-selection { padding: 10px 14px; }
+  .route-selection-label { display: none; }
+  .route-selection h2 { font-size: 17px; }
+  .route-selection p { margin-bottom: 8px; font-size: 11px; }
+}

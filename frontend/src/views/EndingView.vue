@@ -4,8 +4,13 @@ import { useRouter } from 'vue-router'
 import AppShell from '../components/common/AppShell.vue'
 import { archiveObjects } from '../data/objects'
 import { useArchiveStore } from '../stores/archive'
+import { useAccountStore } from '../stores/account'
+import { objectArtwork } from '../data/objectArtwork'
 
 const archive = useArchiveStore()
+const account = useAccountStore()
+const saving = ref(false)
+const saveError = ref('')
 const router = useRouter()
 const note = ref(archive.keeperNote)
 const available = computed(() => archiveObjects.filter((item) => archive.getRecord(item.key).status === 'archived'))
@@ -13,11 +18,16 @@ const chosenKey = ref(available.value.some((item) => item.key === archive.select
   ? archive.selectedObjectKey
   : available.value[0]?.key)
 
-const continueToTicket = () => {
-  if (!archive.endingUnlocked || !chosenKey.value) return
+const continueToTicket = async () => {
+  if (saving.value || !archive.endingUnlocked || !chosenKey.value) return
+  saving.value = true
+  saveError.value = ''
   archive.chooseObject(chosenKey.value)
   archive.keeperNote = note.value.slice(0, 50)
-  router.push('/ticket')
+  try {
+    if (await account.saveNow()) await router.push('/ticket')
+    else saveError.value = '展签仍待同步，请恢复存档连接后重试。你的选择和留言已保留在当前页面。'
+  } finally { saving.value = false }
 }
 </script>
 
@@ -40,7 +50,7 @@ const continueToTicket = () => {
             :aria-pressed="chosenKey === item.key"
             @click="chosenKey = item.key"
           >
-            <span>{{ item.silhouette }}</span>
+            <img :src="objectArtwork[item.key]" :alt="item.name">
             <strong>{{ item.name }}</strong>
           </button>
         </div>
@@ -48,7 +58,8 @@ const continueToTicket = () => {
           <span>写下一句陈列说明 <small>{{ note.length }}/50</small></span>
           <textarea v-model="note" maxlength="50" placeholder="例如：请保留那些无法辨认的空格。"></textarea>
         </label>
-        <button class="primary-button light-button" type="button" :disabled="!archive.endingUnlocked || !chosenKey" @click="continueToTicket">生成这份故事档案的展签</button>
+        <p v-if="saveError" class="ending-save-error" role="alert">{{ saveError }}</p>
+        <button class="primary-button light-button" type="button" :disabled="saving || !archive.endingUnlocked || !chosenKey" @click="continueToTicket">{{ saving ? '正在保存展签…' : '生成这份故事档案的展签' }}</button>
       </div>
     </section>
   </AppShell>

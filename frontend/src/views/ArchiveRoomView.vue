@@ -7,7 +7,6 @@ import ArchiveIndex from '../components/archive/ArchiveIndex.vue'
 import DutyBoard from '../components/archive/DutyBoard.vue'
 import { archiveObjects } from '../data/objects'
 import { useArchiveStore } from '../stores/archive'
-import type { EvidenceLevel } from '../types/archive'
 
 const archive = useArchiveStore()
 const route = useRoute()
@@ -27,15 +26,6 @@ const activeKey = computed(() => previewKey.value ?? selectedKey.value)
 const activeItem = computed(() => archiveObjects.find((item) => item.key === activeKey.value) ?? archiveObjects[0])
 const activeRecord = computed(() => archive.getRecord(activeItem.value.key))
 const activeStatus = computed(() => archive.getObjectStatus(activeItem.value.key))
-
-const evidenceCounts = computed(() => {
-  const counts: Record<EvidenceLevel, number> = { confirmed: 0, inferred: 0, unknown: 0 }
-  Object.values(archive.records).forEach((record) => {
-    if (!record.evidenceVerified && record.status !== 'archived') return
-    Object.values(record.classified).forEach((level) => { counts[level] += 1 })
-  })
-  return counts
-})
 
 const preview = (key: string | null) => { previewKey.value = key }
 
@@ -85,7 +75,7 @@ archive.chooseObject(selectedKey.value)
           :found-count="activeRecord.foundClueIds.length"
         />
 
-        <DutyBoard :current-key="activeKey" :evidence-counts="evidenceCounts" />
+        <DutyBoard :current-key="activeKey" />
       </div>
 
       <footer class="archive-room-footer">

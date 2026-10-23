@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">老战友，留在展柜里</title>
+  <desc id="desc">抽象的现代博物馆展柜与报道记录卡，表达多年后谢宝金重见手摇发电机的记忆。不是1976年现场照片，也未复原真实文物的外形。</desc>
+  <defs><style>.sans{font-family:"Noto Sans SC","Microsoft YaHei",sans-serif}.serif{font-family:"Noto Serif SC","Source Han Serif SC","SimSun",serif}.meta{font:600 15px ui-monospace,Consolas,monospace;letter-spacing:2px;fill:#8d4f3e}.body{font-size:19px;fill:#4b554b}</style></defs>
+  <rect width="1200" height="700" fill="#e9e1cf"/><rect x="40" y="40" width="1120" height="620" fill="none" stroke="#aca38e"/>
+  <text x="86" y="93" class="meta">H04 / MEMORY &amp; COLLECTION</text>
+  <text x="86" y="163" class="serif" font-size="49" font-weight="700" fill="#1b2720">后来，他在展柜前重逢</text>
+  <text x="88" y="207" class="sans body">通信完成了，守护器材的人和记忆却没有被留在路上。</text>
+  <g transform="translate(102 260)">
+    <rect width="585" height="283" fill="#d8cfbb" stroke="#7e897b" stroke-width="3"/>
+    <rect x="17" y="17" width="551" height="220" fill="#eae7d9" stroke="#b7b39f"/>
+    <path d="M34 227h516M147 36l-72 173M478 36l-72 173" stroke="#fff9e9" stroke-opacity=".58" stroke-width="7"/>
+    <rect x="188" y="135" width="209" height="74" rx="4" fill="#6a7467" stroke="#394739" stroke-width="3"/>
+    <path d="M220 136V95m155 41V95M205 95h185" stroke="#4b5b4d" stroke-width="8" stroke-linecap="round"/>
+    <text x="34" y="263" class="sans" font-size="16" fill="#3f4b40">当代展陈 · 器物轮廓仅作示意</text>
+  </g>
+  <g transform="translate(737 277)">
+    <rect width="352" height="249" fill="#f6efdf" stroke="#b7a994" stroke-width="2"/>
+    <path d="M22 53h308M22 184h308" stroke="#d0c1aa"/>
+    <text x="23" y="38" class="meta">ORAL MEMORY / REPORT</text>
+    <text x="23" y="103" class="serif" font-size="33" font-weight="700" fill="#263329">多年后重见</text>
+    <text x="23" y="143" class="sans" font-size="20" fill="#445145">那台被守护的机器</text>
+    <text x="23" y="218" class="sans" font-size="15" fill="#747669">采访与报道记录 · 非现场照片</text>
+  </g>
+  <rect x="86" y="564" width="1028" height="64" fill="#f3ecdf" stroke="#c7bba7"/>
+  <text x="105" y="603" class="sans" font-size="18" fill="#263329">据家属采访与公开报道，谢宝金曾在军事博物馆重见发电机。</text>
+  <text x="886" y="603" class="sans" font-size="14" fill="#737869">据公开报道编绘／示意</text>
+</svg>

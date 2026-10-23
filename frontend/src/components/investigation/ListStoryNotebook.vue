@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import InvestigationRail from './InvestigationRail.vue'
 import { computed } from 'vue'
 import { useArchiveStore } from '../../stores/archive'
 
-const emit = defineEmits<{ review: [clueId: string]; continue: [] }>()
+const emit = defineEmits<{ review: [clueId: string] }>()
 const archive = useArchiveStore()
 const record = computed(() => archive.getRecord('list'))
 const chapters = [
@@ -14,12 +15,8 @@ const complete = computed(() => chapters.every((chapter) => record.value.foundCl
 </script>
 
 <template>
-  <aside class="list-story-notebook" aria-label="名单故事手账">
-    <header>
-      <span>STORY JOURNAL / 名单</span>
-      <h2>这一页的三幕</h2>
-      <p>读到一处，故事就向前一格。</p>
-    </header>
+  <InvestigationRail class="list-story-notebook" :found="record.foundClueIds.length" :total="chapters.length" :ready="complete">
+    <template #notes>
     <div class="notebook-chapters">
       <template v-for="chapter in chapters" :key="chapter.id">
         <button v-if="record.foundClueIds.includes(chapter.id)" type="button" class="notebook-chapter found" @click="emit('review', chapter.id)">
@@ -33,12 +30,9 @@ const complete = computed(() => chapters.every((chapter) => record.value.foundCl
         </div>
       </template>
     </div>
-    <div class="notebook-footer">
-      <span>{{ record.foundClueIds.length }} / {{ chapters.length }} 段故事</span>
-      <button v-if="complete" type="button" @click="emit('continue')">去读完整张纸 →</button>
-      <p v-else>下一段仍在纸面上。</p>
-    </div>
-  </aside>
+    </template>
+    <template #caption><slot /></template>
+  </InvestigationRail>
 </template>
 
 <style scoped>

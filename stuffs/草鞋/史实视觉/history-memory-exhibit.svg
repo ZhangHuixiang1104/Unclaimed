@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" role="img" aria-label="原创红绣球草鞋纪念与展陈意象示意">
+ <defs><pattern id="w" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(38)"><path d="M0 0v14 M7 0v14" stroke="#a48250" stroke-width="2"/></pattern></defs>
+ <rect width="960" height="600" fill="#e5dbc6"/><text x="78" y="84" fill="#694c35" font-family="sans-serif" font-size="17" letter-spacing="3">LATER MEMORY / EXHIBITION</text><path d="M78 104H883" stroke="#746c56" stroke-width="2"/>
+ <rect x="146" y="145" width="668" height="326" rx="3" fill="#f2e8d5" stroke="#84755b" stroke-width="7"/><path d="M146 420H814 M146 445H814" stroke="#bdb09b" stroke-width="4"/>
+ <g transform="translate(290 223)"><path d="M100 0C160 9 180 48 175 111L168 178C159 214 43 215 30 176L19 111C13 48 39 8 100 0Z" fill="url(#w)" stroke="#8c6c43" stroke-width="7"/><path d="M20 99Q95 50 174 102" fill="none" stroke="#755b39" stroke-width="10"/><circle cx="95" cy="-9" r="22" fill="#af4d42"/><path d="M95-31v44 M73-9h44 M80-24l31 31 M111-24 80 7" stroke="#d77b66" stroke-width="3"/></g>
+ <g transform="translate(500 223)"><path d="M100 0C160 9 180 48 175 111L168 178C159 214 43 215 30 176L19 111C13 48 39 8 100 0Z" fill="url(#w)" stroke="#8c6c43" stroke-width="7"/><path d="M20 99Q95 50 174 102" fill="none" stroke="#755b39" stroke-width="10"/><circle cx="95" cy="-9" r="22" fill="#af4d42"/><path d="M95-31v44 M73-9h44 M80-24l31 31 M111-24 80 7" stroke="#d77b66" stroke-width="3"/></g>
+ <path d="M78 502H883" stroke="#746c56" stroke-width="2"/><text x="78" y="543" fill="#5e584a" font-family="sans-serif" font-size="17">ORIGINAL INTERPRETIVE DIAGRAM · NOT AN ARTIFACT PHOTO</text>
+</svg>

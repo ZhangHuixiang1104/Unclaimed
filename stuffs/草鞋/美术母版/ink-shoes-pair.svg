@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 490 110" role="img" aria-label="被写成一双">
+ <title>被写成一双</title>
+ <g fill="#e9d9b8" font-family="KaiTi,STKaiti,serif" font-size="68" font-weight="700">
+  <text x="12" y="77" transform="rotate(-2 12 77)">被</text>
+  <text x="93" y="78" transform="rotate(1 93 78)">写</text>
+  <text x="176" y="75" transform="rotate(-1 176 75)">成</text>
+  <text x="261" y="79" transform="rotate(2 261 79)">一</text>
+  <text x="344" y="76" transform="rotate(-2 344 76)">双</text>
+ </g>
+ <path d="M10 96Q210 101 475 93" fill="none" stroke="#b99361" stroke-width="2" opacity=".72"/>
+</svg>

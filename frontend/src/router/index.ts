@@ -10,7 +10,7 @@ import AboutView from '../views/AboutView.vue'
 import AccountView from '../views/AccountView.vue'
 import { useArchiveStore } from '../stores/archive'
 import { useAccountStore } from '../stores/account'
-import { canEnterProject } from './access'
+import { canEnterProject, confirmFinalSave } from './access'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -36,9 +36,9 @@ router.beforeEach(async (to) => {
     return { name: 'account', query: { next: to.fullPath } }
   }
   const archive = useArchiveStore()
-  if (to.name === 'ending' && !archive.endingUnlocked) return '/history'
-  if (to.name === 'ticket') {
-    if (!archive.endingUnlocked) return '/history'
+  if (to.name === 'ending' || to.name === 'ticket') {
+    if (!await confirmFinalSave(archive.endingUnlocked, account)) return '/history'
+    if (to.name === 'ticket' && (!archive.selectedObjectKey || archive.getRecord(archive.selectedObjectKey).status !== 'archived')) return '/ending'
   }
 })
 

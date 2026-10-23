@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 490 110" role="img" aria-label="只记得脚步">
+ <title>只记得脚步</title>
+ <g fill="#e9d9b8" font-family="KaiTi,STKaiti,serif" font-size="68" font-weight="700">
+  <text x="12" y="76" transform="rotate(1 12 76)">只</text>
+  <text x="95" y="79" transform="rotate(-2 95 79)">记</text>
+  <text x="178" y="75" transform="rotate(2 178 75)">得</text>
+  <text x="261" y="78" transform="rotate(-1 261 78)">脚</text>
+  <text x="344" y="76" transform="rotate(1 344 76)">步</text>
+ </g>
+ <path d="M10 96Q210 101 475 93" fill="none" stroke="#b99361" stroke-width="2" opacity=".72"/>
+</svg>

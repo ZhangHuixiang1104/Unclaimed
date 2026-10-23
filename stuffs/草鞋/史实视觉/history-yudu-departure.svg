@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" role="img" aria-label="原创于都河畔赠鞋与远行意象示意">
+ <defs><linearGradient id="g" x2="0" y2="1"><stop stop-color="#e8dec8"/><stop offset="1" stop-color="#d9ccb4"/></linearGradient><pattern id="h" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(37)"><path d="M0 0v14 M7 0v14" stroke="#947348" stroke-width="2"/></pattern></defs>
+ <rect width="960" height="600" fill="url(#g)"/><text x="77" y="86" fill="#694c35" font-family="sans-serif" font-size="17" letter-spacing="3">YUDU / DEPARTURE</text><path d="M76 106H884" stroke="#746c56" stroke-width="2"/>
+ <path d="M0 390C172 352 291 431 445 397S725 353 960 393V600H0Z" fill="#9eab9e"/><path d="M0 421C198 385 286 453 446 420S732 376 960 420 M0 453C198 418 286 487 446 453S732 410 960 453" fill="none" stroke="#e7e5d4" stroke-opacity=".7" stroke-width="4"/>
+ <path d="M68 381C189 335 260 343 348 371 M644 370C736 335 798 340 905 375" fill="none" stroke="#756d55" stroke-width="8"/>
+ <g fill="#6d6854"><circle cx="245" cy="210" r="23"/><path d="M228 237h35l25 105h-90z"/><circle cx="680" cy="205" r="22"/><path d="M662 232h37l30 110h-100z"/></g><path d="M291 281C366 264 414 270 460 284 M624 278C563 266 520 270 480 286" fill="none" stroke="#a5774b" stroke-width="10" stroke-linecap="round"/>
+ <g transform="translate(424 280) rotate(75)"><path d="M30 0C48-2 67 13 67 40L64 98C59 121 5 121 0 98L-3 42C-3 16 10 2 30 0Z" fill="url(#h)" stroke="#795d3f" stroke-width="4"/><path d="M95 0C115-2 134 13 134 40L131 98C125 121 72 121 67 98L64 42C64 16 76 2 95 0Z" fill="url(#h)" stroke="#795d3f" stroke-width="4"/></g>
+ <path d="M77 503H884" stroke="#746c56" stroke-width="2"/><text x="77" y="544" fill="#5e584a" font-family="sans-serif" font-size="17">ORIGINAL INTERPRETIVE DIAGRAM · NOT A HISTORICAL PHOTOGRAPH</text>
+</svg>

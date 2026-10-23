@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" role="img" aria-label="原创草鞋制作与供给示意">
+ <defs><pattern id="paper" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M0 19h20" stroke="#a59a7c" stroke-opacity=".13"/></pattern><pattern id="weave" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(34)"><path d="M0 0v16 M8 0v16" stroke="#af8a55" stroke-width="3" opacity=".7"/></pattern></defs>
+ <rect width="960" height="600" fill="#e7ddc5"/><rect width="960" height="600" fill="url(#paper)"/>
+ <path d="M78 103H882 M78 501H882" stroke="#746c56" stroke-width="2"/><text x="80" y="84" fill="#694c35" font-family="sans-serif" font-size="17" letter-spacing="3">LONG MARCH / SHOE SUPPLY</text>
+ <path d="M134 207v197 M217 207v197 M134 207h83 M134 306h83 M130 404h90" fill="none" stroke="#795d3c" stroke-width="9"/>
+ <path d="M255 238c75 31 75 101 0 135 M273 221c75 31 75 101 0 135 M291 204c75 31 75 101 0 135" fill="none" stroke="#ad8553" stroke-width="12" stroke-linecap="round"/>
+ <path d="M390 300H565" stroke="#78533d" stroke-width="3"/><path d="m565 300-22-13v26z" fill="#78533d"/>
+ <g transform="translate(620 164)"><path d="M80 0C130 8 159 57 150 118L132 244C125 290 34 295 24 240L5 115C-5 53 26 6 80 0Z" fill="#d0af78" stroke="#76583a" stroke-width="6"/><path d="M80 17C114 23 140 59 134 120L119 237C116 265 45 267 39 237L22 119C14 62 44 22 80 17Z" fill="url(#weave)"/><path d="M13 120Q75 82 141 120 M21 170Q81 126 135 166" fill="none" stroke="#705436" stroke-width="9"/></g>
+ <path d="M735 457h140 M805 428v59" stroke="#a0503f" stroke-width="4"/><text x="80" y="542" fill="#5e584a" font-family="sans-serif" font-size="17">ORIGINAL INTERPRETIVE DIAGRAM · NOT A HISTORICAL PHOTOGRAPH</text>
+</svg>

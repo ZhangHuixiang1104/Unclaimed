@@ -1,0 +1,139 @@
+/* Main artwork is PNG; hit areas retain the original chapter coordinates. */
+.archive-dossier .dossier-art { display:flex; align-items:center; justify-content:center; align-self:stretch; height:auto; min-height:360px; padding:38px 28px; background:radial-gradient(ellipse at center,#eee4d0,#d8cbb2); }
+.archive-dossier .dossier-artwork { display:block; position:static; width:100%; height:auto; max-width:460px; max-height:360px; object-fit:contain; object-position:center; filter:drop-shadow(6px 12px 10px #30231935); pointer-events:none; }
+.archive-dossier .art-bowl .dossier-artwork { width:76%; max-width:320px; max-height:280px; }
+.archive-dossier .art-caption { bottom:15px; right:18px; }
+.archive-dossier.locked .dossier-artwork { filter:brightness(.78) saturate(.65) drop-shadow(6px 12px 10px #30231935); }
+
+
+/* One workspace, shared by every chapter. Geometry of the inner object boards stays unchanged. */
+.object-page { --inspection-border:#5b5c48; --inspection-panel:#24291f; --inspection-ink:#eee3cd; --inspection-muted:#b9bbaa; --inspection-accent:#d6ad76; }
+.shell-object .shell-main.route-object { min-width:0; }
+.object-page > .object-header { display:block; min-height:0; margin:0 0 20px; padding:0 0 18px; border-bottom:1px solid #a89a772b; }
+.object-page .chapter-breadcrumb { display:flex; align-items:center; flex-wrap:wrap; gap:18px; margin-bottom:12px; color:#979e8e; font-size:12px; }
+.object-page .chapter-breadcrumb button { padding:0; border:0; background:none; color:#c7b395; cursor:pointer; font:inherit; }
+.object-page .chapter-breadcrumb details { position:relative; margin-left:auto; }
+.object-page .chapter-breadcrumb summary { cursor:pointer; list-style:none; color:#b5b9a8; }
+.object-page .chapter-breadcrumb details p { position:absolute; z-index:35; right:0; top:22px; width:min(420px,80vw); margin:0; padding:18px; border:1px solid #6d6c50; background:#282d23; box-shadow:0 14px 36px #0008; color:#d6cebd; font-size:14px; line-height:1.8; }
+.object-page > .object-header h1 { margin:0; color:var(--inspection-ink); font:700 clamp(28px,2.5vw,40px)/1.25 var(--font-display); }
+.object-page > .object-header p.investigation-question { margin:10px 0 0; padding:0; border:0; color:#c8c6b4; font-size:15px; font-weight:400; line-height:1.6; }
+.object-page .list-inspection-layout { display:block; }
+.object-page .inspection-workspace { display:grid; grid-template-columns:minmax(0,7fr) minmax(300px,3fr); height:clamp(600px,calc(100svh - 260px),780px); min-width:0; gap:0; align-items:stretch; border:1px solid var(--inspection-border); background:var(--inspection-panel); color:var(--inspection-ink); }
+.object-page .inspection-workspace > :is(.map-worktop,.battery-worktop,.shoes-worktop,.bowl-worktop,.inspector-panel) { display:flex; flex-direction:column; min-width:0; min-height:0; height:100%; margin:0; padding:0; border:0; background:#22271e; box-shadow:none; }
+.object-page .bowl-content { display:contents; }
+.object-page .inspection-workspace .inspection-artifact-stage { position:relative; flex:1 1 0; container-type:size; width:100%; max-width:none; min-height:0; height:auto; aspect-ratio:auto; margin:0; overflow:hidden; border:0; background:radial-gradient(ellipse at 48% 42%,#6c5840aa,#30291fbb 72%),repeating-linear-gradient(2deg,#4b3c2a 0px,#4b3c2a 3px,#463824 4px,#463824 7px); }
+.object-page .inspection-workspace .inspection-artifact-stage.list-inspection-stage { background:radial-gradient(ellipse at center,#6c58404d,#211d17aa),var(--list-desk-url) center / cover; }
+.object-page .inspection-workspace .inspection-artifact-stage > svg { display:block; width:100%; height:100%; }
+.object-page .inspection-workspace :is(.inspection-object-canvas,.battery-scene) { position:absolute; left:50%; top:50%; width:min(100cqw,calc(100cqh * 1.6)); max-width:none; height:auto; aspect-ratio:8 / 5; margin:0; transform:translate(-50%,-50%); }
+.object-page .inspection-workspace .list-artifact { width:min(84cqw,calc(92cqh * 1.3333),720px); max-height:92cqh; top:50%; }
+.object-page .inspection-workspace :is(.stage-credit,.shoes-stage-label,.list-stage-credit) { display:none; }
+.object-page .inspection-workspace :is(.map-stage-caption,.battery-understage,.shoes-understage,.bowl-understage,.field-record-strip) { flex:none; display:block; min-height:46px; margin:0; padding:12px 18px; border:0; border-top:1px solid #aaa08033; background:#23281f; color:var(--inspection-muted); font-size:12px; line-height:1.6; }
+.object-page .inspection-workspace :is(.battery-understage,.shoes-understage) p { margin:0; }
+.object-page .inspection-workspace :is(.battery-understage,.shoes-understage) > span { display:none; }
+.object-page .field-record-strip .current-task-card { padding:0; border:0; background:transparent; }
+.object-page .field-record-strip .current-task-card p { margin:0; font-size:12px; color:var(--inspection-muted); line-height:1.6; }
+.object-page .field-record-strip :is(.current-task-card>span,.current-task-card>strong,.work-log,.contact-sheet) { display:none; }
+/* A compact tool row with views, a disclosure for lighting/tools, and quiet utilities. */
+.object-page .observation-controls { position:relative; display:flex; align-items:center; gap:12px; flex:none; min-height:58px; padding:10px 14px; border:0; border-bottom:1px solid #aaa08033; background:#24291f; }
+.object-page :is(.observation-specific-tools,.observation-common-tools,.observation-views,.observation-current-action) { display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+.object-page .observation-common-tools { margin-left:auto; flex-wrap:nowrap; flex-shrink:0; }
+.object-page .observation-views { border:1px solid #77785e66; border-radius:3px; gap:0; }
+.object-page .observation-controls :is(button,summary) { min-height:32px; margin:0; padding:6px 10px; border:1px solid transparent; border-radius:2px; background:transparent; color:#d5d8c5; font:500 13px/1.4 var(--font-sans); white-space:nowrap; cursor:pointer; }
+.object-page .observation-controls button:is(:hover,[aria-pressed=true],.active):not(:disabled),.object-page .observation-menu[open]>summary { background:#4b4c36; color:#f9edd4; }
+.object-page .observation-controls button:disabled { display:none; }
+.object-page .observation-common-tools button { color:#aaaE9e; padding-inline:7px; }
+.object-page .observation-current-action button { border-color:#ba906333; color:#ebc79b; }
+.object-page .observation-controls :is(button,summary):focus-visible,.object-page .rail-tabs button:focus-visible { outline:2px solid #dfba86; outline-offset:3px; }
+.object-page .observation-menu { position:relative; }
+.object-page .observation-menu summary { list-style:none; border-color:#77785e55; }
+.object-page .observation-menu > div { position:absolute; z-index:40; left:0; top:calc(100% + 8px); display:grid; gap:4px; min-width:180px; padding:8px; border:1px solid #747557; background:#2b3125; box-shadow:0 12px 30px #0007; }
+.object-page .observation-menu button { display:block; width:100%; text-align:left; }
+.object-page .observation-menu button:disabled { display:none; }
+.object-page .observation-help { position:absolute; z-index:45; top:calc(100% + 8px); right:12px; width:min(430px,90%); margin:0; padding:16px; border:1px solid #747557; background:#2b3125; box-shadow:0 12px 30px #0007; color:#d8d3bd; font-size:14px; line-height:1.7; }
+/* The rail is exactly as tall as the worktop; only its active pane scrolls. */
+.object-page .inspection-workspace .inspection-rail { display:flex; flex-direction:column; height:100%; min-width:0; min-height:0; margin:0; padding:0; border:0; border-left:1px solid var(--inspection-border); background:#272d22; color:var(--inspection-ink); }
+.object-page .rail-tabs { display:flex; flex:none; min-height:58px; border-bottom:1px solid #aaa08033; }
+.object-page .rail-tabs button { position:relative; flex:1; padding:14px 8px; border:0; border-bottom:2px solid transparent; background:none; color:#9da491; font:500 14px var(--font-sans); cursor:pointer; }
+.object-page .rail-tabs button[aria-selected=true] { color:#f3e8d2; border-bottom-color:#c49365; }
+.object-page .rail-tabs small { margin-left:5px; font-size:11px; color:#a1a68e; }
+.object-page .rail-tabs i { display:inline-block; width:5px; height:5px; margin-left:5px; vertical-align:middle; border-radius:50%; background:#d6ad76; }
+.object-page .rail-pane { flex:1; min-height:0; padding:20px; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:#73745a #272d22; }
+.object-page .rail-pane:focus-visible { outline:1px solid #b4a47c; outline-offset:-2px; }
+.object-page .rail-intro { margin:0 0 18px; color:#aeb39f; font-size:13px; line-height:1.7; }
+.object-page .inspection-rail :is(.map-journal-list,.battery-notebook-list,.shoes-note-list,.bowl-notes,.notebook-chapters) { display:grid; grid-template-columns:1fr; gap:0; padding:0; }
+.object-page .inspection-rail :is(button.notebook-chapter,.notebook-chapter.waiting,.map-journal-list button,.battery-notebook-list button,.shoes-note-list button,.bowl-notes button) { display:block; width:100%; min-height:70px; margin:0; padding:13px 0; border:0; border-bottom:1px solid #85866a33; background:none; color:#e8e3d1; text-align:left; transform:none; }
+.object-page .inspection-rail :is(button:disabled,.notebook-chapter.waiting) { opacity:.5; }
+.object-page .inspection-rail :is(.map-journal-list,.battery-notebook-list,.shoes-note-list,.bowl-notes,.notebook-chapters) :is(small,button>span) { color:#a9ac95; font-size:11px; }
+.object-page .inspection-rail :is(.map-journal-list,.battery-notebook-list,.shoes-note-list,.bowl-notes,.notebook-chapters) strong { display:block; margin:5px 0 0; font:600 16px/1.5 var(--font-display); }
+.object-page .inspection-rail .notebook-chapter em { display:none; }
+.object-page .rail-next { width:100%; margin:24px 0 0; padding:12px; border:1px solid #9b845a77; background:none; color:#dabc8e; font-size:13px; cursor:pointer; }
+.object-page .inspection-rail :is(.inspection-synthesis,.list-story-synthesis) { display:block; width:100%; margin:0; padding:0; border:0; background:none; box-shadow:none; }
+.object-page .inspection-rail :is(.inspection-synthesis>span,.synthesis-heading>span,.synthesis-conclusion>span) { display:none; }
+.object-page .inspection-rail :is(.inspection-synthesis h2,.list-story-synthesis h2,.rail-empty h2) { margin:0 0 14px; font:600 23px/1.5 var(--font-display); }
+.object-page .inspection-rail :is(.inspection-synthesis p,.synthesis-heading p,.synthesis-conclusion small,.rail-empty p) { margin:0 0 16px; color:#b6bca8; font-size:14px; line-height:1.8; }
+.object-page .inspection-rail :is(.map-caption-options,.battery-caption-options,.shoes-options,.bowl-options) { display:grid; grid-template-columns:minmax(0,1fr); gap:8px; margin:18px 0 0; padding:0; }
+.object-page .inspection-rail :is(.map-caption-options,.battery-caption-options,.shoes-options,.bowl-options) button { width:100%; padding:12px; border:1px solid #73765a66; background:transparent; color:#dddcc7; font-size:14px; line-height:1.7; text-align:left; white-space:normal; cursor:pointer; }
+.object-page .inspection-rail :is(.map-caption-options,.battery-caption-options,.shoes-options,.bowl-options) button[aria-pressed=true] { border-color:#cca472; background:#4b4b33; color:#fff0d6; }
+.object-page .inspection-rail .synthesis-heading { padding:0; }
+.object-page .inspection-rail .synthesis-conclusion { margin:20px 0 0; padding:0; border:0; background:none; }
+.object-page .inspection-rail .synthesis-conclusion p { color:#eee4cd; font:600 20px/1.6 var(--font-display); }
+.object-page .inspection-rail :is(.map-save-button,.battery-save,.shoes-save,.bowl-save,.synthesis-conclusion button) { display:block; width:100%; margin-top:20px; padding:12px; border:1px solid #ae7d59; background:#78503a; color:#fff1d8; font-size:14px; line-height:1.6; text-align:center; }
+.object-page .rail-empty { padding-top:25px; }
+.object-page .rail-empty>span { display:block; margin-bottom:20px; color:#c4a576; font-size:13px; }
+.object-page .rail-empty button { padding:8px 0; border:0; background:none; color:#d5b687; cursor:pointer; }
+/* One quiet completion strip, with a single primary next step. */
+.object-page > .history-gate.chapter-completion { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:18px; min-height:78px; margin-top:0; padding:18px 4px; border:0; border-bottom:1px solid #a89a772b; background:none; box-shadow:none; }
+.object-page .completion-status { display:flex; gap:12px; align-items:center; }
+.object-page .completion-dot { flex:none; width:6px; height:6px; border-radius:50%; background:#9fa58c; }
+.object-page .unlocked .completion-dot { background:#d3b17e; }
+.object-page .completion-status h2 { margin:0 0 4px; color:#dce0cd; font:600 15px var(--font-sans); }
+.object-page .completion-status p { margin:0; color:#9da590; font-size:13px; line-height:1.6; }
+.object-page .completion-actions { display:flex; align-items:center; flex-wrap:wrap; gap:16px; }
+.object-page .completion-actions :is(button,a) { padding:10px 16px; border:0; background:none; font:500 14px var(--font-sans); cursor:pointer; }
+.object-page .completion-actions .completion-primary { border:1px solid #8d6149; background:#774d38; color:#f7e9d1; }
+.object-page .completion-actions .completion-secondary { color:#c0b99d; }
+.object-page .completion-count { color:#9da590; font-size:13px; }
+/* Dialogs and enlarged observation preserve all chapter hit areas. */
+.object-page .inspection-workspace :is(.map-clue-scrim,.battery-story-scrim,.shoes-scrim,.bowl-scrim,.list-clue-card-overlay) { position:fixed; inset:0; z-index:100; display:grid; place-items:center; padding:20px; background:#0a0d09d9; }
+.object-page .inspection-workspace [role=dialog] { max-height:85dvh; width:min(620px,calc(100vw - 32px)); overflow:auto; padding:26px 30px; border:1px solid #b99564; background:#eee2c9; color:#302a21; box-shadow:0 25px 80px #0008; }
+.object-page .inspection-workspace [role=dialog] :is(h2,h3) { margin:12px 0; font:700 28px/1.4 var(--font-display); }
+.object-page .inspection-workspace [role=dialog]>p { font-size:16px; line-height:1.8; }
+.object-page .inspection-workspace [role=dialog]>button:first-child { float:right; padding:6px 8px; border:0; background:none; color:#795637; cursor:pointer; }
+.object-page .inspection-workspace .observation-backdrop { position:fixed; inset:0; z-index:85; background:#0a0c09e8; }
+.object-page .inspection-enlarged .inspection-artifact-stage { position:fixed; z-index:86; left:50%; top:50%; transform:translate(-50%,-50%); width:min(1200px,92vw,calc(78dvh * 1.6)); height:auto; min-height:0; aspect-ratio:8 / 5; flex:none; border:1px solid #c7a779; box-shadow:0 24px 90px #0009; }
+.object-page .inspection-enlarged .observation-enlarge { position:fixed; z-index:87; top:18px; right:4vw; background:#343c2c; }
+.inspection-overlay-open { overflow:hidden; }
+@media(max-width:1180px) { .object-page .observation-controls { flex-wrap:wrap; gap:8px; } .object-page .inspection-workspace { grid-template-columns:minmax(0,7fr) minmax(280px,3fr); } }
+@media(max-width:1000px) {
+ .object-page .inspection-workspace { grid-template-columns:minmax(0,1fr); height:auto; }
+ .object-page .inspection-workspace > :is(.map-worktop,.battery-worktop,.shoes-worktop,.bowl-worktop,.inspector-panel) { height:clamp(430px,72svh,620px); }
+ .object-page .inspection-workspace .inspection-rail { height:480px; border-left:0; border-top:1px solid var(--inspection-border); }
+}
+@media(max-width:760px) {
+ .archive-dossier { grid-template-columns:minmax(0,1fr); }
+ .archive-dossier .dossier-art { min-height:280px; padding:32px 24px; border-right:0; border-bottom:1px solid #756c5c44; }
+ .archive-dossier .dossier-artwork { max-height:260px; width:auto; max-width:100%; }
+ .archive-dossier .art-bowl .dossier-artwork { width:auto; max-width:70%; max-height:220px; }
+ .archive-dossier .dossier-copy { min-width:0; padding:22px 24px 22px 40px; }
+ .archive-dossier .dossier-header>div { flex-wrap:wrap; gap:6px; }
+ .archive-dossier .dossier-footer { flex-wrap:wrap; gap:14px; }
+ .object-page .chapter-breadcrumb { gap:10px; }
+ .object-page .chapter-breadcrumb>span { font-size:10px; }
+ .object-page > .object-header p.investigation-question { font-size:14px; }
+ .object-page .completion-actions { width:100%; justify-content:flex-end; }
+ .object-page .observation-controls { padding:9px; }
+ .object-page .observation-controls :is(button,summary) { padding-inline:8px; font-size:12px; }
+ .object-page .rail-pane { padding:18px; }
+}
+@media(max-width:560px) {
+ .object-page .inspection-workspace .base-sweep { left:5%; right:5%; bottom:7%; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:7px; padding:9px; }
+ .object-page .inspection-workspace .base-sweep label { grid-column:1 / -1; }
+ .object-page .inspection-workspace .base-sweep input { min-width:0; width:100%; }
+ .object-page .inspection-workspace .base-sweep button { white-space:nowrap; font-size:12px; padding:8px; }
+}
+@media(prefers-reduced-motion:reduce) { .object-page .inspection-workspace * { scroll-behavior:auto; transition:none; } }
+
+.object-page .inspection-workspace :is(.inspection-caption,.list-prop-note) { display:none; }
+.object-page .observation-views:not(:has(button:not(:disabled))),.object-page .observation-menu:not(:has(button:not(:disabled))) { display:none; }
+
+.object-page .inspection-rail .inspection-synthesis>div>span { display:none; }

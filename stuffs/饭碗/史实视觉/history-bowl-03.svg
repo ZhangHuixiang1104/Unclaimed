@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" role="img" aria-label="原创后制示意：一只抽象瓷碗被托付，不复原徐排长赠碗现场或真实文物外观">
+  <defs>
+    <linearGradient id="paper" x2="0" y2="1"><stop stop-color="#e9dfcb"/><stop offset="1" stop-color="#d3c2a7"/></linearGradient>
+    <linearGradient id="bowl" x2="0" y2="1"><stop stop-color="#eee4cf"/><stop offset="1" stop-color="#ae9980"/></linearGradient>
+  </defs>
+  <rect width="960" height="600" fill="url(#paper)"/>
+  <circle cx="480" cy="297" r="205" fill="none" stroke="#a99273" stroke-opacity=".36" stroke-width="2"/><circle cx="480" cy="297" r="247" fill="none" stroke="#a99273" stroke-opacity=".2" stroke-width="2"/>
+  <path d="M264 427q88-82 174-53l59 30q28 10 47-9l77-73q23-19 40-1 13 14-2 33l-97 124q-28 37-82 31l-132-17-84 44Z" fill="#8d755e" stroke="#5e5447" stroke-width="4"/>
+  <path d="M696 427q-88-82-174-53l-59 30q-28 10-47-9l-77-73q-23-19-40-1-13 14 2 33l97 124q28 37 82 31l132-17 84 44Z" fill="#b19b7c" stroke="#5e5447" stroke-width="4"/>
+  <path d="M300 208q11 149 180 161 169-12 180-161Z" fill="url(#bowl)" stroke="#635f51" stroke-width="5"/><ellipse cx="480" cy="208" rx="180" ry="56" fill="#f2e8d3" stroke="#635f51" stroke-width="5"/><ellipse cx="480" cy="213" rx="146" ry="36" fill="#d2c5ac"/><path d="M419 390h122" stroke="#8b6e55" stroke-width="11" stroke-linecap="round"/>
+  <path d="M63 75h834M63 528h834" stroke="#6d6c59" stroke-opacity=".45" stroke-width="2"/>
+</svg>

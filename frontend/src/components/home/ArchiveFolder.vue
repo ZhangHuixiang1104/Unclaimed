@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { HomeArchivePreview } from '../../data/homeArchives'
+import { objectArtwork } from '../../data/objectArtwork'
 
 defineProps<{
   item: HomeArchivePreview
@@ -34,10 +35,7 @@ const emit = defineEmits<{
       <small>{{ item.index }}</small>
       <strong>{{ item.shortTitle }}</strong>
     </span>
-    <span class="folder-paper-detail" aria-hidden="true">
-      <i></i><i></i><i></i>
-    </span>
-    <span class="folder-object-mark" aria-hidden="true">{{ item.silhouette }}</span>
+    <span class="folder-object-art" aria-hidden="true"><img :src="objectArtwork[item.key]" alt=""></span>
     <span v-if="archived" class="folder-stamp">已存档</span>
   </button>
 </template>

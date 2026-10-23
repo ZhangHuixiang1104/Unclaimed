@@ -1,13 +1,21 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { archiveObjects } from '../../data/objects'
 import { useArchiveStore } from '../../stores/archive'
 
-defineProps<{
-  currentKey: string
-  evidenceCounts: { confirmed: number; inferred: number; unknown: number }
-}>()
+defineProps<{ currentKey: string }>()
 
 const archive = useArchiveStore()
+const foundClues = computed(() => archiveObjects.reduce((total, item) => total + archive.getRecord(item.key).foundClueIds.length, 0))
+const completedInvestigations = computed(() => archiveObjects.filter((item) => archive.getRecord(item.key).evidenceVerified).length)
+const currentTask = computed(() => {
+  const item = archiveObjects.find((entry) => entry.key === archive.nextObjectKey)
+  if (!item) return null
+  const record = archive.getRecord(item.key)
+  if (record.historyRevealed) return { title: `翻阅「${item.name}」的史实`, detail: '物件故事已记录，继续阅读独立史实材料。', to: `/history/${item.key}`, action: '继续翻阅史实' }
+  if (record.evidenceVerified) return { title: `揭露「${item.name}」的史实`, detail: '线索已收齐，请从检查台主动开启真实档案。', to: `/object/${item.key}`, action: '返回检查台' }
+  return { title: `检查「${item.name}」`, detail: '观察物件、找到故事线索，再整理调查经过。', to: `/object/${item.key}`, action: record.status === 'investigating' ? '继续调查' : '开始调查' }
+})
 </script>
 
 <template>
@@ -19,16 +27,23 @@ const archive = useArchiveStore()
     </header>
 
     <section class="evidence-summary">
-      <span class="board-label">今晚已记录</span>
-      <div><span>直接证据</span><strong>{{ String(evidenceCounts.confirmed).padStart(2, '0') }}</strong></div>
-      <div><span>合理推测</span><strong>{{ String(evidenceCounts.inferred).padStart(2, '0') }}</strong></div>
-      <div><span>仍然未知</span><strong>{{ String(evidenceCounts.unknown).padStart(2, '0') }}</strong></div>
+      <span class="board-label">调查记录</span>
+      <div><span>已发现线索</span><strong>{{ String(foundClues).padStart(2, '0') }}</strong></div>
+      <div><span>已完成调查</span><strong>{{ String(completedInvestigations).padStart(2, '0') }} / 05</strong></div>
+      <div><span>已归档史实</span><strong>{{ String(archive.archivedCount).padStart(2, '0') }} / 05</strong></div>
     </section>
 
-    <section class="duty-note">
-      <span class="board-label">工作便签 / 01</span>
-      <blockquote>“别先问它们属于谁。先问，它们经历过什么。”</blockquote>
-      <small>请勿替未知填写姓名</small>
+    <section v-if="currentTask" class="duty-note">
+      <span class="board-label">下一步 / 当前值守</span>
+      <strong>{{ currentTask.title }}</strong>
+      <p>{{ currentTask.detail }}</p>
+      <RouterLink :to="currentTask.to">{{ currentTask.action }} →</RouterLink>
+    </section>
+    <section v-else class="duty-note">
+      <span class="board-label">值守完成</span>
+      <strong>五件档案均已归档</strong>
+      <p>每件虚构物品的故事与真实史料，已分别保存。</p>
+      <RouterLink to="/ending">翻阅终章 →</RouterLink>
     </section>
 
     <section class="mini-route">

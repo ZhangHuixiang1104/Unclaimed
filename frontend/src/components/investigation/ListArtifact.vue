@@ -1,23 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import frontPaper from '../../../../stuffs/名单/美术母版/list_front_master_blank.png'
-import backPaper from '../../../../stuffs/名单/美术母版/list_back_master_blank.png'
+import frontPaper from '../../assets/objects/list-front.png'
+import backPaper from '../../assets/objects/list-back.png'
 import mudOverlay from '../../../../stuffs/名单/美术母版/list_mud_overlay.png'
 import rakingTexture from '../../../../stuffs/名单/美术母版/list_raking_light_texture.png'
-import frontTitle from '../../../../stuffs/名单/美术母版/ink-front-title.png'
-import frontTurn1 from '../../../../stuffs/名单/美术母版/ink-front-turn1.png'
-import frontTurn2 from '../../../../stuffs/名单/美术母版/ink-front-turn2.png'
-import frontTurn3 from '../../../../stuffs/名单/美术母版/ink-front-turn3.png'
-import frontEquipment from '../../../../stuffs/名单/美术母版/ink-front-equipment.png'
-import frontSupplies from '../../../../stuffs/名单/美术母版/ink-front-supplies.png'
-import frontTwoPeople from '../../../../stuffs/名单/美术母版/ink-front-two-people.png'
-import frontName from '../../../../stuffs/名单/美术母版/ink-front-name.png'
-import backTitle from '../../../../stuffs/名单/美术母版/ink-back-title.png'
-import backOpenBox from '../../../../stuffs/名单/美术母版/ink-back-open-box.png'
-import backRecordedBox from '../../../../stuffs/名单/美术母版/ink-back-recorded-box.png'
-import backReceipt from '../../../../stuffs/名单/美术母版/ink-back-receipt.png'
-import backBorrow from '../../../../stuffs/名单/美术母版/ink-back-borrow.png'
-import backReturn from '../../../../stuffs/名单/美术母版/ink-back-return.png'
 
 const props = defineProps<{
   side: 'front' | 'back'
@@ -57,30 +43,6 @@ const activeZone = computed(() => props.assembled && props.wiped
   : undefined)
 const foundZones = computed(() => clueZones.filter((zone) => zone.side === props.side && props.foundClueIds.includes(zone.id)))
 const mudBounds = { x: 550, y: 475, width: 200, height: 100 }
-type InkImage = { src: string; x: number; y: number; width: number; height: number }
-// Alpha bounds are measured at alpha > 32; positioning the visible ink, not the PNG's transparent canvas.
-const placeInk = (src: string, imageWidth: number, imageHeight: number, alphaLeft: number, alphaTop: number, alphaBottom: number, x: number, y: number, inkHeight: number): InkImage => {
-  const scale = inkHeight / (alphaBottom - alphaTop)
-  return { src, x: x - alphaLeft * scale, y: y - alphaTop * scale, width: imageWidth * scale, height: imageHeight * scale }
-}
-const frontInk: InkImage[] = [
-  placeInk(frontTitle, 1995, 788, 68, 114, 688, 260, 180, 72),
-  placeInk(frontTurn1, 1774, 887, 361, 185, 697, 260, 365, 48),
-  placeInk(frontEquipment, 1774, 887, 293, 183, 739, 480, 365, 48),
-  placeInk(frontTurn2, 1774, 887, 279, 151, 735, 260, 490, 48),
-  placeInk(frontSupplies, 1983, 793, 125, 166, 677, 480, 490, 48),
-  placeInk(frontTurn3, 1774, 887, 299, 164, 742, 260, 630, 48),
-  placeInk(frontTwoPeople, 2079, 756, 111, 154, 606, 480, 630, 48),
-  placeInk(frontName, 1774, 887, 204, 148, 722, 260, 826, 48),
-]
-const backInk: InkImage[] = [
-  placeInk(backTitle, 2156, 729, 416, 176, 566, 260, 184, 62),
-  placeInk(backOpenBox, 2172, 724, 267, 216, 524, 350, 375, 48),
-  placeInk(backRecordedBox, 2172, 724, 87, 240, 458, 350, 495, 48),
-  placeInk(backReceipt, 1983, 793, 149, 160, 635, 260, 685, 50),
-  placeInk(backBorrow, 1774, 887, 262, 161, 765, 260, 825, 48),
-  placeInk(backReturn, 1774, 887, 223, 93, 792, 900, 825, 48),
-]
 const canvas = ref<HTMLCanvasElement | null>(null)
 const lightPosition = ref({ x: 420, y: 450 })
 let initialOpaquePixels = 0
@@ -253,24 +215,10 @@ watch(() => props.wiped, (wiped) => {
           <g clip-path="url(#list-outer-clip)">
           <g :clip-path="`url(#list-piece-${piece})`">
           <g mask="url(#list-physical-missing)">
-            <image :href="side === 'front' ? frontPaper : backPaper" width="1448" height="1086" :transform="side === 'back' ? 'translate(1448 0) scale(-1 1)' : undefined" />
+            <image :href="side === 'front' ? frontPaper : backPaper" width="1448" height="1086" />
             <image v-if="tool === 'side'" :href="rakingTexture" x="78" y="75" width="1294" height="936" preserveAspectRatio="xMidYMid slice" opacity=".13" mask="url(#list-raking-mask)" />
 
-            <g v-if="side === 'front'" class="list-ink">
-              <image v-for="(ink, index) in frontInk" :key="`front-${index}`" :href="ink.src" :x="ink.x" :y="ink.y" :width="ink.width" :height="ink.height" />
-              <path class="list-rule" d="M257 292 H1158" />
-              <path class="list-rule list-name-line" d="M457 879 H800" />
-              <rect class="list-mark" x="1095" y="360" width="54" height="54" /><circle class="list-mark-dot" cx="1122" cy="387" r="6" />
-              <rect class="list-mark" x="1095" y="485" width="54" height="54" /><circle class="list-mark-dot" cx="1122" cy="512" r="6" />
-              <path class="list-mark" d="M1095 625 H1112 M1133 625 H1149 V679 H1095 V625" />
-            </g>
-            <g v-else class="list-ink list-back-ink">
-              <image v-for="(ink, index) in backInk" :key="`back-${index}`" :href="ink.src" :x="ink.x" :y="ink.y" :width="ink.width" :height="ink.height" />
-              <path class="list-rule" d="M257 288 H1158" />
-              <path class="list-mark" d="M255 379 H272 M293 379 H309 V433 H255 V379" />
-              <rect class="list-mark" x="255" y="495" width="54" height="54" /><circle class="list-mark-dot" cx="282" cy="522" r="6" />
-              <path class="list-rule" d="M257 638 H1158" />
-            </g>
+
           </g>
           </g>
           </g>

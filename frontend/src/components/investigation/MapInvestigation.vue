@@ -1,33 +1,21 @@
 <script setup lang="ts">
+import InvestigationRail from './InvestigationRail.vue'
+import ObservationControls from './ObservationControls.vue'
+import { inspectionRecord } from './inspectionRecord'
 import { computed, ref } from 'vue'
 import { objectByKey } from '../../data/objects'
 import { useArchiveStore } from '../../stores/archive'
-import frontPaper from '../../../../stuffs/行军图/美术母版/map_paper_front_blank.png'
-import backPaper from '../../../../stuffs/行军图/美术母版/map_paper_back_blank.png'
-import terrain from '../../../../stuffs/行军图/美术母版/map-terrain.svg'
-import routeA from '../../../../stuffs/行军图/美术母版/route-a.svg'
-import routeB from '../../../../stuffs/行军图/美术母版/route-b.svg'
-import routeC from '../../../../stuffs/行军图/美术母版/route-c.svg'
-import routeD from '../../../../stuffs/行军图/美术母版/route-d.svg'
-import fold from '../../../../stuffs/行军图/美术母版/map-fold-mask.svg'
-import rulerImage from '../../../../stuffs/行军图/美术母版/map-tracing-ruler.svg'
-import frontTitle from '../../../../stuffs/行军图/美术母版/ink-front-title.png'
-import frontCamp from '../../../../stuffs/行军图/美术母版/ink-front-camp.png'
-import frontGully from '../../../../stuffs/行军图/美术母版/ink-front-gully.png'
-import frontWest from '../../../../stuffs/行军图/美术母版/ink-front-west-slope.png'
-import frontNorth from '../../../../stuffs/行军图/美术母版/ink-front-north-bank.png'
-import frontLower from '../../../../stuffs/行军图/美术母版/ink-front-lower-bank.png'
-import frontHigh from '../../../../stuffs/行军图/美术母版/ink-front-high-ground.png'
-import frontFirst from '../../../../stuffs/行军图/美术母版/ink-front-first-route.png'
-import backOne from '../../../../stuffs/行军图/美术母版/ink-back-report-01.png'
-import backTwo from '../../../../stuffs/行军图/美术母版/ink-back-report-02.png'
-import backThree from '../../../../stuffs/行军图/美术母版/ink-back-report-03.png'
-import backFour from '../../../../stuffs/行军图/美术母版/ink-back-report-04.png'
-import backBlank from '../../../../stuffs/行军图/美术母版/ink-back-north-blank.png'
+import frontOne from '../../assets/objects/map-front-1.png'
+import frontTwo from '../../assets/objects/map-front-2.png'
+import frontThree from '../../assets/objects/map-front-3.png'
+import frontFour from '../../assets/objects/map-front-4.png'
+import backPaper from '../../assets/objects/map-back.png'
+import rulerImage from '../../assets/objects/map-ruler.png'
+const frontPhases = [frontOne, frontTwo, frontThree, frontFour]
 
 const archive = useArchiveStore()
 const item = objectByKey('map')!
-const record = computed(() => archive.getRecord('map'))
+const record = computed(() => inspectionRecord(item, archive.getRecord('map')))
 const side = ref<'front' | 'back'>('front')
 const unfolded = ref(record.value.completedInteractions.includes('map-unfolded'))
 const sideLight = ref(false)
@@ -49,24 +37,6 @@ const earlyClueCopy: Record<string, string> = {
 const selectedStoryText = computed(() => selectedClue.value && (allFound.value
   ? selectedClue.value.description
   : earlyClueCopy[selectedClue.value.id]))
-const routes = [routeA, routeB, routeC, routeD]
-const frontInk = [
-  { src: frontTitle, x: 160, y: 137, w: 410, h: 118, crop: '147 122 1846 557', iw: 2167, ih: 726 },
-  { src: frontCamp, x: 165, y: 731, w: 113, h: 60, crop: '351 239 893 500', iw: 1568, ih: 1003 },
-  { src: frontGully, x: 455, y: 579, w: 112, h: 60, crop: '387 297 795 441', iw: 1568, ih: 1003 },
-  { src: frontWest, x: 440, y: 281, w: 120, h: 55, crop: '373 293 909 426', iw: 1568, ih: 1003 },
-  { src: frontNorth, x: 1050, y: 226, w: 125, h: 54, crop: '335 312 933 427', iw: 1568, ih: 1003 },
-  { src: frontLower, x: 1040, y: 671, w: 120, h: 56, crop: '404 313 849 429', iw: 1568, ih: 1003 },
-  { src: frontHigh, x: 790, y: 148, w: 123, h: 62, crop: '366 274 889 481', iw: 1568, ih: 1003 },
-  { src: frontFirst, x: 317, y: 607, w: 120, h: 43, crop: '319 269 1165 427', iw: 1774, ih: 887 },
-]
-const backInk = [
-  { src: backOne, x: 210, y: 273, w: 560, h: 83, crop: '83 187 2006 346' },
-  { src: backTwo, x: 210, y: 398, w: 660, h: 79, crop: '43 215 2090 305' },
-  { src: backThree, x: 210, y: 523, w: 660, h: 81, crop: '38 211 2096 310' },
-  { src: backFour, x: 210, y: 648, w: 865, h: 80, crop: '16 215 2153 252' },
-  { src: backBlank, x: 1150, y: 787, w: 240, h: 51, crop: '115 207 1294 322' },
-]
 const spots = [
   { id: 'map-near-route', label: '观察折角下的旧墨线', path: 'M242 679 Q357 552 517 536 Q590 534 610 575 Q569 627 467 653 Q356 706 254 732 Z' },
   { id: 'map-north-bank', label: '观察北滩的线尾', path: 'M1009 220 Q1120 210 1180 254 L1191 377 Q1137 408 1037 384 Q995 313 1009 220 Z' },
@@ -112,49 +82,41 @@ const rulerDrag = (event: PointerEvent) => {
   if ((event.currentTarget as Element).hasPointerCapture(event.pointerId)) moveRuler(event)
 }
 defineExpose({ reviewClue: (id: string) => { if (record.value.foundClueIds.includes(id)) activeClueId.value = id } })
+const resetObservation = () => { side.value = 'front'; sideLight.value = false; phase.value = 4; rulerVisible.value = false; rulerX.value = 540; rulerY.value = 390; activeClueId.value = null }
 </script>
 
 <template>
-  <section class="map-investigation" aria-label="虚构行路小图调查台">
+  <section class="map-investigation inspection-workspace" aria-label="虚构行路小图调查台">
     <div class="map-worktop">
-      <header class="map-worktop-head"><div><span>FICTIONAL ARTIFACT / 无名河谷</span><h2>先看这张纸怎么改了主意</h2></div><p>点开纸面的笔迹与背注。这里没有真实战役路线，也没有预先标好的答案。</p></header>
-      <div class="map-tools">
-        <button type="button" :disabled="!unfolded" :aria-pressed="side === 'front'" @click="side = 'front'">看正面</button>
-        <button type="button" :disabled="!unfolded" :aria-pressed="side === 'back'" @click="side = 'back'; archive.completeInteraction('map', 'map-back-viewed')">翻背面</button>
-        <button type="button" :disabled="!unfolded || side === 'back'" :aria-pressed="sideLight" @click="sideLight = !sideLight">移侧光</button>
-        <button type="button" :disabled="!unfolded || side === 'back'" @click="phase = phase === 4 ? 1 : phase + 1">逐层透视</button>
-        <button type="button" :disabled="!unfolded || side === 'back'" :aria-pressed="rulerVisible" @click="rulerVisible = !rulerVisible">{{ rulerVisible ? '收起描图尺' : '放上描图尺' }}</button>
-        <span>{{ side === 'back' ? '背注只写当时收到的消息' : phase === 4 ? '完整叠墨' : '观察一层旧笔迹' }}</span>
-      </div>
-      <div class="map-paper-stage" :class="{ 'raking-light': sideLight }">
-        <svg viewBox="0 0 1600 1000" role="img" :aria-label="side === 'front' ? '虚构无名河谷行路小图正面' : '虚构行路小图背面更新记录'">
-          <defs><clipPath id="map-paper-clip"><path d="M76 67 L156 62 L242 66 L337 63 L433 65 L530 65 L626 64 L718 63 L816 68 L908 63 L1002 65 L1098 65 L1194 64 L1290 64 L1382 63 L1481 63 Q1533 65 1546 92 L1549 176 L1547 278 L1546 373 L1547 468 L1547 565 L1546 665 L1547 763 L1547 855 Q1548 909 1518 929 L1415 932 L1317 932 L1219 932 L1118 931 L1017 933 L918 933 L816 932 L716 932 L616 932 L514 932 L413 933 L313 932 L214 930 L113 931 Q53 930 43 896 L43 813 L45 715 L45 615 L43 516 L42 417 L41 318 L43 218 L42 135 Q42 81 76 67 Z"/></clipPath></defs>
-          <g clip-path="url(#map-paper-clip)">
-            <g v-if="side === 'front'">
-              <image :href="frontPaper" width="1600" height="1000" preserveAspectRatio="none"/>
-              <image :href="terrain" width="1600" height="1000"/>
-              <image v-for="(route, index) in routes.slice(0, phase)" :key="index" :href="route" width="1600" height="1000"/>
-              <svg v-for="ink in frontInk" :key="ink.src" :x="ink.x" :y="ink.y" :width="ink.w" :height="ink.h" :viewBox="ink.crop"><image :href="ink.src" :width="ink.iw" :height="ink.ih"/></svg>
-              <image v-if="rulerVisible" :href="rulerImage" :x="rulerX" :y="rulerY" width="420" height="102" class="map-ruler" @pointerdown="rulerDown" @pointermove="rulerDrag"/>
-              <g class="map-hotspots"><path v-for="spot in spots" :key="spot.id" :d="spot.path" tabindex="0" role="button" :aria-label="spot.label" @click="inspect(spot.id)" @keydown.enter.prevent="inspect(spot.id)" @keydown.space.prevent="inspect(spot.id)"/></g>
-            </g>
-            <g v-else>
-              <image :href="backPaper" width="1600" height="1000" preserveAspectRatio="none"/>
-              <g fill="none" stroke-width="7" opacity=".72"><path d="M174 323 h28" stroke="#68665d"/><path d="M174 448 h28" stroke="#8a7962"/><path d="M174 573 h28" stroke="#9c5946"/><path d="M174 698 h28" stroke="#3b3831"/></g>
-              <svg v-for="ink in backInk" :key="ink.src" :x="ink.x" :y="ink.y" :width="ink.w" :height="ink.h" :viewBox="ink.crop"><image :href="ink.src" width="2172" height="724"/></svg>
-              <g class="map-hotspots"><rect v-for="(spot, index) in spots" :key="spot.id" x="205" :y="270 + index * 125" width="880" height="90" tabindex="0" role="button" :aria-label="`观察背面第${index + 1}行的笔迹`" @click="inspect(spot.id)" @keydown.enter.prevent="inspect(spot.id)" @keydown.space.prevent="inspect(spot.id)"/></g>
-            </g>
+
+      <ObservationControls help="先展开小图，查看正背两面；侧光和逐层透视帮助分辨笔迹，描图尺可以拖动。" @reset="resetObservation" :ready="unfolded">
+<template #view><button type="button" :disabled="!unfolded" :aria-pressed="side === 'front'" @click="side = 'front'">看正面</button>
+<button type="button" :disabled="!unfolded" :aria-pressed="side === 'back'" @click="side = 'back'; archive.completeInteraction('map', 'map-back-viewed')">翻背面</button></template>
+<template #observe><button type="button" :disabled="!unfolded || side === 'back'" :aria-pressed="sideLight" @click="sideLight = !sideLight">移侧光</button>
+<button type="button" :disabled="!unfolded || side === 'back'" @click="phase = phase === 4 ? 1 : phase + 1">{{ phase === 4 ? '逐层查看笔迹' : `笔迹第 ${phase} 层 / 继续` }}</button>
+<button type="button" :disabled="!unfolded || side === 'back'" :aria-pressed="rulerVisible" @click="rulerVisible = !rulerVisible">{{ rulerVisible ? '收起描图尺' : '放上描图尺' }}</button></template>
+
+</ObservationControls>
+      <div class="map-paper-stage inspection-artifact-stage" :class="{ 'raking-light': sideLight }">
+        <svg viewBox="0 0 1600 1000" role="group" :aria-label="side === 'front' ? '虚构无名河谷行路小图正面' : '虚构行路小图背面更新记录'">
+          <image :href="side === 'front' ? frontPhases[phase - 1] : backPaper" width="1600" height="1000" />
+          <g v-if="side === 'front'">
+            <image v-if="rulerVisible" :href="rulerImage" :x="rulerX" :y="rulerY" width="420" height="102" class="map-ruler" @pointerdown="rulerDown" @pointermove="rulerDrag" />
+            <g class="map-hotspots"><path v-for="spot in spots" :key="spot.id" :d="spot.path" tabindex="0" role="button" :aria-label="spot.label" @click="inspect(spot.id)" @keydown.enter.prevent="inspect(spot.id)" @keydown.space.prevent="inspect(spot.id)" /></g>
           </g>
-          <image :href="fold" width="1600" height="1000" pointer-events="none"/>
+          <g v-else class="map-hotspots"><rect v-for="(spot, index) in spots" :key="spot.id" x="205" :y="270 + index * 125" width="880" height="90" tabindex="0" role="button" :aria-label="`观察背面第${index + 1}行的笔迹`" @click="inspect(spot.id)" @keydown.enter.prevent="inspect(spot.id)" @keydown.space.prevent="inspect(spot.id)" /></g>
         </svg>
         <button v-if="!unfolded" class="map-unfold" type="button" @click="unfold"><span>档案纸仍折着</span><strong>展开行路小图 →</strong></button>
       </div>
-      <p class="map-stage-caption">原创叙事道具 · 无名河谷。纸上的地点与真实战役、渡口不对应。{{ unfolded ? '靠近字迹和改线处，点击观察；可翻背核对。' : '' }}</p>
+      <p class="map-stage-caption">{{ !unfolded ? '先展开小图，再查看纸面的笔迹。' : allFound ? '线索已读齐，可在右侧整理展签。' : side === 'back' ? '逐行阅读背面的更新语。' : '查看改线与笔迹，翻到背面核对。' }}</p>
     </div>
-    <div class="map-story-grid">
-      <aside class="map-journal"><header><span>FIELD NOTES / 故事手账</span><h2>这张图逐渐说出的事</h2></header><div class="map-journal-list"><button v-for="(clue, index) in item.clues" :key="clue.id" type="button" :disabled="!record.foundClueIds.includes(clue.id)" @click="activeClueId = clue.id"><small>{{ record.foundClueIds.includes(clue.id) ? `片段 ${index + 1} · 已读` : '仍藏在纸上' }}</small><strong>{{ record.foundClueIds.includes(clue.id) ? clue.title : '等你从笔迹中发现' }}</strong></button></div></aside>
-      <section class="map-synthesis"><span>暂作展签 / 仅对这张虚构纸件负责</span><h2>{{ allFound ? '线停下了，判断没有停止。' : '故事还未读完' }}</h2><p>{{ allFound ? '被擦淡的线，是曾经的打算；停在岸前的线，是纸上最后能负责的决定。选择一条有证据支撑的展签，随时可以改选。' : '正面找笔迹，背面读消息。四段故事都被看见后，才能写下这张图的暂时结论。' }}</p><div v-if="allFound" class="map-caption-options"><button v-for="(caption, index) in captions" :key="caption" type="button" :aria-pressed="selectedCaption === index" @click="selectedCaption = index">{{ caption }}</button></div><p v-if="selectedCaption !== null" class="map-caption-feedback">{{ captionFeedback }}</p><p v-if="allFound && selectedCaption === 2 && !backViewed" class="map-caption-feedback">还需翻到背面，亲自核对“暂不放行”的更新语。</p><button v-if="allFound && backViewed && selectedCaption === 2 && !record.evidenceVerified" class="map-save-button" type="button" @click="save">保存这张图的故事 →</button><strong v-if="record.evidenceVerified" class="map-saved">虚构故事已保存 · 史实档案现可独立翻阅</strong></section>
-    </div>
+    <InvestigationRail class="map-journal" :found="record.foundClueIds.length" :total="item.clues.length" :ready="allFound">
+<template #notes><div class="map-journal-list"><button v-for="(clue, index) in item.clues" :key="clue.id" type="button" :disabled="!record.foundClueIds.includes(clue.id)" @click="activeClueId = clue.id"><small>{{ record.foundClueIds.includes(clue.id) ? `片段 ${index + 1} · 已读` : '仍藏在纸上' }}</small><strong>{{ record.foundClueIds.includes(clue.id) ? clue.title : '等你从笔迹中发现' }}</strong></button></div>
+</template>
+<template #caption><section class="map-synthesis inspection-synthesis"><span>暂作展签 / 仅对这张虚构纸件负责</span><h2>{{ allFound ? '线停下了，判断没有停止。' : '故事还未读完' }}</h2><p>{{ allFound ? '被擦淡的线，是曾经的打算；停在岸前的线，是纸上最后能负责的决定。选择一条有证据支撑的展签，随时可以改选。' : '正面找笔迹，背面读消息。四段故事都被看见后，才能写下这张图的暂时结论。' }}</p><div v-if="allFound" class="map-caption-options"><button v-for="(caption, index) in captions" :key="caption" type="button" :aria-pressed="selectedCaption === index" @click="selectedCaption = index">{{ caption }}</button></div><p v-if="selectedCaption !== null" class="map-caption-feedback">{{ captionFeedback }}</p><p v-if="allFound && selectedCaption === 2 && !backViewed" class="map-caption-feedback">还需翻到背面，亲自核对“暂不放行”的更新语。</p><button v-if="allFound && backViewed && selectedCaption === 2 && !record.evidenceVerified" class="map-save-button" type="button" @click="save">保存这张图的故事 →</button><strong v-if="record.evidenceVerified" class="map-saved">虚构故事已保存 · 史实档案现可独立翻阅</strong></section>
+</template>
+</InvestigationRail>
+
     <div v-if="selectedClue" class="map-clue-scrim" @click.self="activeClueId = null"><article class="map-clue-card" role="dialog" aria-modal="true" :aria-label="selectedClue.title"><button type="button" class="map-clue-close" @click="activeClueId = null">关闭 ×</button><span>纸上故事 / 原创虚构</span><h2>{{ selectedClue.title }}</h2><p>{{ selectedStoryText }}</p><small>{{ allFound ? '故事读齐后仍需留白：没有署名、日期或渡河完成记录。' : '先留下这处观察；等读到其他更新语，再把它放回整张图。' }}</small><button type="button" @click="activeClueId = null">收进故事手账 →</button></article></div>
   </section>
 </template>
