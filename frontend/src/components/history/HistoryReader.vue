@@ -26,7 +26,7 @@ const readingPane = ref<HTMLElement | null>(null)
 const sourcePane = ref<HTMLElement | null>(null)
 const active = computed(() => props.stations[activeIndex.value]!)
 const activeFigure = computed(() => active.value.figures[imageIndex.value])
-const imageSource = (figure: HistoryFigureData) => import.meta.env.DEV && figure.researchSrc ? figure.researchSrc : figure.src
+const imageSource = (figure: HistoryFigureData) => figure.researchSrc || figure.src
 const thumbnailError = (event: Event, figure: HistoryFigureData) => {
   const image = event.target as HTMLImageElement
   if (figure.src && image.getAttribute('src') !== figure.src) image.src = figure.src

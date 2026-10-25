@@ -2,6 +2,7 @@
 import HistoryReader from './HistoryReader.vue'
 import type { HistoryStationData } from './readerTypes'
 import { historyRecords } from '../../data/historyRecords'
+import { historyResearchImages } from '../../data/historyResearchImages'
 import passage from '../../../../stuffs/饭碗/史实视觉/history-bowl-01.svg'
 import care from '../../../../stuffs/饭碗/史实视觉/history-bowl-02.svg'
 import gift from '../../../../stuffs/饭碗/史实视觉/history-bowl-03.svg'
@@ -25,7 +26,7 @@ const materials: HistoryStationData[] = stations.map((station, index) => ({
   detail: station.detail, boundary: station.boundary, source: station.source, sourceUrl: station.url,
   figures: [{ id: `bowl-${index}`, label: '资料图版', src: station.image, alt: '据公开报道编绘的原创史实示意',
     caption: '据公开报道编绘 · 原创示意，非历史照片或馆藏原件。', credit: '原创史实视觉',
-    researchSrc: `/__research/bowl-history/${researchImages[index]!.key}`,
+    researchSrc: historyResearchImages.bowl[researchImages[index]!.key as keyof typeof historyResearchImages.bowl],
     researchAlt: researchImages[index]!.caption, researchCaption: researchImages[index]!.caption, researchCredit: photoCredits[index],
   }],
 }))

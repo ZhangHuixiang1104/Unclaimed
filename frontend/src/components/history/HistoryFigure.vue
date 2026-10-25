@@ -6,7 +6,7 @@ const props = withDefaults(defineProps<{ figure?: HistoryFigureData; station: Hi
 const emit = defineEmits<{ enlarge: []; unavailable: [] }>()
 const researchFailed = ref(false)
 const fallbackFailed = ref(false)
-const research = computed(() => import.meta.env.DEV && props.figure?.researchSrc && !researchFailed.value)
+const research = computed(() => Boolean(props.figure?.researchSrc && !researchFailed.value))
 const src = computed(() => research.value ? props.figure?.researchSrc : !fallbackFailed.value ? props.figure?.src : undefined)
 const caption = computed(() => research.value ? props.figure?.researchCaption ?? props.figure?.caption : props.figure?.caption)
 const alt = computed(() => research.value ? props.figure?.researchAlt ?? props.figure?.alt : props.figure?.alt)

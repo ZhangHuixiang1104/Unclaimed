@@ -2,6 +2,7 @@
 import HistoryReader from './HistoryReader.vue'
 import type { HistoryStationData } from './readerTypes'
 import { historyRecords } from '../../data/historyRecords'
+import { historyResearchImages } from '../../data/historyResearchImages'
 import supplyVisual from '../../../../stuffs/草鞋/史实视觉/history-shoe-supply.svg'
 import yuduVisual from '../../../../stuffs/草鞋/史实视觉/history-yudu-departure.svg'
 import wearingVisual from '../../../../stuffs/草鞋/史实视觉/history-two-wearings.svg'
@@ -54,7 +55,7 @@ const materials: HistoryStationData[] = stations.map((station, index) => ({
   detail: station.detail, boundary: station.boundary, source: station.source, sourceUrl: station.url,
   figures: [{ id: `shoes-${index}`, label: '资料图版', src: station.image, alt: station.alt,
     caption: '据公开报道编绘 · 原创示意，非历史照片或馆藏原件。', credit: '原创史实视觉',
-    researchSrc: `/__research/shoes-history/${researchImages[index]!.key}`,
+    researchSrc: historyResearchImages.shoes[researchImages[index]!.key as keyof typeof historyResearchImages.shoes],
     researchAlt: researchImages[index]!.caption, researchCaption: researchImages[index]!.caption, researchCredit: photoCredits[index],
   }],
 }))

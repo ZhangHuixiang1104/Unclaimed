@@ -22,7 +22,5 @@ backend/data/*.db-*
 backend/data/**/
 backend/__pycache__/
 
-# Source research scans are local editorial references, not cleared assets.
-stuffs/**/史实资料/images/
-stuffs/**/史实材料/images/
+# Chapter history images are bundled by the frontend and tracked with the source.
 

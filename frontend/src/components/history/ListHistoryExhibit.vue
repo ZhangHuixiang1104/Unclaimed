@@ -2,12 +2,13 @@
 import HistoryReader from './HistoryReader.vue'
 import type { HistoryStationData } from './readerTypes'
 import { historyRecords } from '../../data/historyRecords'
+import { historyResearchImages } from '../../data/historyResearchImages'
 
 const props = defineProps<{ archived: boolean; visitedStationIds: string[] }>()
 const emit = defineEmits<{ archive: []; visit: [index: number] }>()
 
 type ExhibitImage = { src: string; alt: string; label: string; caption: string; credit: string }
-const researchImage = (key: string) => `/__research/list-history/${key}`
+const researchImage = (key: keyof typeof historyResearchImages.list) => historyResearchImages.list[key]
 type ExhibitStation = {
   year: string
   label: string

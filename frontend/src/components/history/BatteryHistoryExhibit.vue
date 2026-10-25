@@ -2,6 +2,7 @@
 import HistoryReader from './HistoryReader.vue'
 import type { HistoryStationData } from './readerTypes'
 import { historyRecords } from '../../data/historyRecords'
+import { historyResearchImages } from '../../data/historyResearchImages'
 import communicationVisual from '../../../../stuffs/电池盒/史实视觉/history-communication-chain.svg'
 import repairVisual from '../../../../stuffs/电池盒/史实视觉/history-repair-material.svg'
 import carryVisual from '../../../../stuffs/电池盒/史实视觉/history-generator-carry.svg'
@@ -53,7 +54,7 @@ const materials: HistoryStationData[] = stations.map((station, index) => ({
   detail: station.detail, boundary: station.boundary, source: station.source, sourceUrl: station.url,
   figures: [{ id: `battery-${index}`, label: '资料图版', src: station.image, alt: station.alt,
     caption: '据公开报道编绘 · 原创示意，非历史照片或馆藏原件。', credit: '原创史实视觉',
-    researchSrc: `/__research/battery-history/${researchImages[index]!.key}`,
+    researchSrc: historyResearchImages.battery[researchImages[index]!.key as keyof typeof historyResearchImages.battery],
     researchAlt: researchImages[index]!.caption, researchCaption: researchImages[index]!.caption, researchCredit: photoCredits[index],
   }],
 }))

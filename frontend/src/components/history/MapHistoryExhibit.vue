@@ -2,6 +2,7 @@
 import HistoryReader from './HistoryReader.vue'
 import type { HistoryStationData } from './readerTypes'
 import { historyRecords } from '../../data/historyRecords'
+import { historyResearchImages } from '../../data/historyResearchImages'
 import phaseDiagram from '../../../../stuffs/行军图/史实视觉/history-phase-diagram.svg'
 import mapReportCard from '../../../../stuffs/行军图/史实视觉/history-map-report-card.svg'
 import crossingConditions from '../../../../stuffs/行军图/史实视觉/history-crossing-conditions.svg'
@@ -37,8 +38,6 @@ const historyMoments = [
     { date: '后来被记住', title: '名字进入展陈', body: '报道提及37名船工参与摆渡。今天的名单展板是后来的纪念材料，不是1935年的现场合影。' },
   ] },
 ] as const
-// Research photographs stay outside the production bundle. Local development
-// previews are for editorial review until their image rights are cleared.
 const researchPhotos = [
   null,
   { key: 'museumMap', label: '三元宫地图陈列', alt: '三元宫展陈地图的现代照片，纸面有地形线与地名', caption: '三元宫地图展陈的现代照片；不能据此认定图中纸张就是1935年缴获的原件。' },
@@ -52,7 +51,7 @@ const materials: HistoryStationData[] = stations.map((station, index) => {
     label: station.short, period: station.period, title: station.title, lead: station.lead,
     detail: station.detail, boundary: station.limit, source: station.source, sourceUrl: station.url,
     moments: historyMoments[index]!.moments,
-    figures: photo ? [{ ...illustration, id: `map-photo-${index}`, label: import.meta.env.DEV ? photo.label : '史实示意', researchSrc: `/__research/map-history/${photo.key}`, researchAlt: photo.alt, researchCaption: photo.caption, researchCredit: '报道配图 · 拍摄语境见图注' }, ...(import.meta.env.DEV ? [illustration] : [])] : [illustration],
+    figures: photo ? [{ ...illustration, id: `map-photo-${index}`, label: photo.label, researchSrc: historyResearchImages.map[photo.key], researchAlt: photo.alt, researchCaption: photo.caption, researchCredit: '报道配图 · 拍摄语境见图注' }, illustration] : [illustration],
   }
 })
 </script>
