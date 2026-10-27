@@ -32,7 +32,6 @@ const preview = (key: string | null) => { previewKey.value = key }
 const select = (key: string) => {
   selectedKey.value = key
   previewKey.value = null
-  archive.chooseObject(key)
   void router.replace({ query: { ...route.query, focus: key } })
 }
 
@@ -40,7 +39,6 @@ watch(() => route.query.focus, (value) => {
   if (validKey(value)) selectedKey.value = String(value)
 })
 
-archive.chooseObject(selectedKey.value)
 </script>
 
 <template>

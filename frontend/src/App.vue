@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import { watch } from 'vue'
+import { RouterView, useRouter } from 'vue-router'
 import { useAccountStore } from './stores/account'
 
 const account = useAccountStore()
+const router = useRouter()
+watch(() => account.signedIn, (signedIn) => {
+  if (!signedIn && account.reauthUsername && router.currentRoute.value.name !== 'account') {
+    void router.replace('/account')
+  }
+})
 </script>
 
 <template>

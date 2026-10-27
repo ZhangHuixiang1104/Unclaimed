@@ -5,7 +5,6 @@ html,body { min-width:0; }
 .app-shell .brand strong { color:#eee7d8; font:650 16px var(--font-sans); }
 .app-shell :is(.brand small,.keeper-id,.main-nav) { color:#adb0a1; }
 .app-shell .main-nav a.router-link-active { color:#dca38e; border-color:#a95047; }
-.app-shell .icon-button { color:#c5c6b5; border-color:#6d70554d; }
 .shell-main { min-width:0; }
 /* Preserve each image's proportions, including constrained flex/grid children. */
 .archive-dossier .dossier-art { min-width:0; overflow:visible; }

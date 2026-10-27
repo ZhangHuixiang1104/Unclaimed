@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAccountStore } from '../stores/account'
 import { useArchiveStore } from '../stores/archive'
@@ -17,6 +17,9 @@ const password = ref('')
 const busy = ref(false)
 const legacyBackupDownloaded = ref(false)
 const saveFeedback = ref('')
+watch(() => account.reauthUsername, (username) => {
+  if (username) { mode.value = 'login'; name.value = username; password.value = '' }
+}, { immediate: true })
 const syncLabel = computed(() => account.syncState === 'synced' && !account.pendingUpload ? '云端已保存' : account.syncState === 'saving' ? '正在保存…' : account.syncState === 'loading' ? '正在连接…' : account.pendingSafe && account.pendingUpload ? '本机暂存 · 待同步' : '等待同步')
 const canContinue = computed(() => account.cloudReady && !['loading', 'conflict', 'upgrade'].includes(account.syncState))
 const currentCount = computed(() => Object.keys(archive.records).length)
@@ -115,7 +118,7 @@ const beginNewEdition = async () => {
             <p class="account-description">旧版线索与当前章节不兼容。旧存档仍在云端，尚未覆盖；先下载备份，再决定是否开始新版调查。</p>
             <p v-if="account.error" class="account-message error" role="alert">{{ account.error }}</p>
             <div class="account-actions"><button type="button" class="account-text-action" :disabled="busy" @click="downloadLegacySave">{{ legacyBackupDownloaded ? '重新下载旧档' : '下载旧版存档' }} ↓</button><button type="button" class="account-cta" :disabled="!legacyBackupDownloaded || busy" @click="beginNewEdition">{{ busy ? '正在创建…' : '确认开始新版' }} <span>→</span></button></div>
-            <p class="account-note">确认后，云端将替换为新版空白进度。下载的旧档可留存。</p><button type="button" class="account-text-action" :disabled="busy" @click="signOut">暂不迁移，退出账号</button>
+            <p class="account-note">确认后，云端将替换为新版空白进度。下载的旧档可留存。</p><button type="button" class="account-text-action" :disabled="busy || account.pendingUpload" @click="signOut">暂不迁移，退出账号</button>
           </template>
           <template v-else-if="account.syncState === 'conflict'">
             <span class="account-eyebrow">存档核对</span><h1>从哪一份记录，<br>继续调查？</h1>

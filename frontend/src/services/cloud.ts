@@ -40,8 +40,8 @@ const request = async <T>(path: string, init: RequestInit = {}): Promise<T> => {
 
 export const cloudApi = {
   checkCompatibility: async () => {
-    const health = await request<{ status?: string; saveContract?: string }>('/health')
-    if (health.status !== 'ok' || health.saveContract !== CONTENT_VERSION) {
+    const health = await request<{ status?: string; saveContract?: string; identityContract?: string }>('/health')
+    if (health.status !== 'ok' || health.saveContract !== CONTENT_VERSION || health.identityContract !== 'account-bound-v1') {
       throw new ApiError('存档服务版本与当前页面不一致。请关闭旧的前后端进程，再从项目根目录重新启动。', 426)
     }
   },
@@ -53,8 +53,11 @@ export const cloudApi = {
     method: 'POST', body: JSON.stringify({ username, password }),
   }),
   logout: () => request<{ ok: boolean }>('/auth/logout', { method: 'POST' }),
-  getSave: () => request<CloudSave>('/save'),
-  putSave: (progress: SavedProgress, baseRevision: number) => request<CloudSave>('/save', {
-    method: 'PUT', body: JSON.stringify({ progress, baseRevision }),
+  getSave: (username: string) => request<CloudSave>('/save', {
+    headers: { 'Content-Type': 'application/json', 'X-Archive-Username': username },
+  }),
+  putSave: (progress: SavedProgress, baseRevision: number, username: string) => request<CloudSave>('/save', {
+    method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Archive-Username': username },
+    body: JSON.stringify({ progress, baseRevision }),
   }),
 }

@@ -34,7 +34,7 @@ class AccountSaveTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory(dir=Path(__file__).parent / "data")
         database = Path(self.tmp.name) / "test.db"
         self.app = create_app(f"sqlite:///{database.as_posix()}")
-        self.client = TestClient(self.app)
+        self.client = TestClient(self.app, headers={"X-Archive-Username": "keeper01"})
 
     def tearDown(self):
         self.client.close()
@@ -42,10 +42,13 @@ class AccountSaveTests(unittest.TestCase):
         self.tmp.cleanup()
 
     def register(self, username="keeper01"):
-        return self.client.post("/api/v1/auth/register", json={"username": username, "password": "safe-password-123"})
+        response = self.client.post("/api/v1/auth/register", json={"username": username, "password": "safe-password-123"})
+        if response.status_code == 201:
+            self.client.headers["X-Archive-Username"] = username.lower()
+        return response
 
     def test_account_can_save_logout_and_restore(self):
-        self.assertEqual(self.client.get("/api/v1/health").json(), {"status": "ok", "saveContract": "independent-chapters-v6"})
+        self.assertEqual(self.client.get("/api/v1/health").json(), {"status": "ok", "saveContract": "independent-chapters-v6", "identityContract": "account-bound-v1"})
         self.assertEqual(self.register().status_code, 201)
         self.assertEqual(self.client.get("/api/v1/auth/me").json()["username"], "keeper01")
         self.assertEqual(self.client.get("/api/v1/save").json()["revision"], 0)
@@ -220,7 +223,7 @@ class AccountSaveTests(unittest.TestCase):
         self.assertEqual(self.register().status_code, 201)
         self.assertEqual(self.client.put("/api/v1/save", json={"progress": sample_progress(), "baseRevision": 0}).status_code, 200)
         database_url = str(self.app.state.engine.url)
-        with TestClient(create_app(database_url)) as reopened:
+        with TestClient(create_app(database_url), headers={"X-Archive-Username": "keeper01"}) as reopened:
             self.assertEqual(reopened.post("/api/v1/auth/login", json={"username": "keeper01", "password": "safe-password-123"}).status_code, 200)
             self.assertEqual(reopened.get("/api/v1/save").json()["progress"]["records"]["list"]["foundClueIds"], ["list-fold"])
             reopened.app.state.engine.dispose()
@@ -231,6 +234,35 @@ class AccountSaveTests(unittest.TestCase):
         invalid["records"]["unknown"] = invalid["records"]["list"]
         response = self.client.put("/api/v1/save", json={"progress": invalid, "baseRevision": 0})
         self.assertEqual(response.status_code, 422)
+
+    def test_same_revision_cookie_switch_cannot_read_or_write_another_account(self):
+        self.assertEqual(self.register().status_code, 201)
+        first = self.client.put("/api/v1/save", json={"progress": sample_progress("2026-1111"), "baseRevision": 0})
+        self.assertEqual(first.json()["revision"], 1)
+        self.assertEqual(self.register("keeper02").status_code, 201)
+        second = self.client.put("/api/v1/save", json={"progress": sample_progress("2026-2222"), "baseRevision": 0})
+        self.assertEqual(second.json()["revision"], 1)
+
+        stale_identity = {"X-Archive-Username": "keeper01"}
+        self.assertEqual(self.client.get("/api/v1/save", headers=stale_identity).status_code, 401)
+        changed = self.client.put("/api/v1/save", headers=stale_identity,
+                                  json={"progress": sample_progress("2026-1111"), "baseRevision": 1})
+        self.assertEqual(changed.status_code, 401)
+        repeated = self.client.put("/api/v1/save", headers=stale_identity,
+                                   json={"progress": sample_progress("2026-2222"), "baseRevision": 1})
+        self.assertEqual(repeated.status_code, 401)
+        unchanged = self.client.get("/api/v1/save").json()
+        self.assertEqual(unchanged["revision"], 1)
+        self.assertEqual(unchanged["progress"]["keeperNumber"], "2026-2222")
+
+    def test_old_client_without_expected_identity_cannot_read_or_save(self):
+        self.assertEqual(self.register().status_code, 201)
+        self.client.headers.pop("X-Archive-Username")
+        self.assertEqual(self.client.get("/api/v1/save").status_code, 422)
+        response = self.client.put("/api/v1/save", json={"progress": sample_progress(), "baseRevision": 0})
+        self.assertEqual(response.status_code, 422)
+        self.client.headers["X-Archive-Username"] = "keeper01"
+        self.assertIsNone(self.client.get("/api/v1/save").json()["progress"])
 
 
 if __name__ == "__main__":

@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { useArchiveStore } from '../../stores/archive'
-import { useSettingsStore } from '../../stores/settings'
 import { useAccountStore } from '../../stores/account'
 
 const route = useRoute()
 const archive = useArchiveStore()
-const settings = useSettingsStore()
 const account = useAccountStore()
 </script>
 
@@ -31,9 +29,6 @@ const account = useAccountStore()
       <div class="topbar-actions">
         <span class="keeper-id">档案员 {{ archive.keeperNumber }}</span>
         <span class="keeper-id sync-label">{{ account.signedIn ? account.syncState === 'synced' && !account.pendingUpload ? '云端已保存' : account.syncState === 'saving' ? '保存中…' : account.pendingSafe && account.pendingUpload ? '本机暂存 · 待同步' : '存档待同步' : '未登录 · 进度不保留' }}</span>
-        <button class="icon-button" type="button" :aria-pressed="settings.soundEnabled" @click="settings.soundEnabled = !settings.soundEnabled">
-          {{ settings.soundEnabled ? '声音 开' : '声音 关' }}
-        </button>
       </div>
     </header>
 

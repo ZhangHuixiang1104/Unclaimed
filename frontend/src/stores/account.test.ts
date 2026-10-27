@@ -3,13 +3,28 @@ import { createPinia, setActivePinia } from 'pinia'
 import { useAccountStore } from './account'
 import { useArchiveStore } from './archive'
 import type { SavedProgress } from '../services/progress'
+import { readPendingSave, writePendingSave } from '../services/pendingSave'
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
   status, headers: { 'Content-Type': 'application/json' },
 })
-const health = () => json({ status: 'ok', saveContract: 'independent-chapters-v6' })
+const health = () => json({ status: 'ok', saveContract: 'independent-chapters-v6', identityContract: 'account-bound-v1' })
+const memoryStorage = () => {
+  const entries = new Map<string, string>()
+  return {
+    getItem: (key: string) => entries.get(key) ?? null,
+    setItem: (key: string, value: string) => { entries.set(key, value) },
+    removeItem: (key: string) => { entries.delete(key) },
+    get length() { return entries.size },
+    key: (index: number) => [...entries.keys()][index] ?? null,
+  }
+}
 
-beforeEach(() => { setActivePinia(createPinia()) })
+beforeEach(() => {
+  setActivePinia(createPinia())
+  vi.stubGlobal('localStorage', memoryStorage())
+  vi.stubGlobal('sessionStorage', memoryStorage())
+})
 afterEach(() => { vi.unstubAllGlobals() })
 
 describe('账号与云端进度', () => {
@@ -88,14 +103,17 @@ describe('账号与云端进度', () => {
     const remote: SavedProgress = {
       keeperNumber: '2026-1234', records: {}, createdAt: '2026-10-16T00:00:00.000Z',
     }
+    let remoteRevision = 4
     vi.stubGlobal('fetch', vi.fn(async (input: string) => input.endsWith('/health') ? health()
       : input.endsWith('/auth/me') || input.endsWith('/auth/login') ? json({ username: 'keeper01' })
-        : json({ progress: remote, revision: 4, updatedAt: 200 })))
+        : json({ progress: remote, revision: remoteRevision, updatedAt: 200 })))
     const account = useAccountStore()
     await account.initialize()
     expect(account.ready).toBe(true)
     expect(useArchiveStore().keeperNumber).toBe('2026-1234')
     expect(account.revision).toBe(4)
+    remoteRevision = 5
+    remote.keeperNote = '另一页更新的记录'
 
     setActivePinia(createPinia())
     const archive = useArchiveStore()
@@ -104,9 +122,9 @@ describe('账号与云端进度', () => {
     expect(await secondAccount.authenticate('login', 'keeper01', 'long-password')).toBe(true)
     expect(secondAccount.syncState).toBe('conflict')
     await secondAccount.chooseCloud()
-    expect(secondAccount.syncState).toBe('saving')
     expect(archive.keeperNumber).toBe('2026-1234')
     expect(Object.keys(archive.records)).toHaveLength(0)
+    expect(archive.keeperNote).toBe('另一页更新的记录')
   })
 
   it('云端把可选字段返回为 null 时，不把同一份存档误判为冲突', async () => {
@@ -397,6 +415,251 @@ describe('账号与云端进度', () => {
     expect(account.syncState).toBe('conflict')
     expect(uploads).toHaveLength(0)
     expect(useArchiveStore().keeperNumber).toBe(localProgress.keeperNumber)
-    expect(storage.size).toBe(1)
+    expect(storage.size).toBe(2)
+  })
+
+  it('Cookie切到同修订另一账号时停止保存，换号不带入旧进度，原账号可恢复暂存', async () => {
+    const archive = useArchiveStore()
+    const first = { ...archive.exportProgress(), keeperNumber: '2026-1111' }
+    const second = { ...first, keeperNumber: '2026-2222' }
+    const remote: Record<string, SavedProgress> = { keeper01: first, keeper02: second }
+    let activeUser = ''
+    const writes: string[] = []
+    vi.stubGlobal('fetch', vi.fn(async (input: string, init?: RequestInit) => {
+      if (input.endsWith('/health')) return health()
+      if (input.endsWith('/auth/login')) {
+        activeUser = JSON.parse(String(init?.body)).username
+        return json({ username: activeUser })
+      }
+      if (input.endsWith('/auth/logout')) return json({ ok: true })
+      const expected = new Headers(init?.headers).get('X-Archive-Username')
+      if (expected !== activeUser) return json({ detail: '当前登录账号已变更' }, 401)
+      if (init?.method === 'PUT') {
+        writes.push(activeUser)
+        remote[activeUser] = JSON.parse(String(init.body)).progress
+      }
+      return json({ progress: remote[activeUser], revision: 1, updatedAt: 100 })
+    }))
+    const account = useAccountStore()
+    expect(await account.authenticate('login', 'keeper01', 'long-password')).toBe(true)
+    archive.keeperNote = '账号一的新记录'
+    activeUser = 'keeper02'
+    expect(await account.saveNow()).toBe(false)
+    expect(account.signedIn).toBe(false)
+    expect(account.syncState).toBe('guest')
+    expect(account.reauthUsername).toBe('keeper01')
+    expect(readPendingSave('keeper01')?.progress.keeperNote).toBe('账号一的新记录')
+    expect(writes).toEqual([])
+
+    expect(await account.authenticate('login', 'keeper02', 'long-password')).toBe(true)
+    expect(archive.keeperNumber).toBe('2026-2222')
+    expect(archive.keeperNote).toBe('')
+    expect(writes).toEqual([])
+    await account.logout()
+    expect(await account.authenticate('login', 'keeper01', 'long-password')).toBe(true)
+    expect(archive.keeperNote).toBe('账号一的新记录')
+    expect(remote.keeper02.keeperNote).toBe('')
+    expect(writes).toEqual(['keeper01'])
+    expect(readPendingSave('keeper01')).toBeNull()
+  })
+
+  it('冲突选择读取云端也绑定原账号，身份变化后保留当前档案并重新登录', async () => {
+    const archive = useArchiveStore()
+    archive.startObject('list')
+    const local = archive.exportProgress()
+    const remote = { ...local, keeperNumber: '2026-9999' }
+    let activeUser = 'keeper01'
+    vi.stubGlobal('fetch', vi.fn(async (input: string, init?: RequestInit) => {
+      if (input.endsWith('/health')) return health()
+      if (input.endsWith('/auth/login')) return json({ username: 'keeper01' })
+      expect(new Headers(init?.headers).get('X-Archive-Username')).toBe('keeper01')
+      if (activeUser !== 'keeper01') return json({ detail: '当前登录账号已变更' }, 401)
+      return json({ progress: remote, revision: 1, updatedAt: 100 })
+    }))
+    const account = useAccountStore()
+    await account.authenticate('login', 'keeper01', 'long-password')
+    expect(account.syncState).toBe('conflict')
+    activeUser = 'keeper02'
+    await account.chooseCloud()
+    expect(account.signedIn).toBe(false)
+    expect(archive.keeperNumber).toBe(local.keeperNumber)
+    expect(readPendingSave('keeper01')?.conflicted).toBe(true)
+  })
+
+  it('冲突期间继续调查仍写本页暂存，保留原修订与冲突标记，刷新后恢复', async () => {
+    vi.useFakeTimers()
+    try {
+      const archive = useArchiveStore()
+      archive.startObject('list')
+      const local = archive.exportProgress()
+      const remote = { ...local, keeperNumber: '2026-9999' }
+      const writes: unknown[] = []
+      vi.stubGlobal('fetch', vi.fn(async (input: string, init?: RequestInit) => {
+        if (input.endsWith('/health')) return health()
+        if (input.endsWith('/auth/login') || input.endsWith('/auth/me')) return json({ username: 'keeper01' })
+        if (init?.method === 'PUT') writes.push(init.body)
+        return json({ progress: remote, revision: 7, updatedAt: 100 })
+      }))
+      const account = useAccountStore()
+      await account.authenticate('login', 'keeper01', 'long-password')
+      expect(account.syncState).toBe('conflict')
+      archive.keeperNote = '冲突后继续观察'
+      archive.completeInteraction('list', 'list-pieces-assembled')
+      await vi.advanceTimersByTimeAsync(1000)
+      const pending = readPendingSave('keeper01')!
+      expect(pending.baseRevision).toBe(7)
+      expect(pending.conflicted).toBe(true)
+      expect(pending.progress.keeperNote).toBe('冲突后继续观察')
+      expect(pending.progress.records.list.completedInteractions).toContain('list-pieces-assembled')
+      expect(writes).toEqual([])
+      setActivePinia(createPinia())
+      const restored = useAccountStore()
+      await restored.initialize()
+      expect(restored.syncState).toBe('conflict')
+      expect(useArchiveStore().keeperNote).toBe('冲突后继续观察')
+      expect(writes).toEqual([])
+    } finally { vi.useRealTimers() }
+  })
+
+  it('离线重试收到401后进入登录，重新认证原账号后补传暂存', async () => {
+    let remote: SavedProgress | null = null
+    let failure = 0
+    vi.stubGlobal('fetch', vi.fn(async (input: string, init?: RequestInit) => {
+      if (input.endsWith('/health')) return health()
+      if (input.endsWith('/auth/login')) return json({ username: 'keeper01' })
+      if (failure) return json({ detail: '连接或登录失效' }, failure)
+      if (init?.method === 'PUT') remote = JSON.parse(String(init.body)).progress
+      return json({ progress: remote, revision: remote ? 1 : 0, updatedAt: remote ? 100 : null })
+    }))
+    const account = useAccountStore()
+    await account.authenticate('login', 'keeper01', 'long-password')
+    useArchiveStore().keeperNote = '重试前的记录'
+    failure = 503
+    expect(await account.saveNow()).toBe(false)
+    expect(account.syncState).toBe('offline')
+    failure = 401
+    await account.retry()
+    expect(account.syncState).toBe('guest')
+    expect(account.signedIn).toBe(false)
+    expect(readPendingSave('keeper01')?.progress.keeperNote).toBe('重试前的记录')
+    failure = 0
+    expect(await account.authenticate('login', 'keeper01', 'long-password')).toBe(true)
+    expect((remote as SavedProgress | null)?.keeperNote).toBe('重试前的记录')
+    expect(account.pendingUpload).toBe(false)
+  })
+
+  it('无待上传改动的旧档可暂不迁移退出，云档与本机旧档均保留', async () => {
+    const archive = useArchiveStore()
+    archive.startObject('list')
+    const local = archive.exportProgress()
+    const legacy = { ...local, contentVersion: 'legacy-v1' }
+    const writes: unknown[] = []
+    vi.stubGlobal('fetch', vi.fn(async (input: string, init?: RequestInit) => {
+      if (input.endsWith('/health')) return health()
+      if (input.endsWith('/auth/login')) return json({ username: 'keeper01' })
+      if (input.endsWith('/auth/logout')) return json({ ok: true })
+      if (init?.method === 'PUT') writes.push(init.body)
+      return json({ progress: legacy, revision: 4, updatedAt: 100 })
+    }))
+    const account = useAccountStore()
+    await account.authenticate('login', 'keeper01', 'long-password')
+    expect(account.syncState).toBe('upgrade')
+    expect(account.pendingUpload).toBe(false)
+    await account.logout()
+    expect(account.signedIn).toBe(false)
+    expect(archive.exportProgress()).toEqual(local)
+    expect(writes).toEqual([])
+    await account.authenticate('login', 'keeper01', 'long-password')
+    expect(account.syncState).toBe('upgrade')
+    expect(account.cloudProgress).toEqual(legacy)
+  })
+
+  it('旧档仍有未上传暂存时保留退出保护', async () => {
+    const archive = useArchiveStore()
+    archive.startObject('list')
+    const legacy = { ...archive.exportProgress(), contentVersion: 'legacy-v1' }
+    writePendingSave({ username: 'keeper01', baseRevision: 4, progress: archive.exportProgress(), updatedAt: 100 })
+    vi.stubGlobal('fetch', vi.fn(async (input: string) => input.endsWith('/health') ? health()
+      : input.endsWith('/auth/login') ? json({ username: 'keeper01' })
+        : json({ progress: legacy, revision: 4, updatedAt: 100 })))
+    const account = useAccountStore()
+    await account.authenticate('login', 'keeper01', 'long-password')
+    expect(account.syncState).toBe('upgrade')
+    await expect(account.logout()).rejects.toThrow('当前进度尚未保存')
+    expect(readPendingSave('keeper01')).not.toBeNull()
+  })
+
+  it('新标签逐份核对其他标签草稿，确认一份后继续保留并呈现下一份', async () => {
+    const baseline = useArchiveStore().exportProgress()
+    localStorage.setItem('unclaimed-pending-save-v2:keeper01:first-tab', JSON.stringify({
+      username: 'keeper01', baseRevision: 5, updatedAt: 1,
+      progress: { ...baseline, keeperNote: '较早页面的调查' },
+    }))
+    localStorage.setItem('unclaimed-pending-save-v2:keeper01:second-tab', JSON.stringify({
+      username: 'keeper01', baseRevision: 5, updatedAt: 2,
+      progress: { ...baseline, keeperNote: '较新页面的调查' },
+    }))
+    let remote = baseline
+    let revision = 5
+    const writes: SavedProgress[] = []
+    vi.stubGlobal('fetch', vi.fn(async (input: string, init?: RequestInit) => {
+      if (input.endsWith('/health')) return health()
+      if (input.endsWith('/auth/login')) return json({ username: 'keeper01' })
+      if (init?.method === 'PUT') {
+        const body = JSON.parse(String(init.body)) as { progress: SavedProgress; baseRevision: number }
+        expect(body.baseRevision).toBe(revision)
+        remote = body.progress
+        writes.push(remote)
+        revision++
+      }
+      return json({ progress: remote, revision, updatedAt: 100 })
+    }))
+    const account = useAccountStore()
+    await account.authenticate('login', 'keeper01', 'long-password')
+    expect(account.syncState).toBe('conflict')
+    expect(useArchiveStore().keeperNote).toBe('较新页面的调查')
+    expect(writes).toEqual([])
+    await account.chooseCurrent()
+    expect(writes).toHaveLength(1)
+    expect(remote.keeperNote).toBe('较新页面的调查')
+    expect(account.syncState).toBe('conflict')
+    expect(useArchiveStore().keeperNote).toBe('较早页面的调查')
+    expect(readPendingSave('keeper01')?.baseRevision).toBe(5)
+    await account.chooseCloud()
+    expect(account.syncState).toBe('synced')
+    expect(useArchiveStore().keeperNote).toBe('较新页面的调查')
+    expect(account.pendingUpload).toBe(false)
+    expect(readPendingSave('keeper01')).toBeNull()
+  })
+
+  it('恢复外页草稿后暂存失败，重连和409核对均保留内存中的新操作', async () => {
+    const archive = useArchiveStore()
+    archive.startObject('list')
+    const local = archive.exportProgress()
+    archive.reset()
+    localStorage.setItem('unclaimed-pending-save-v2:keeper01:source', JSON.stringify({
+      username: 'keeper01', baseRevision: 1, updatedAt: 100, progress: local,
+    }))
+    const remote = { ...local, keeperNumber: '2026-9999' }
+    vi.stubGlobal('fetch', vi.fn(async (input: string, init?: RequestInit) => {
+      if (input.endsWith('/health')) return health()
+      if (input.endsWith('/auth/me')) return json({ username: 'keeper01' })
+      if (init?.method === 'PUT') return json({ detail: '存档冲突' }, 409)
+      return json({ progress: remote, revision: 2, updatedAt: 200 })
+    }))
+    const account = useAccountStore()
+    await account.initialize()
+    expect(account.syncState).toBe('conflict')
+    vi.spyOn(localStorage, 'setItem').mockImplementation(() => { throw new Error('QuotaExceededError') })
+    archive.completeInteraction('list', 'list-pieces-assembled')
+    archive.keeperNote = '暂存失败后继续观察'
+    expect(account.pendingSafe).toBe(false)
+    await account.retry()
+    expect(archive.getRecord('list').completedInteractions).toContain('list-pieces-assembled')
+    expect(archive.keeperNote).toBe('暂存失败后继续观察')
+    archive.keeperNote = '冲突后仍保留的新记录'
+    await account.chooseCurrent()
+    expect(account.syncState).toBe('conflict')
+    expect(archive.keeperNote).toBe('冲突后仍保留的新记录')
   })
 })

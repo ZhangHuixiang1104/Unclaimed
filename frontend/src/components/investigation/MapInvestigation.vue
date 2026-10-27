@@ -34,7 +34,7 @@ const earlyClueCopy: Record<string, string> = {
   'map-lower-bank': '下滩旁的笔迹断在水边。线尾没有写“已过”，也没有写后来发生了什么。',
   'map-crossing': '两层深浅不同的线在这里相压，其中一笔折向高处。先核对笔压，再看背面写了什么。',
 }
-const selectedStoryText = computed(() => selectedClue.value && (allFound.value
+const selectedStoryText = computed(() => selectedClue.value && (allFound.value && backViewed.value
   ? selectedClue.value.description
   : earlyClueCopy[selectedClue.value.id]))
 const spots = [
@@ -58,7 +58,8 @@ const captionFeedback = computed(() => selectedCaption.value === 0
 const unfold = () => { unfolded.value = true; archive.completeInteraction('map', 'map-unfolded') }
 const inspect = (id: string) => {
   if (!unfolded.value) return
-  archive.findClue('map', id)
+  if (side.value === 'front') archive.findClue('map', id)
+  else archive.completeInteraction('map', 'map-back-viewed')
   activeClueId.value = id
 }
 const save = () => {
@@ -91,7 +92,7 @@ const resetObservation = () => { side.value = 'front'; sideLight.value = false; 
 
       <ObservationControls help="先展开小图，查看正背两面；侧光和逐层透视帮助分辨笔迹，描图尺可以拖动。" @reset="resetObservation" :ready="unfolded">
 <template #view><button type="button" :disabled="!unfolded" :aria-pressed="side === 'front'" @click="side = 'front'">看正面</button>
-<button type="button" :disabled="!unfolded" :aria-pressed="side === 'back'" @click="side = 'back'; archive.completeInteraction('map', 'map-back-viewed')">翻背面</button></template>
+<button type="button" :disabled="!unfolded" :aria-pressed="side === 'back'" @click="side = 'back'">翻背面</button></template>
 <template #observe><button type="button" :disabled="!unfolded || side === 'back'" :aria-pressed="sideLight" @click="sideLight = !sideLight">移侧光</button>
 <button type="button" :disabled="!unfolded || side === 'back'" @click="phase = phase === 4 ? 1 : phase + 1">{{ phase === 4 ? '逐层查看笔迹' : `笔迹第 ${phase} 层 / 继续` }}</button>
 <button type="button" :disabled="!unfolded || side === 'back'" :aria-pressed="rulerVisible" @click="rulerVisible = !rulerVisible">{{ rulerVisible ? '收起描图尺' : '放上描图尺' }}</button></template>
@@ -108,12 +109,12 @@ const resetObservation = () => { side.value = 'front'; sideLight.value = false; 
         </svg>
         <button v-if="!unfolded" class="map-unfold" type="button" @click="unfold"><span>档案纸仍折着</span><strong>展开行路小图 →</strong></button>
       </div>
-      <p class="map-stage-caption">{{ !unfolded ? '先展开小图，再查看纸面的笔迹。' : allFound ? '线索已读齐，可在右侧整理展签。' : side === 'back' ? '逐行阅读背面的更新语。' : '查看改线与笔迹，翻到背面核对。' }}</p>
+      <p class="map-stage-caption">{{ !unfolded ? '先展开小图，再查看纸面的笔迹。' : allFound && backViewed ? '正背证据已核对，可在右侧整理展签。' : side === 'back' ? '逐行阅读背面的更新语，再与正面笔迹核对。' : '查看改线与笔迹，翻到背面核对。' }}</p>
     </div>
     <InvestigationRail class="map-journal" :found="record.foundClueIds.length" :total="item.clues.length" :ready="allFound">
 <template #notes><div class="map-journal-list"><button v-for="(clue, index) in item.clues" :key="clue.id" type="button" :disabled="!record.foundClueIds.includes(clue.id)" @click="activeClueId = clue.id"><small>{{ record.foundClueIds.includes(clue.id) ? `片段 ${index + 1} · 已读` : '仍藏在纸上' }}</small><strong>{{ record.foundClueIds.includes(clue.id) ? clue.title : '等你从笔迹中发现' }}</strong></button></div>
 </template>
-<template #caption><section class="map-synthesis inspection-synthesis"><span>暂作展签 / 仅对这张虚构纸件负责</span><h2>{{ allFound ? '线停下了，判断没有停止。' : '故事还未读完' }}</h2><p>{{ allFound ? '被擦淡的线，是曾经的打算；停在岸前的线，是纸上最后能负责的决定。选择一条有证据支撑的展签，随时可以改选。' : '正面找笔迹，背面读消息。四段故事都被看见后，才能写下这张图的暂时结论。' }}</p><div v-if="allFound" class="map-caption-options"><button v-for="(caption, index) in captions" :key="caption" type="button" :aria-pressed="selectedCaption === index" @click="selectedCaption = index">{{ caption }}</button></div><p v-if="selectedCaption !== null" class="map-caption-feedback">{{ captionFeedback }}</p><p v-if="allFound && selectedCaption === 2 && !backViewed" class="map-caption-feedback">还需翻到背面，亲自核对“暂不放行”的更新语。</p><button v-if="allFound && backViewed && selectedCaption === 2 && !record.evidenceVerified" class="map-save-button" type="button" @click="save">保存这张图的故事 →</button><strong v-if="record.evidenceVerified" class="map-saved">虚构故事已保存 · 史实档案现可独立翻阅</strong></section>
+<template #caption><section class="map-synthesis inspection-synthesis"><span>暂作展签 / 仅对这张虚构纸件负责</span><h2>{{ allFound && backViewed ? '线停下了，判断没有停止。' : '故事还未读完' }}</h2><p>{{ allFound && backViewed ? '被擦淡的线，是曾经的打算；停在岸前的线，是纸上最后能负责的决定。选择一条有证据支撑的展签，随时可以改选。' : '正面找笔迹，背面读消息。四段故事都被看见后，才能写下这张图的暂时结论。' }}</p><div v-if="allFound && backViewed" class="map-caption-options"><button v-for="(caption, index) in captions" :key="caption" type="button" :aria-pressed="selectedCaption === index" @click="selectedCaption = index">{{ caption }}</button></div><p v-if="selectedCaption !== null" class="map-caption-feedback">{{ captionFeedback }}</p><p v-if="allFound && !backViewed" class="map-caption-feedback">还需阅读背面笔迹，核对“暂不放行”的更新语。</p><button v-if="allFound && backViewed && selectedCaption === 2 && !record.evidenceVerified" class="map-save-button" type="button" @click="save">保存这张图的故事 →</button><strong v-if="record.evidenceVerified" class="map-saved">虚构故事已保存 · 史实档案现可独立翻阅</strong></section>
 </template>
 </InvestigationRail>
 

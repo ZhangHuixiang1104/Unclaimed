@@ -5,6 +5,8 @@ dist/
 tmp/
 
 # Local environment and logs
+.venv/
+.pytest_cache/
 .env
 .env.*
 !.env.example
@@ -20,7 +22,8 @@ Thumbs.db
 backend/data/*.db
 backend/data/*.db-*
 backend/data/**/
-backend/__pycache__/
+__pycache__/
+*.py[cod]
 
 # Chapter history images are bundled by the frontend and tracked with the source.
 

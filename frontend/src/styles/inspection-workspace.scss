@@ -62,7 +62,7 @@
 .object-page .rail-intro { margin:0 0 18px; color:#aeb39f; font-size:13px; line-height:1.7; }
 .object-page .inspection-rail :is(.map-journal-list,.battery-notebook-list,.shoes-note-list,.bowl-notes,.notebook-chapters) { display:grid; grid-template-columns:1fr; gap:0; padding:0; }
 .object-page .inspection-rail :is(button.notebook-chapter,.notebook-chapter.waiting,.map-journal-list button,.battery-notebook-list button,.shoes-note-list button,.bowl-notes button) { display:block; width:100%; min-height:70px; margin:0; padding:13px 0; border:0; border-bottom:1px solid #85866a33; background:none; color:#e8e3d1; text-align:left; transform:none; }
-.object-page .inspection-rail :is(button:disabled,.notebook-chapter.waiting) { opacity:.5; }
+.object-page .inspection-rail button:disabled { opacity:.5; }
 .object-page .inspection-rail :is(.map-journal-list,.battery-notebook-list,.shoes-note-list,.bowl-notes,.notebook-chapters) :is(small,button>span) { color:#a9ac95; font-size:11px; }
 .object-page .inspection-rail :is(.map-journal-list,.battery-notebook-list,.shoes-note-list,.bowl-notes,.notebook-chapters) strong { display:block; margin:5px 0 0; font:600 16px/1.5 var(--font-display); }
 .object-page .inspection-rail .notebook-chapter em { display:none; }

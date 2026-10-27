@@ -2,63 +2,103 @@
 
 > 姓名留白，证据说话；故事与史实分别保存。
 
-这是一部以长征历史为阅读背景的互动数字档案作品。玩家先注册或登录档案员账号，再按**名单 → 行军图 → 电池盒 → 草鞋 → 饭碗**调查五件**虚构**物品。五件各有自己的故事；“转三”只属于名单章节，不是整部作品的共同任务。五章均先读物件故事、保存展签，再主动进入独立史实展柜，翻阅四站材料并建档。
+以长征历史为阅读背景的互动数字档案作品。玩家注册或登录后，依次调查 **名单 → 行军图 → 电池盒 → 草鞋 → 饭碗**，观察物件、整理故事展签，再进入各章独立的四站史实展柜。五件建档后进入终章，为选定的物件留下留言并生成保管票据。
 
-## 当前可运行范围
+五件游戏物品及其故事为原创虚构；史实展柜提供独立来源。“转三”只属于名单章节，章节索引的连线表示调查顺序。
 
-前端已有首页、账号、档案室、检查台、章节／史实索引、史实详情、终章与保管凭证，并支持顺序解锁。五章均已接入专属检查流程与四站独立史实展柜；第五章《留给后来的人》使用透明旧碗与包纸母版、原创史实示意图。研究用真实照片尚未取得产品使用许可，不打包。后端已有注册／登录、HttpOnly Cookie、按账号隔离的 SQLite 云存档与冲突处理。旧版云存档按内容版本迁移受影响章节并保留备份，不会自动冒充新版通关。
+## 本机快速启动
 
-**尚待制作：**五章真实浏览器视觉与手感验收、素材体积优化、研究图版的逐件授权、公开部署安全验收与多人试玩。当前版本不宣称使用了已授权馆藏文物照片。
+本机 macOS 已有 `.venv` 和前端依赖，在项目根目录运行：
 
-## 本地运行
+```sh
+make dev
+```
 
-需要 Node.js 和 Python 3.11+。在项目根目录运行以下命令。
+打开 **http://127.0.0.1:5173**。直接运行 `make` 也会启动开发服务，按 **Ctrl+C** 退出。
 
-Windows 可以先安装依赖，然后用一个命令同时启动前端和存档服务：
+- 使用项目内 `.venv/bin/python` 启动后端，前端将 `/api` 代理到 `127.0.0.1:8000`。
+- 已有版本匹配的后端会复用；退出只清理本次启动的进程。
+- 8000 或 5173 端口冲突时明确报错，保留原服务。
+- 账号与存档保存在 `backend/data/archive.db`，启动和退出均保留该文件。
+
+首次在其他 macOS 环境准备依赖时，需要 Node.js、Python 3.11+ 和 Make：
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -r backend/requirements.txt
+npm --prefix frontend install
+make dev
+```
+
+Windows 使用 PowerShell 启动脚本。当前 Makefile 依赖 Bash、macOS 虚拟环境路径和 `lsof`，不适用于原生 Windows；两种平台使用各自入口。
 
 ```powershell
 python -m pip install -r backend/requirements.txt
 npm --prefix frontend install
-powershell -ExecutionPolicy Bypass -File .\start-dev.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\start-dev.ps1
 ```
 
-脚本会先确认 8000 端口的存档服务健康且版本匹配，再启动前端；若已有旧后端进程，会明确提示先关闭它。结束前端时也会停止由该脚本启动的后端。若后端已单独运行，脚本不会关闭它。已有账号、`backend/data/archive.db` 和云存档都不会被清除。
+需要分别启动时，在两个终端运行后端与前端；两个终端保持运行：
 
-也可以分别启动两个终端，在项目根目录启动后端：
-
-```powershell
-python -m pip install -r backend/requirements.txt
-python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000
+```sh
+.venv/bin/python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000
 ```
 
-在另一个终端启动前端：
-
-```powershell
-cd frontend
-npm install
-npm run dev
+```sh
+npm --prefix frontend run dev -- --strictPort
 ```
 
-浏览器打开 `http://127.0.0.1:5173`。**两个终端必须同时保持运行**：前端将 `/api` 转发到 `127.0.0.1:8000`，只开前端会出现账号可见但存档同步失败。可先打开 `http://127.0.0.1:8000/api/v1/health`，确认返回 `status: ok` 且 `saveContract: independent-chapters-v6`。如已创建账号但首份存档失败，启动后端后在账号页点“重新连接存档服务”，不要重复注册。不要删除 `backend/data/archive.db`；其中可能包含现有账号及存档。
+## 目录与阅读入口
 
-调查进度修改后，页面会先显示“保存中…”，云端确认后才显示“云端已保存”。若服务临时断开，未同步的**游戏进度**会暂存在当前浏览器（不包含密码）；恢复服务后点击“立即重试”，若云端版本未变化便自动补传。暂存期间不要清理本站浏览器数据；若云端和本机都发生修改，账号页会要求明确选择，不会自动覆盖。进度未确认保存时不能退出账号。正式部署时仍需为 `backend/data/archive.db` 做服务器备份，浏览器暂存不能代替云端备份。
+| 路径 | 用途 |
+| --- | --- |
+| [Makefile](Makefile) | 本机 macOS 一键开发启动 |
+| [scripts/start-dev.ps1](scripts/start-dev.ps1) | Windows PowerShell 开发启动 |
+| [frontend/](frontend/README.md) | Vue／TypeScript 前端；具体流程见 [PLAYER_FLOW](frontend/PLAYER_FLOW.md) |
+| `backend/` | FastAPI／SQLAlchemy／SQLite 账号与存档服务 |
+| `backend/data/archive.db` | 本机账号与存档，属于本地数据，不提交 Git |
+| [docs/](docs/README.md) | 现行设计、数据契约、交互规范、验收与研究台账 |
+| `stuffs/` | 按五件物品整理的章节方案、素材母版、史实研究及来源清单 |
+| `scripts/` | Windows 启动脚本、道具图层合成脚本与配置 |
+| [比赛要求.md](比赛要求.md) | 比赛规则与说明书栏目，统一维护这一份 |
+| [archive/](archive/长征失物招领处参赛设计与开发计划.md) | 历史提案，保留创作过程记录 |
 
-检查：
+阅读顺序：[当前分章方案](docs/08当前分章设计与运行口径.md) → [总体架构](docs/01总体架构.md) → [数据与状态契约](docs/02数据与状态契约.md) → [开发任务与验收](docs/05开发任务与验收.md)。视觉实现另见 [前端设计系统](frontend/DESIGN_SYSTEM.md)。
 
-```powershell
-cd frontend
-npm run test
-npm run build
+`.venv/`、`frontend/node_modules/` 是本机依赖，保留以便直接测试；`frontend/dist/`、`*.tsbuildinfo`、Python 和前端工具缓存均可重新生成，已纳入 Git 忽略。构建产物通过下方构建命令生成。
+
+## 存档与连接
+
+进度先显示“保存中…”，云端确认后显示“云端已保存”。未上传进度按账号和页面实例分别暂存浏览器；冲突期间继续保护本机操作，刷新或重开页面后用现有账号页核对草稿与云端版本。暂存期间请保留本站浏览器数据。
+
+会话过期或其他标签页切换账号后，页面返回原账号登录入口，保留其草稿。旧版云存档保留备份与版本保护；不兼容的旧档先下载备份，再由玩家决定是否开始新版。
+
+连接失败时先检查后端健康接口：**http://127.0.0.1:8000/api/v1/health**。当前应返回：
+
+```json
+{
+  "status": "ok",
+  "saveContract": "independent-chapters-v6",
+  "identityContract": "account-bound-v1"
+}
 ```
 
-```powershell
-python -m unittest discover -s backend -p 'test_*.py' -v
+更新前后端后需重启旧进程。已有账号首次同步失败时，在账号页用原账号重连。
+
+## 检查与当前状态
+
+在项目根目录运行：
+
+```sh
+npm --prefix frontend run test
+npm --prefix frontend run build
+.venv/bin/python -m unittest discover -s backend -p 'test_*.py' -v
 ```
 
-## 文档与边界
+五章已有专属互动、故事保存与独立史实展柜，账号存档、顺序解锁、终章及票据均已接入。2026-10-26 已通过 **52 项前端测试、13 项后端测试和生产构建**；浏览器检查覆盖首章键盘与鼠标操作、地图正背核对、票据稳定性、会话失效恢复、旧档退出、多页草稿保护和跨账号拒写。Makefile 已用临时数据库验证启动、退出清理、后端复用与端口冲突。
 
-当前内容口径见[独立章节方案](docs/08当前分章设计与运行口径.md)，文档索引见[docs/README](docs/README.md)，具体玩家流程见[frontend/PLAYER_FLOW](frontend/PLAYER_FLOW.md)。先前把五件串成同一“转三”任务的策划稿只保留为废弃草案，不再指导实现。
+2026-10-27 完成存档恢复的最小修复与声音占位代码清理，前端 **54 项测试及生产构建通过**；隔离数据库浏览器验证暂存失败后重连保留最新操作、恢复来源链完整清理及后续云端保存。
 
-名单对应的历史阅读是**土城战役后的伤员救护支线**，不是湘江。历史报道中的手迹、姓名与本游戏名单及回执无关联；章节索引的连线仅表示玩家调查顺序，绝不是五件物品的真实行军路线。正式历史图片、音频、字体和引文须分别核验来源与使用权。
+待验收：五章完整真人试玩、其他章节的视觉与手感、素材体积优化、公开部署安全及 Windows 启动脚本实跑。研究照片当前随构建打包，逐图使用许可仍待核验，公开发布前须完成核权。完整记录见[开发任务与验收](docs/05开发任务与验收.md)。
 
-技术栈：Vue 3、TypeScript、Vite、Vue Router、Pinia、SCSS、Howler.js；FastAPI、SQLAlchemy、SQLite。本地配置只供演示；公开部署前须落实 HTTPS、安全 Cookie、数据库备份、登录限流和账号恢复方案。
+比赛截止 **2026 年 11 月 5 日 23:00**；作品说明书、项目实体与真实运行演示视频的要求见[比赛要求](比赛要求.md)。

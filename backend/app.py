@@ -12,7 +12,7 @@ import uuid
 from pathlib import Path
 from typing import Annotated, Literal
 
-from fastapi import Cookie, Depends, FastAPI, HTTPException, Response, status
+from fastapi import Cookie, Depends, FastAPI, Header, HTTPException, Response, status
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import ForeignKey, Integer, String, Text, create_engine, select, text, update
 from sqlalchemy.engine import URL
@@ -199,7 +199,7 @@ def create_app(database_url: str | URL | None = None) -> FastAPI:
     @app.get("/api/v1/health")
     def health(db: Session = Depends(get_db)) -> dict[str, str]:
         db.execute(text("SELECT 1"))
-        return {"status": "ok", "saveContract": SAVE_CONTRACT_VERSION}
+        return {"status": "ok", "saveContract": SAVE_CONTRACT_VERSION, "identityContract": "account-bound-v1"}
 
     @app.post("/api/v1/auth/register", status_code=status.HTTP_201_CREATED)
     def register(credentials: Credentials, response: Response, db: Session = Depends(get_db)) -> dict[str, str]:
@@ -246,7 +246,13 @@ def create_app(database_url: str | URL | None = None) -> FastAPI:
         return {"username": user.username}
 
     @app.get("/api/v1/save", response_model=SaveResponse)
-    def get_save(user: User = Depends(require_user), db: Session = Depends(get_db)) -> SaveResponse:
+    def get_save(
+        expected_username: Annotated[str, Header(alias="X-Archive-Username")],
+        user: User = Depends(require_user),
+        db: Session = Depends(get_db),
+    ) -> SaveResponse:
+        if expected_username != user.username:
+            raise HTTPException(status_code=401, detail="当前登录账号已变更，请重新登录原账号")
         saved = db.get(CloudSave, user.id)
         if saved is None:
             return SaveResponse(progress=None, revision=0, updatedAt=None)
@@ -255,9 +261,12 @@ def create_app(database_url: str | URL | None = None) -> FastAPI:
     @app.put("/api/v1/save", response_model=SaveResponse)
     def put_save(
         request: SaveRequest,
+        expected_username: Annotated[str, Header(alias="X-Archive-Username")],
         user: User = Depends(require_user),
         db: Session = Depends(get_db),
     ) -> SaveResponse:
+        if expected_username != user.username:
+            raise HTTPException(status_code=401, detail="当前登录账号已变更，请重新登录原账号")
         serialized = request.progress.model_dump_json(exclude_none=True)
         if len(serialized.encode("utf-8")) > 64_000:
             raise HTTPException(status_code=413, detail="存档数据过大")

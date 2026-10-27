@@ -19,6 +19,7 @@ const width = 1448
 const height = 1086
 type PieceId = 'left' | 'upper' | 'lower'
 const pieces: PieceId[] = ['left', 'upper', 'lower']
+const pieceLabels: Record<PieceId, string> = { left: '左侧', upper: '右上', lower: '右下' }
 const scatteredOffsets: Record<PieceId, { x: number; y: number }> = {
   left: { x: -65, y: 24 },
   upper: { x: 70, y: -53 },
@@ -38,10 +39,10 @@ const clueZones = [
   { id: 'list-key', side: 'back', x: 235, y: 350, width: 800, height: 228, label: '背面记号图例' },
   { id: 'list-stub', side: 'back', x: 235, y: 665, width: 610, height: 224, label: '另存回执与缺口' },
 ] as const
-const activeZone = computed(() => props.assembled && props.wiped
-  ? clueZones.find((zone) => zone.id === props.nextClueId && zone.side === props.side)
-  : undefined)
-const foundZones = computed(() => clueZones.filter((zone) => zone.side === props.side && props.foundClueIds.includes(zone.id)))
+const visibleZones = computed(() => clueZones.filter((zone) => zone.side === props.side
+  && (props.foundClueIds.includes(zone.id) || (props.assembled && props.wiped && zone.id === props.nextClueId))))
+const canWipe = computed(() => props.assembled && props.side === 'front' && props.tool === 'wipe' && !props.wiped)
+const wipeAction = ref<HTMLButtonElement | null>(null)
 const mudBounds = { x: 550, y: 475, width: 200, height: 100 }
 const canvas = ref<HTMLCanvasElement | null>(null)
 const lightPosition = ref({ x: 420, y: 450 })
@@ -56,6 +57,7 @@ const svgPoint = (event: PointerEvent) => {
 
 const startPieceDrag = (piece: PieceId, event: PointerEvent) => {
   if (props.assembled || props.side !== 'front' || snappedPieces.value[piece]) return
+  ;(event.currentTarget as SVGGElement).focus({ preventScroll: true })
   const point = svgPoint(event)
   const offset = pieceOffsets.value[piece]
   drag.value = { piece, pointerId: event.pointerId, startX: point.x, startY: point.y, baseX: offset.x, baseY: offset.y }
@@ -73,21 +75,28 @@ const movePiece = (event: PointerEvent) => {
   }
 }
 
+const snapPiece = (piece: PieceId) => {
+  if (props.assembled || props.side !== 'front' || snappedPieces.value[piece]) return
+  pieceOffsets.value[piece] = { x: 0, y: 0 }
+  snappedPieces.value[piece] = true
+  emit('progress', snappedCount.value)
+  if (pieces.every((entry) => snappedPieces.value[entry])) emit('assembled')
+}
+
 const finishPieceDrag = (event: PointerEvent) => {
   if (!drag.value || drag.value.pointerId !== event.pointerId) return
   const piece = drag.value.piece
   drag.value = null
   const offset = pieceOffsets.value[piece]
-  if (Math.hypot(offset.x, offset.y) <= 45) {
-    pieceOffsets.value[piece] = { x: 0, y: 0 }
-    snappedPieces.value[piece] = true
-    emit('progress', snappedCount.value)
-    if (pieces.every((entry) => snappedPieces.value[entry])) emit('assembled')
-  }
+  if (Math.hypot(offset.x, offset.y) <= 45) snapPiece(piece)
   if (svg.value?.hasPointerCapture(event.pointerId)) svg.value.releasePointerCapture(event.pointerId)
 }
 
-const onZoneClick = (id: string) => emit('clue', id)
+const onZoneClick = (id: string, event: Event) => {
+  ;(event.currentTarget as SVGGElement).focus({ preventScroll: true })
+  if (props.foundClueIds.includes(id)) emit('review', id)
+  else emit('clue', id)
+}
 
 watch(() => props.assembled, (assembled) => {
   if (!assembled) return
@@ -148,7 +157,8 @@ const erase = (point: { x: number; y: number }) => {
 }
 
 const startWipe = (event: PointerEvent) => {
-  if (!props.assembled || props.side !== 'front' || props.tool !== 'wipe' || props.wiped) return
+  if (!canWipe.value) return
+  wipeAction.value?.focus({ preventScroll: true })
   drawing = true
   previousPoint = null
   canvas.value?.setPointerCapture(event.pointerId)
@@ -169,6 +179,10 @@ const finishWipe = () => {
   }
 }
 
+const clearMud = () => {
+  if (canWipe.value) emit('wiped')
+}
+
 onMounted(drawMud)
 watch(() => props.wiped, (wiped) => {
   if (wiped) canvas.value?.getContext('2d')?.clearRect(0, 0, width, height)
@@ -178,7 +192,7 @@ watch(() => props.wiped, (wiped) => {
 
 <template>
   <div class="list-artifact" :class="{ 'wiping': assembled && tool === 'wipe' && side === 'front' && !wiped, 'assembling': !assembled }" @pointermove="moveLight">
-    <svg ref="svg" class="list-artifact-paper" :viewBox="`0 0 ${width} ${height}`" role="img" :aria-label="assembled ? (side === 'front' ? '虚构转送名单正面，姓名处为纸张真实缺口' : '虚构转送名单背面，含方框图例和另存回执注记') : `三片分开的名单纸片，已有${snappedCount}片对齐`" @pointermove="movePiece" @pointerup="finishPieceDrag" @pointercancel="finishPieceDrag">
+    <svg ref="svg" class="list-artifact-paper" :viewBox="`0 0 ${width} ${height}`" role="group" :aria-label="assembled ? (side === 'front' ? '虚构转送名单正面，姓名处为纸张真实缺口' : '虚构转送名单背面，含方框图例和另存回执注记') : `三片分开的名单纸片，已有${snappedCount}片对齐；可拖动纸片，或聚焦后按回车或空格对齐`" @pointermove="movePiece" @pointerup="finishPieceDrag" @pointercancel="finishPieceDrag">
       <desc v-if="side === 'front'">转送事项：转一，器材；转二，备用物料；转三，后随二人。姓名栏的纸张缺失。</desc>
       <desc v-else>背面注记：开口框，待交接；框内加点，已有接收记录。回执另存。随借与交回之间的纸张缺失。</desc>
       <defs>
@@ -211,7 +225,7 @@ watch(() => props.wiped, (wiped) => {
 
       <path v-if="!assembled" class="list-assembly-guide" d="M81 77 Q112 70 175 76 L1359 76 Q1373 77 1371 102 L1373 983 Q1372 1013 1350 1011 L88 1010 Q73 1007 76 986 L76 107 Q75 82 81 77 Z" />
       <g>
-        <g v-for="piece in pieces" :key="piece" :class="['list-piece', { snapped: snappedPieces[piece], dragging: drag?.piece === piece }]" :transform="`translate(${pieceOffsets[piece].x} ${pieceOffsets[piece].y})`" @pointerdown="startPieceDrag(piece, $event)">
+        <g v-for="piece in pieces" :key="piece" :class="['list-piece', { snapped: snappedPieces[piece], dragging: drag?.piece === piece }]" :transform="`translate(${pieceOffsets[piece].x} ${pieceOffsets[piece].y})`" role="button" :tabindex="!assembled && side === 'front' && !snappedPieces[piece] ? 0 : -1" :aria-disabled="assembled || side !== 'front' || snappedPieces[piece]" :aria-label="`${pieceLabels[piece]}纸片${snappedPieces[piece] ? '已对齐' : '，按回车或空格对齐'}`" @pointerdown="startPieceDrag(piece, $event)" @keydown.enter.prevent.stop="snapPiece(piece)" @keydown.space.prevent.stop="snapPiece(piece)">
           <g clip-path="url(#list-outer-clip)">
           <g :clip-path="`url(#list-piece-${piece})`">
           <g mask="url(#list-physical-missing)">
@@ -225,15 +239,17 @@ watch(() => props.wiped, (wiped) => {
         </g>
       </g>
 
-      <g v-if="activeZone" class="list-discovery-zone" :aria-label="activeZone.label" @click.stop="onZoneClick(activeZone.id)">
-        <rect :x="activeZone.x" :y="activeZone.y" :width="activeZone.width" :height="activeZone.height" rx="18" />
-        <g class="list-discovery-label" aria-hidden="true">
-          <rect :x="activeZone.x" :y="activeZone.y - 43" width="262" height="34" rx="3" />
-          <text :x="activeZone.x + 13" :y="activeZone.y - 19">点击阅读这处记录</text>
-        </g>
-      </g>
-      <g v-for="zone in foundZones" :key="zone.id" class="list-found-zone" role="button" :aria-label="`回看${zone.label}线索卡`" @click.stop="emit('review', zone.id)">
-        <circle :cx="zone.x + 12" :cy="zone.y + 12" r="16" /><path :d="`M${zone.x + 5} ${zone.y + 12} l5 5 l10 -11`" />
+      <g v-for="zone in visibleZones" :key="zone.id" :class="foundClueIds.includes(zone.id) ? 'list-found-zone' : 'list-discovery-zone'" role="button" tabindex="0" :aria-label="`${foundClueIds.includes(zone.id) ? '回看' : '阅读'}${zone.label}线索卡`" @click.stop="onZoneClick(zone.id, $event)" @keydown.enter.prevent.stop="onZoneClick(zone.id, $event)" @keydown.space.prevent.stop="onZoneClick(zone.id, $event)">
+        <template v-if="!foundClueIds.includes(zone.id)">
+          <rect :x="zone.x" :y="zone.y" :width="zone.width" :height="zone.height" rx="18" />
+          <g class="list-discovery-label" aria-hidden="true">
+            <rect :x="zone.x" :y="zone.y - 43" width="262" height="34" rx="3" />
+            <text :x="zone.x + 13" :y="zone.y - 19">点击或按回车阅读</text>
+          </g>
+        </template>
+        <template v-else>
+          <circle :cx="zone.x + 12" :cy="zone.y + 12" r="16" /><path :d="`M${zone.x + 5} ${zone.y + 12} l5 5 l10 -11`" />
+        </template>
       </g>
     </svg>
 
@@ -243,12 +259,13 @@ watch(() => props.wiped, (wiped) => {
       :class="{ visible: assembled && side === 'front' && !wiped }"
       :width="width"
       :height="height"
-      aria-label="覆盖备用物料末字的泥点，可选择轻拭工具后拖动鼠标清理"
+      aria-label="覆盖备用物料末字的泥点，选择轻拭工具后可拖动清理，或使用清理泥点按钮"
       @pointerdown="startWipe"
       @pointermove="moveWipe"
       @pointerup="finishWipe"
       @pointercancel="finishWipe"
     ></canvas>
+    <button v-if="assembled && side === 'front' && (tool === 'wipe' || wiped)" ref="wipeAction" type="button" class="list-wipe-action" :aria-disabled="wiped" :tabindex="wiped ? -1 : 0" @click.stop="clearMud">{{ wiped ? '泥点已清' : '清理泥点（回车 / 空格）' }}</button>
   </div>
 </template>
 
@@ -268,18 +285,25 @@ watch(() => props.wiped, (wiped) => {
 .list-mud-canvas { width: 100%; height: 100%; display: block; position: absolute; inset: 0; }
 .list-artifact-paper { touch-action: none; }
 .list-piece { transition: transform .32s ease; }
+.list-piece:focus-visible { outline: 5px solid #ffe1a1; outline-offset: -12px; }
 .list-piece.dragging { transition: none; cursor: grabbing; }
 .assembling .list-piece:not(.snapped) { cursor: grab; }
 .list-assembly-guide { fill: rgba(211,195,160,.025); stroke: rgba(222,205,169,.43); stroke-width: 3; stroke-dasharray: 15 13; pointer-events: none; }
 .list-discovery-zone > rect { fill: rgba(168,95,72,.07); stroke: rgba(125,64,47,.62); stroke-width: 3; stroke-dasharray: 12 11; cursor: help; transition: fill .2s ease, stroke .2s ease; }
 .list-discovery-zone > rect { cursor: pointer; }
-.list-discovery-zone:hover > rect { fill: rgba(168,95,72,.18); stroke: #743b2e; }
+.list-discovery-zone:hover > rect,
+.list-discovery-zone:focus-visible > rect { fill: rgba(168,95,72,.18); stroke: #743b2e; }
+.list-discovery-zone:focus-visible > rect { stroke-width: 6; stroke-dasharray: none; }
 .list-discovery-label { pointer-events: none; }
 .list-discovery-label rect { fill: #e9dcc4; stroke: #814a3b; stroke-width: 2; stroke-dasharray: none; }
 .list-discovery-label text { fill: #58372c; font-family: var(--font-sans); font-size: 21px; font-weight: 700; letter-spacing: .03em; }
 .list-found-zone { cursor: pointer; }
 .list-found-zone circle { fill: #6d332a; stroke: #e2d0b3; stroke-width: 3; }
 .list-found-zone path { fill: none; stroke: #f2e8d6; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.list-found-zone:focus-visible circle { stroke: #ffe1a1; stroke-width: 8; }
+.list-wipe-action { position: absolute; z-index: 2; left: 50%; bottom: 0; transform: translateX(-50%); padding: 10px 16px; border: 2px solid #d7bf95; border-radius: 3px; color: #f5ead6; background: #423b2c; font: 600 14px/1.4 var(--font-sans); white-space: nowrap; cursor: pointer; }
+.list-wipe-action:focus-visible { outline: 3px solid #ffe1a1; outline-offset: 4px; }
+.list-wipe-action[aria-disabled="true"] { cursor: default; }
 .list-ink { fill: #40382d; font-family: var(--font-serif); font-size: 45px; font-weight: 600; letter-spacing: .04em; }
 .list-title { font-size: 58px; letter-spacing: .12em; }
 .list-rule { fill: none; stroke: rgba(73,60,43,.58); stroke-width: 2; }

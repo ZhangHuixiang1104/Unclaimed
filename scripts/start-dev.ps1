@@ -1,7 +1,8 @@
 $ErrorActionPreference = 'Stop'
-$projectRoot = $PSScriptRoot
+$projectRoot = Split-Path -Parent $PSScriptRoot
 $healthUrl = 'http://127.0.0.1:8000/api/v1/health'
 $expectedSaveContract = 'independent-chapters-v6'
+$expectedIdentityContract = 'account-bound-v1'
 $backendProcess = $null
 
 function Get-ArchiveBackendHealth {
@@ -13,8 +14,8 @@ function Get-ArchiveBackendHealth {
 }
 
 $backendHealth = Get-ArchiveBackendHealth
-if ($backendHealth -and ($backendHealth.status -ne 'ok' -or $backendHealth.saveContract -ne $expectedSaveContract)) {
-  throw "Port 8000 has an incompatible archive service (found: $($backendHealth.saveContract); expected: $expectedSaveContract). Stop that backend process, then run start-dev.ps1 again."
+if ($backendHealth -and ($backendHealth.status -ne 'ok' -or $backendHealth.saveContract -ne $expectedSaveContract -or $backendHealth.identityContract -ne $expectedIdentityContract)) {
+  throw "Port 8000 has an incompatible archive service (save: $($backendHealth.saveContract); identity: $($backendHealth.identityContract)). Stop that backend process, then run start-dev.ps1 again."
 }
 
 if (-not $backendHealth) {
@@ -23,14 +24,14 @@ if (-not $backendHealth) {
   $backendReady = $false
   for ($attempt = 0; $attempt -lt 30; $attempt++) {
     $backendHealth = Get-ArchiveBackendHealth
-    if ($backendHealth -and $backendHealth.status -eq 'ok' -and $backendHealth.saveContract -eq $expectedSaveContract) { $backendReady = $true; break }
+    if ($backendHealth -and $backendHealth.status -eq 'ok' -and $backendHealth.saveContract -eq $expectedSaveContract -and $backendHealth.identityContract -eq $expectedIdentityContract) { $backendReady = $true; break }
     if ($backendProcess.HasExited) { break }
     Start-Sleep -Milliseconds 500
   }
   if (-not $backendReady) {
     if (-not $backendProcess.HasExited) { Stop-Process -Id $backendProcess.Id }
     if ($backendHealth) {
-      throw "Archive service returned an incompatible save contract (found: $($backendHealth.saveContract); expected: $expectedSaveContract)."
+      throw "Archive service returned incompatible contracts (save: $($backendHealth.saveContract); identity: $($backendHealth.identityContract))."
     }
     throw 'Archive service did not start. Run "python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000" in this directory to see the backend error.'
   }

@@ -48,7 +48,6 @@ const complete = computed(() => chapters.every((chapter) => record.value.foundCl
 .notebook-chapter em { display: block; margin-top: 9px; color: #e4b29e; font-size: 11px; font-style: normal; }
 .notebook-chapter.found { cursor: pointer; transition: transform .2s ease, border-color .2s ease; }
 .notebook-chapter.found:hover { transform: translateX(-4px); border-color: #b87861; }
-.notebook-chapter.waiting { opacity: .55; }
 .notebook-chapter.waiting strong { font-size: 14px; font-weight: 400; }
 .notebook-footer { padding: 18px 20px 22px; border-top: 1px solid rgba(198,178,143,.2); }
 .notebook-footer span { color: #d8c6ac; font-size: 11px; }
@@ -62,7 +61,6 @@ const complete = computed(() => chapters.every((chapter) => record.value.foundCl
 .notebook-chapters { gap: 0; padding: 4px 20px; }
 .notebook-chapter { min-height: 62px; padding: 8px 4px; border: 0; border-bottom: 1px solid rgba(198,178,143,.22); background: transparent; }
 .notebook-chapter strong { font: 650 15px/1.45 var(--font-sans); }
-.notebook-chapter.waiting { opacity: .72; }
 .notebook-chapter.waiting strong { font-size: 14px; }
 .notebook-chapter em { margin-top: 4px; font-size: 12px; }
 .notebook-chapter.found:hover { padding-left: 10px; border-bottom-color: #b87861; transform: none; }

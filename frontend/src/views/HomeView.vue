@@ -64,7 +64,6 @@ const selectArchive = (key: string) => {
 const enter = async () => {
   if (stage.value === 'opening' || stage.value === 'leaving') return
   const focusKey = selectedId.value ?? (hasProgress.value ? remainingObject.value.key : null)
-  if (focusKey) archive.chooseObject(focusKey)
   stage.value = 'opening'
   await new Promise<void>((resolve) => timers.push(window.setTimeout(resolve, 780)))
   stage.value = 'leaving'

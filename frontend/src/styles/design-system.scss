@@ -27,7 +27,6 @@ select:focus-visible {
 
 .primary-button,
 .secondary-button,
-.icon-button,
 .text-button { font-family: var(--font-sans); }
 
 .eyebrow {
@@ -65,11 +64,6 @@ select:focus-visible {
 :is(.shell-archive, .shell-object, .shell-history, .shell-history-detail, .shell-about) .main-nav a.router-link-active {
   color: #e0a499;
   border-color: var(--color-accent);
-}
-:is(.shell-archive, .shell-object, .shell-history, .shell-history-detail, .shell-about) .icon-button {
-  color: #b9bbb3;
-  border-color: rgba(216,204,175,.23);
-  font-size: 11px;
 }
 
 /* Opening scene */

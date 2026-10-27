@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ObservationControls from './ObservationControls.vue'
 import { inspectionRecord } from './inspectionRecord'
-import { computed, nextTick, onBeforeUnmount, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import type { ArchiveObject } from '../../types/archive'
 import { useArchiveStore } from '../../stores/archive'
 import ListArtifact from './ListArtifact.vue'
@@ -28,6 +28,24 @@ const artifactSide = ref<'front' | 'back'>('front')
 const markerMessage = ref(props.item.key === 'list' ? '先把散落的三片纸接回一页，看看这份记录究竟写到了哪里。' : '先选择观察工具，再在物件上标记可疑区域。')
 const listAssemblyCount = ref(0)
 const listCardOpen = ref(false)
+const listDialog = ref<HTMLElement | null>(null)
+let listReturnFocus: HTMLElement | SVGElement | null = null
+watch(listCardOpen, async (open) => {
+  if (open) listReturnFocus = document.activeElement as HTMLElement | SVGElement | null
+  await nextTick()
+  if (open) listDialog.value?.querySelector<HTMLButtonElement>('button')?.focus()
+  else if (listReturnFocus?.isConnected) listReturnFocus.focus()
+})
+const onListDialogKey = (event: KeyboardEvent) => {
+  if (event.key === 'Escape') { event.preventDefault(); listCardOpen.value = false }
+  if (event.key !== 'Tab') return
+  const buttons = listDialog.value?.querySelectorAll<HTMLButtonElement>('button')
+  if (!buttons?.length) return
+  const target = event.shiftKey ? buttons[buttons.length - 1] : buttons[0]
+  if (document.activeElement === (event.shiftKey ? buttons[0] : buttons[buttons.length - 1])) {
+    event.preventDefault(); target?.focus()
+  }
+}
 const panel = ref<HTMLElement | null>(null)
 const logs = ref<WorkLog[]>([])
 const rejectedCandidateIds = ref<string[]>([])
@@ -357,7 +375,7 @@ onBeforeUnmount(() => window.clearTimeout(scanTimer))
 
 
       <div v-if="item.key === 'list' && listCardOpen && activeClue && listClueCards[activeClue.id]" class="list-clue-card-overlay" @click.self="listCardOpen = false">
-        <article class="list-clue-card" role="dialog" aria-modal="true" :aria-label="`${listClueCards[activeClue.id].heading}故事卡`">
+        <article ref="listDialog" class="list-clue-card" role="dialog" aria-modal="true" :aria-label="`${listClueCards[activeClue.id].heading}故事卡`" @keydown="onListDialogKey">
           <div class="list-clue-card-heading"><span>名单故事 / 第 {{ listClueCards[activeClue.id].number }} 幕</span><button type="button" aria-label="关闭故事卡" @click="listCardOpen = false">×</button></div>
           <h3>{{ listClueCards[activeClue.id].heading }}</h3>
           <p class="list-card-scene">{{ listClueCards[activeClue.id].scene }}</p>

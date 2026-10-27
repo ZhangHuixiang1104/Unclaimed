@@ -1,7 +1,7 @@
 import { computed, nextTick, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { ApiError, cloudApi, type CloudSave } from '../services/cloud'
-import { clearPendingSave, readPendingSave, writePendingSave } from '../services/pendingSave'
+import { clearPendingSave, readPendingSave, writePendingSave, type PendingSave } from '../services/pendingSave'
 import { CONTENT_VERSION, type SavedProgress } from '../services/progress'
 import { useArchiveStore } from './archive'
 
@@ -21,12 +21,14 @@ export const useAccountStore = defineStore('account', () => {
   const cloudUpdatedAt = ref<number | null>(null)
   const pendingSafe = ref(true)
   const pendingUpload = ref(false)
+  const reauthUsername = ref<string | null>(null)
   const signedIn = computed(() => username.value !== null)
   let paused = false
   let saveTimer: ReturnType<typeof setTimeout> | null = null
   let saving = false
   let saveQueued = false
   let initialization: Promise<void> | null = null
+  let progressOwner: string | null = null
 
   const stopPendingSave = () => {
     if (saveTimer) clearTimeout(saveTimer)
@@ -58,20 +60,65 @@ export const useAccountStore = defineStore('account', () => {
   const sameProgress = (first: SavedProgress | null, second: SavedProgress) =>
     first !== null && comparableProgress(first) === comparableProgress(second)
 
-  const rememberProgress = (progress = archive.exportProgress(), baseRevision?: number, conflicted?: boolean) => {
-    if (!username.value) return
-    const previous = readPendingSave(username.value)
-    pendingSafe.value = writePendingSave({
+  const rememberProgress = (progress = archive.exportProgress(), baseRevision?: number, conflicted?: boolean,
+    previous = username.value ? readPendingSave(username.value, true) : null) => {
+    if (!username.value) return null
+    const pending = {
       username: username.value,
       baseRevision: baseRevision ?? previous?.baseRevision ?? revision.value,
       progress,
       updatedAt: Date.now(),
       conflicted: conflicted ?? previous?.conflicted ?? false,
-    })
+      ...(previous?.legacySnapshot ? { legacySnapshot: previous.legacySnapshot } : {}),
+      ...(previous?.recoveredFrom ? { recoveredFrom: previous.recoveredFrom } : {}),
+    }
+    pendingSafe.value = writePendingSave(pending)
     pendingUpload.value = true
+    return pending
+  }
+
+  const handleFailure = (cause: unknown, fallback: string) => {
+    if (cause instanceof ApiError && cause.status === 401) {
+      if (username.value && syncState.value !== 'upgrade') rememberProgress()
+      reauthUsername.value = username.value ?? progressOwner
+      username.value = null
+      cloudReady.value = false
+      stopPendingSave()
+      syncState.value = 'guest'
+      error.value = reauthUsername.value
+        ? '登录已过期或账号已切换，请重新登录。原账号进度已保留在当前页面。'
+        : cause.message
+    } else {
+      syncState.value = 'offline'
+      error.value = cause instanceof Error ? cause.message : fallback
+    }
+  }
+
+  const assertIdentity = (expectedUsername: string) => {
+    if (username.value !== expectedUsername) throw new ApiError('账号已切换，请重新登录。', 401)
+  }
+
+  const useIdentity = async (name: string) => {
+    if (progressOwner && progressOwner !== name) {
+      if (pendingUpload.value && !pendingSafe.value) {
+        throw new Error('原账号进度尚未成功暂存，请先登录原账号完成保存。')
+      }
+      paused = true
+      archive.reset()
+      await nextTick()
+      paused = false
+      revision.value = 0
+      cloudProgress.value = null
+      cloudUpdatedAt.value = null
+    }
+    username.value = name
+    progressOwner = name
+    reauthUsername.value = null
   }
 
   const applyCloud = async (save: CloudSave) => {
+    const expectedUsername = username.value
+    const pending = expectedUsername ? readPendingSave(expectedUsername) : null
     paused = true
     stopPendingSave()
     revision.value = save.revision
@@ -84,39 +131,48 @@ export const useAccountStore = defineStore('account', () => {
       return
     }
     if (save.progress) archive.replaceProgress(save.progress)
+    else archive.reset()
     await nextTick()
     paused = false
-    if (username.value) clearPendingSave(username.value)
+    if (expectedUsername) assertIdentity(expectedUsername)
+    const cleared = !pending || clearPendingSave(pending)
     pendingSafe.value = true
-    pendingUpload.value = false
+    pendingUpload.value = expectedUsername ? readPendingSave(expectedUsername) !== null : false
     cloudReady.value = true
     syncState.value = 'synced'
     error.value = ''
-    if (save.progress && !sameProgress(save.progress, archive.exportProgress())) scheduleSave()
+    if (cleared && pendingUpload.value) await reconcile()
+    else if (save.progress && !sameProgress(save.progress, archive.exportProgress())) scheduleSave()
   }
 
-  const upload = async (progress: SavedProgress) => {
-    rememberProgress(progress)
-    const save = await cloudApi.putSave(progress, revision.value)
+  const upload = async (progress: SavedProgress, previous?: PendingSave) => {
+    const expectedUsername = username.value
+    if (!expectedUsername) throw new ApiError('请重新登录。', 401)
+    const pending = rememberProgress(progress, undefined, undefined, previous)
+    const save = await cloudApi.putSave(progress, revision.value, expectedUsername)
+    assertIdentity(expectedUsername)
     revision.value = save.revision
     cloudProgress.value = save.progress
     cloudUpdatedAt.value = save.updatedAt
-    if (username.value) {
-      if (sameProgress(archive.exportProgress(), progress)) {
-        clearPendingSave(username.value)
-        pendingUpload.value = false
-        pendingSafe.value = true
-      } else {
-        rememberProgress(archive.exportProgress(), save.revision)
-      }
+    let cleared = false
+    if (sameProgress(archive.exportProgress(), progress)) {
+      cleared = !pending || clearPendingSave(pending)
+      pendingUpload.value = readPendingSave(expectedUsername) !== null
+      pendingSafe.value = true
+    } else {
+      rememberProgress(archive.exportProgress(), save.revision, false)
     }
     cloudReady.value = true
     syncState.value = 'synced'
     error.value = ''
+    if (cleared && pendingUpload.value) await reconcile()
   }
 
   const reconcile = async () => {
-    const remote = await cloudApi.getSave()
+    const expectedUsername = username.value
+    if (!expectedUsername) throw new ApiError('请重新登录。', 401)
+    const remote = await cloudApi.getSave(expectedUsername)
+    assertIdentity(expectedUsername)
     const local = archive.exportProgress()
     const pending = username.value ? readPendingSave(username.value) : null
     pendingUpload.value = pending !== null
@@ -130,7 +186,8 @@ export const useAccountStore = defineStore('account', () => {
       return
     }
     if (pending) {
-      const current = hasPlayProgress(local) && !sameProgress(local, pending.progress) ? local : pending.progress
+      const current = hasPlayProgress(local) && (!pending.recoveredFrom || !pendingSafe.value)
+        ? local : pending.progress
       if (isOlderEdition(current)) {
         syncState.value = 'upgrade'
         error.value = '本机暂存的是旧版进度，尚未覆盖云端。'
@@ -144,9 +201,9 @@ export const useAccountStore = defineStore('account', () => {
       if (sameProgress(remote.progress, migrated)) {
         await applyCloud(remote)
       } else if (!pending.conflicted && remote.revision === pending.baseRevision) {
-        await upload(migrated)
+        await upload(migrated, pending)
       } else {
-        rememberProgress(migrated, pending.baseRevision, true)
+        rememberProgress(migrated, pending.baseRevision, true, pending)
         syncState.value = 'conflict'
         error.value = '云端与本机都有更新，尚未覆盖任一份进度。'
       }
@@ -173,17 +230,11 @@ export const useAccountStore = defineStore('account', () => {
     try {
       await cloudApi.checkCompatibility()
       const me = await cloudApi.me()
-      username.value = me.username
+      await useIdentity(me.username)
       await reconcile()
     } catch (cause) {
-      if (cause instanceof ApiError && cause.status === 401) {
-        username.value = null
-        syncState.value = 'guest'
-      } else {
-        syncState.value = 'offline'
-        error.value = cause instanceof Error ? cause.message : '存档服务暂时不可用。'
-        if (username.value && hasPlayProgress(archive.exportProgress())) rememberProgress()
-      }
+      if (username.value && hasPlayProgress(archive.exportProgress())) rememberProgress()
+      handleFailure(cause, '存档服务暂时不可用。')
     } finally {
       ready.value = true
       initialization = null
@@ -200,20 +251,25 @@ export const useAccountStore = defineStore('account', () => {
     try {
       await cloudApi.checkCompatibility()
       const result = await cloudApi[mode](name, password)
-      username.value = result.username
+      await useIdentity(result.username)
       await reconcile()
       return true
     } catch (cause) {
       if (username.value && hasPlayProgress(archive.exportProgress())) rememberProgress()
-      error.value = cause instanceof Error ? cause.message : '登录失败。'
-      syncState.value = username.value ? 'offline' : 'guest'
+      handleFailure(cause, '登录失败。')
+      if (!username.value) syncState.value = 'guest'
       return false
     }
   }
 
   const chooseCloud = async () => {
-    if (!cloudProgress.value) return
-    await applyCloud({ progress: cloudProgress.value, revision: revision.value, updatedAt: cloudUpdatedAt.value })
+    if (!username.value) return
+    const expectedUsername = username.value
+    try {
+      const remote = await cloudApi.getSave(expectedUsername)
+      assertIdentity(expectedUsername)
+      await applyCloud(remote)
+    } catch (cause) { handleFailure(cause, '读取云端存档失败。') }
   }
 
   const chooseCurrent = async () => {
@@ -222,10 +278,9 @@ export const useAccountStore = defineStore('account', () => {
       await upload(archive.exportProgress())
     } catch (cause) {
       if (cause instanceof ApiError && cause.status === 409) {
-        await reconcile()
+        try { await reconcile() } catch (failure) { handleFailure(failure, '保存失败。') }
       } else {
-        syncState.value = 'offline'
-        error.value = cause instanceof Error ? cause.message : '保存失败。'
+        handleFailure(cause, '保存失败。')
       }
     }
   }
@@ -242,14 +297,15 @@ export const useAccountStore = defineStore('account', () => {
       return true
     } catch (cause) {
       paused = false
-      syncState.value = 'upgrade'
-      error.value = cause instanceof Error ? cause.message : '新版存档创建失败，旧版仍在云端。'
+      handleFailure(cause, '新版存档创建失败，旧版仍在云端。')
+      if (username.value) syncState.value = 'upgrade'
       return false
     }
   }
 
   const flushSave = async () => {
     if (!username.value || paused || syncState.value === 'conflict' || syncState.value === 'upgrade') return
+    if (readPendingSave(username.value, true)?.conflicted) { syncState.value = 'conflict'; return }
     if (saving) { saveQueued = true; return }
     saving = true
     syncState.value = 'saving'
@@ -259,10 +315,9 @@ export const useAccountStore = defineStore('account', () => {
       await upload(snapshot)
     } catch (cause) {
       if (cause instanceof ApiError && cause.status === 409) {
-        try { await reconcile() } catch { syncState.value = 'offline' }
+        try { await reconcile() } catch (failure) { handleFailure(failure, '自动保存失败。') }
       } else {
-        syncState.value = 'offline'
-        error.value = cause instanceof Error ? cause.message : '自动保存失败。'
+        handleFailure(cause, '自动保存失败。')
       }
     } finally {
       saving = false
@@ -274,8 +329,13 @@ export const useAccountStore = defineStore('account', () => {
   }
 
   const scheduleSave = () => {
-    if (!username.value || paused || syncState.value === 'conflict' || syncState.value === 'upgrade') return
-    rememberProgress()
+    if (!username.value || paused || syncState.value === 'upgrade') return
+    const pending = rememberProgress()
+    if (syncState.value === 'conflict' || pending?.conflicted) {
+      syncState.value = 'conflict'
+      stopPendingSave()
+      return
+    }
     if (syncState.value !== 'offline') syncState.value = 'saving'
     if (saveTimer) clearTimeout(saveTimer)
     saveTimer = setTimeout(() => { saveTimer = null; void flushSave() }, 700)
@@ -295,8 +355,7 @@ export const useAccountStore = defineStore('account', () => {
     try { await cloudApi.checkCompatibility(); await reconcile() }
     catch (cause) {
       if (hasPlayProgress(archive.exportProgress())) rememberProgress()
-      syncState.value = 'offline'
-      error.value = cause instanceof Error ? cause.message : '连接失败。'
+      handleFailure(cause, '连接失败。')
     }
   }
 
@@ -319,7 +378,8 @@ export const useAccountStore = defineStore('account', () => {
   }
 
   const logout = async () => {
-    if (syncState.value !== 'synced' || (username.value && readPendingSave(username.value))) {
+    const leaveOldEdition = syncState.value === 'upgrade' && !pendingUpload.value
+    if ((!leaveOldEdition && syncState.value !== 'synced') || (username.value && readPendingSave(username.value))) {
       throw new Error('当前进度尚未保存。请先重新连接存档服务，确认保存后再退出。')
     }
     stopPendingSave()
@@ -333,9 +393,9 @@ export const useAccountStore = defineStore('account', () => {
     pendingUpload.value = false
     syncState.value = 'guest'
     error.value = ''
-    archive.reset()
+    if (!leaveOldEdition) archive.reset()
   }
 
-  return { username, ready, signedIn, cloudReady, syncState, error, revision, cloudProgress, cloudUpdatedAt, pendingSafe, pendingUpload,
+  return { username, ready, signedIn, cloudReady, syncState, error, revision, cloudProgress, cloudUpdatedAt, pendingSafe, pendingUpload, reauthUsername,
     initialize, authenticate, chooseCloud, chooseCurrent, startNewEdition, retry, saveNow, logout }
 })

@@ -69,8 +69,7 @@ h1, h2, h3, blockquote { font-family: var(--font-display); }
 .main-nav a.router-link-active { color: var(--red-dark); border-color: var(--red-dark); }
 .topbar-actions { justify-self: end; display: flex; align-items: center; gap: 14px; }
 .keeper-id { font-size: 11px; color: var(--muted); }
-.icon-button, .text-button { border: 0; background: transparent; color: inherit; }
-.icon-button { border: 1px solid var(--line); padding: 7px 10px; font-size: 11px; }
+.text-button { border: 0; background: transparent; color: inherit; }
 .shell-main { width: min(1440px, 100%); margin: 0 auto; padding: 48px 4vw 88px; }
 .eyebrow { display: block; margin-bottom: 9px; color: var(--red-dark); font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; }
 .eyebrow.light { color: #d9a89d; }
